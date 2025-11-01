@@ -45,7 +45,7 @@ This script will:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ChehAchraf/OptimaCv.git
 cd rs
 ```
 
@@ -254,11 +254,11 @@ npm install
 
 ## 📄 License
 
-[Add your license here]
+Akhouya hada dyalna thzo tmchi l7abs
 
 ## 🤝 Contributing
 
-[Add contribution guidelines here]
+Respect the archeticture layhfdk 
 
 ## 📞 Support
 
