@@ -137,6 +137,7 @@ Create a `.env` file in the root directory with the following:
 
 ```env
 GOOGLE_API_KEY=your_google_gemini_api_key
+
 ```
 
 **How to get a Google Gemini API Key:**
