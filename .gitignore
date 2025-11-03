@@ -83,7 +83,7 @@ cython_debug/
 
 # Project specific
 check_models.py
-main.py
+
 
 # Node.js / Frontend
 node_modules/
