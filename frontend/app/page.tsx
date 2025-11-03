@@ -1,7 +1,10 @@
 'use client'; 
 
 import { useState } from 'react';
-import HeroSection from '@/components/HeroSection'; 
+import HeroSection from '@/components/HeroSection';
+import ProcessSection from '@/components/ProcessSection';
+import TrustSection from '@/components/TrustSection';
+import CompanySection from '@/components/CompanySection';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'; 
 import { Textarea } from '@/components/ui/textarea';
@@ -114,6 +117,12 @@ export default function Home() {
   return (
     <>
       <HeroSection />
+      
+      <ProcessSection />
+
+      <TrustSection />
+
+      <CompanySection />
 
       <section id="analyze" className="py-20 lg:py-32 bg-gray-50 dark:bg-black">
         <div className="container max-w-4xl mx-auto px-4">
