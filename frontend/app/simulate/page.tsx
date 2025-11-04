@@ -81,16 +81,17 @@ export default function SimulatePage() {
     const resetSilenceTimer = () => {
       if (silenceTimerRef.current) window.clearTimeout(silenceTimerRef.current);
       silenceTimerRef.current = window.setTimeout(() => {
-        // If no new results for 1500ms, consider the answer done -> ask next question
-        if (wsRef.current) {
+        // If no new results for 4000ms (4 seconds), consider the answer done -> ask next question
+        // This gives users enough time to think and continue speaking
+        if (wsRef.current && !finishingRef.current) {
           wsRef.current.send(JSON.stringify({ type: 'control', action: 'next' }));
         }
-        // if no next question arrives within 3s, force finish
+        // if no next question arrives within 5s, force finish (only if we're not already finishing)
         if (nextAwaitTimerRef.current) window.clearTimeout(nextAwaitTimerRef.current);
         nextAwaitTimerRef.current = window.setTimeout(() => {
           if (!finishingRef.current) { finishingRef.current = true; finish(); }
-        }, 3000);
-      }, 1500);
+        }, 5000);
+      }, 4000); // Increased from 1500ms to 4000ms (4 seconds)
     };
 
     rec.onresult = (e: any) => {
@@ -99,8 +100,14 @@ export default function SimulatePage() {
         const text = res[0].transcript.trim();
         if (text) {
           lastResultAtRef.current = Date.now();
+          // Cancel silence timer if we're still getting results (user is still speaking)
+          if (silenceTimerRef.current) {
+            window.clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = null;
+          }
           if (res.isFinal) {
             if (wsRef.current) wsRef.current.send(JSON.stringify({ type: 'transcript', text, timestamp_ms: Date.now() }));
+            // Only start silence timer after final result - gives user time to continue or finish
             resetSilenceTimer();
           }
         }
@@ -123,18 +130,33 @@ export default function SimulatePage() {
       if (msg.type === 'question') {
         setCurrentQuestion(msg.text);
         speak(msg.text);
-        // reset per-question hard timeout (20s)
+        // Cancel any existing silence timer when a new question arrives
+        if (silenceTimerRef.current) {
+          window.clearTimeout(silenceTimerRef.current);
+          silenceTimerRef.current = null;
+        }
+        // reset per-question hard timeout (45s) - gives more time for longer answers
         if (questionTimerRef.current) window.clearTimeout(questionTimerRef.current);
         questionTimerRef.current = window.setTimeout(() => {
           if (wsRef.current && !finishingRef.current) {
             wsRef.current.send(JSON.stringify({ type: 'control', action: 'next' }));
           }
-        }, 20000);
+        }, 45000); // Increased from 20s to 45s
         // cancel awaiting-next timer since we got it
         if (nextAwaitTimerRef.current) { window.clearTimeout(nextAwaitTimerRef.current); nextAwaitTimerRef.current = null; }
       }
       if (msg.type === 'info' && msg.text === 'done') {
-        if (!finishingRef.current) { finishingRef.current = true; finish(); }
+        // Only finish if we're not already processing - ensures last question is answered
+        // Give user a moment to finish their last answer before finishing
+        if (!finishingRef.current && !processing) {
+          // Wait a bit before finishing to ensure last answer is captured
+          setTimeout(() => {
+            if (!finishingRef.current) {
+              finishingRef.current = true;
+              finish();
+            }
+          }, 2000);
+        }
       }
     };
     ws.onclose = () => {
