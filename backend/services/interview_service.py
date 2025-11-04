@@ -11,15 +11,15 @@ class InterviewService:
     async def create_session(self, session_id: str, cv_pdf_bytes: bytes, job_description: str) -> List[str]:
         cv_text = pdf_service.parse_text(cv_pdf_bytes)
         seed_prompt = f"""
-        You are an experienced HR interviewer (non-technical).
-        Generate exactly THREE concise behavioral questions (no coding, no project deep-dives).
-        Focus on soft skills, teamwork, conflict resolution, motivation, communication, time management,
-        alignment with the role, and growth mindset.
+        Tu es un recruteur RH (non technique). Produis exactement TROIS questions comportementales concises en FRANÇAIS.
+        Aucune question technique et pas d'approfondissement de projets spécifiques.
+        Concentre-toi sur les soft skills, le travail d'équipe, la gestion de conflit, la motivation, la communication,
+        la gestion du temps, l'alignement avec le rôle et l'état d'esprit de progression.
 
-        Return ONLY this JSON:
+        Renvoie UNIQUEMENT ce JSON:
         {{ "questions": ["Q1", "Q2", "Q3"] }}
 
-        Context (for personalization, don't ask about specific projects):
+        Contexte (pour personnaliser sans citer de projet précis):
         CV:
         ---
         {cv_text}
@@ -37,9 +37,9 @@ class InterviewService:
             initial = (data.get("questions", []) or [])[:3]
         except Exception:
             initial = [
-                "Tell me about a time you handled a conflict within a team and what you learned.",
-                "What motivates you in a role like this, and how do you stay motivated during challenges?",
-                "Describe how you structure your time when priorities compete and deadlines are tight."
+                "Parle-moi d’un conflit que tu as géré au sein d’une équipe et ce que tu en as retenu.",
+                "Qu’est-ce qui te motive dans ce poste et comment gardes-tu cette motivation face aux difficultés ?",
+                "Comment organises-tu ton temps quand plusieurs priorités et délais entrent en conflit ?"
             ]
 
         self.sessions[session_id] = {

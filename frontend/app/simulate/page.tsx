@@ -22,6 +22,7 @@ export default function SimulatePage() {
   const [currentQuestion, setCurrentQuestion] = useState<string>('');
   const [report, setReport] = useState<Report | null>(null);
   const [running, setRunning] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -34,6 +35,7 @@ export default function SimulatePage() {
 
   const speak = (text: string) => {
     const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'fr-FR';
     try { speechSynthesis.cancel(); } catch {}
     speechSynthesis.speak(u);
   };
@@ -70,7 +72,7 @@ export default function SimulatePage() {
     const rec = new SR();
     rec.continuous = true;
     rec.interimResults = true;
-    rec.lang = 'en-US';
+    rec.lang = 'fr-FR';
 
     const resetSilenceTimer = () => {
       if (silenceTimerRef.current) window.clearTimeout(silenceTimerRef.current);
@@ -145,6 +147,7 @@ export default function SimulatePage() {
 
   const finish = async () => {
     setRunning(false);
+    setProcessing(true);
     if (silenceTimerRef.current) { window.clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
     try { wsRef.current?.send(JSON.stringify({ type: 'control', action: 'finish' })); } catch {}
     try { wsRef.current?.close(); } catch {}
@@ -154,10 +157,11 @@ export default function SimulatePage() {
     stopRecording();
     if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
 
-    if (!sessionId) return;
+    if (!sessionId) { setProcessing(false); return; }
     const r = await fetch(`http://localhost:8000/api/v1/interview/session/${sessionId}/finalize`, { method: 'POST' });
     const data = await r.json();
     setReport(data);
+    setProcessing(false);
   };
 
   useEffect(() => {
@@ -174,58 +178,66 @@ export default function SimulatePage() {
     <div className="container max-w-4xl mx-auto px-4 py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Interview Simulation (HR, 3 questions)</CardTitle>
+          <CardTitle>Simulation d’entretien (RH, 3 questions)</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {!sessionId && !running && !report && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Upload CV (PDF)</Label>
+                <Label>Téléchargez votre CV (PDF)</Label>
                 <Input type="file" accept="application/pdf" onChange={(e) => setCvFile(e.target.files?.[0] || null)} />
               </div>
               <div className="space-y-2">
-                <Label>Job Description</Label>
+                <Label>Description de poste</Label>
                 <Textarea rows={8} value={jd} onChange={(e) => setJd(e.target.value)} />
               </div>
-              <Button onClick={startAll} disabled={!cvFile || !jd}>Start</Button>
+              <Button onClick={startAll} disabled={!cvFile || !jd}>Démarrer</Button>
             </div>
           )}
 
-          {(sessionId || running) && !report && (
+          {(sessionId || running) && !report && !processing && (
             <div className="space-y-4">
               <video ref={videoRef} className="w-full max-h-80 rounded bg-black" muted playsInline />
               <div className="p-4 rounded border">
-                <div className="font-semibold mb-2">Current Question</div>
-                <div>{currentQuestion || 'Waiting for the interviewer...'}</div>
+                <div className="font-semibold mb-2">Question en cours</div>
+                <div>{currentQuestion || "En attente de l'intervieweur..."}</div>
               </div>
+            </div>
+          )}
+
+          {processing && !report && (
+            <div className="space-y-4 p-6 border rounded text-center">
+              <div className="text-xl font-semibold">Traitement de votre simulation…</div>
+              <div className="text-sm text-muted-foreground">Analyse des réponses et génération du rapport.</div>
+              <div className="animate-pulse mt-4">Chargement…</div>
             </div>
           )}
 
           {report && (
             <div className="space-y-4">
-              <div className="text-lg font-semibold">Overall: {report.scores.overall}/10</div>
+              <div className="text-lg font-semibold">Score global : {report.scores.overall}/10</div>
               <div className="grid grid-cols-2 gap-2">
-                <div>Content: {report.scores.content}/10</div>
-                <div>Structure: {report.scores.structure}/10</div>
-                <div>Clarity: {report.scores.clarity}/10</div>
-                <div>Confidence: {report.scores.confidence}/10</div>
-                <div>Stress: {report.scores.stress}/10</div>
-                <div>Body language: {report.scores.body_language}/10</div>
+                <div>Contenu : {report.scores.content}/10</div>
+                <div>Structure : {report.scores.structure}/10</div>
+                <div>Clarté : {report.scores.clarity}/10</div>
+                <div>Confiance : {report.scores.confidence}/10</div>
+                <div>Stress : {report.scores.stress}/10</div>
+                <div>Langage corporel : {report.scores.body_language}/10</div>
               </div>
               <div className="space-y-1">
-                <div className="font-semibold">Summary</div>
+                <div className="font-semibold">Résumé</div>
                 <div className="text-sm">{report.summary}</div>
               </div>
               <div>
-                <div className="font-semibold">Strengths</div>
+                <div className="font-semibold">Points forts</div>
                 <ul className="list-disc list-inside">{report.strengths.map((s, i) => <li key={i}>{s}</li>)}</ul>
               </div>
               <div>
-                <div className="font-semibold">Weaknesses</div>
+                <div className="font-semibold">Points faibles</div>
                 <ul className="list-disc list-inside">{report.weaknesses.map((s, i) => <li key={i}>{s}</li>)}</ul>
               </div>
               <div>
-                <div className="font-semibold">Recommendations</div>
+                <div className="font-semibold">Recommandations</div>
                 <ul className="list-disc list-inside">{report.recommendations.map((s, i) => <li key={i}>{s}</li>)}</ul>
               </div>
             </div>
