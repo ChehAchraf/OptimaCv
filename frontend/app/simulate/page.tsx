@@ -32,6 +32,10 @@ export default function SimulatePage() {
   const recRef = useRef<any>(null);
   const silenceTimerRef = useRef<number | null>(null);
   const lastResultAtRef = useRef<number>(0);
+  const finishingRef = useRef<boolean>(false);
+  const questionTimerRef = useRef<number | null>(null);       // hard timeout per question
+  const nextAwaitTimerRef = useRef<number | null>(null);      // wait for next question before forcing finish
+  const sessionIdRef = useRef<string | null>(null);
 
   const speak = (text: string) => {
     const u = new SpeechSynthesisUtterance(text);
@@ -57,8 +61,8 @@ export default function SimulatePage() {
     mr.onstop = async () => {
       const blob = new Blob(chunksRef.current, { type: 'video/webm' });
       // optional upload:
-      // if (sessionId) { const fd = new FormData(); fd.append('file', blob, 'interview.webm');
-      // await fetch(`http://localhost:8000/api/v1/interview/session/${sessionId}/media`, { method: 'POST', body: fd }); }
+      if (sessionId) { const fd = new FormData(); fd.append('file', blob, 'interview.webm');
+      await fetch(`http://localhost:8000/api/v1/interview/session/${sessionId}/media`, { method: 'POST', body: fd }); }
     };
     mr.start(1000);
     recorderRef.current = mr;
@@ -81,6 +85,11 @@ export default function SimulatePage() {
         if (wsRef.current) {
           wsRef.current.send(JSON.stringify({ type: 'control', action: 'next' }));
         }
+        // if no next question arrives within 3s, force finish
+        if (nextAwaitTimerRef.current) window.clearTimeout(nextAwaitTimerRef.current);
+        nextAwaitTimerRef.current = window.setTimeout(() => {
+          if (!finishingRef.current) { finishingRef.current = true; finish(); }
+        }, 3000);
       }, 1500);
     };
 
@@ -114,9 +123,31 @@ export default function SimulatePage() {
       if (msg.type === 'question') {
         setCurrentQuestion(msg.text);
         speak(msg.text);
+        // reset per-question hard timeout (20s)
+        if (questionTimerRef.current) window.clearTimeout(questionTimerRef.current);
+        questionTimerRef.current = window.setTimeout(() => {
+          if (wsRef.current && !finishingRef.current) {
+            wsRef.current.send(JSON.stringify({ type: 'control', action: 'next' }));
+          }
+        }, 20000);
+        // cancel awaiting-next timer since we got it
+        if (nextAwaitTimerRef.current) { window.clearTimeout(nextAwaitTimerRef.current); nextAwaitTimerRef.current = null; }
       }
       if (msg.type === 'info' && msg.text === 'done') {
-        finish(); // auto-finish when server says done (after 3 questions)
+        if (!finishingRef.current) { finishingRef.current = true; finish(); }
+      }
+    };
+    ws.onclose = () => {
+      // Fallback: ensure finalize even if no 'done' info was received
+      if (!finishingRef.current) {
+        finishingRef.current = true;
+        finish();
+      }
+    };
+    ws.onerror = () => {
+      if (!finishingRef.current) {
+        finishingRef.current = true;
+        finish();
       }
     };
     wsRef.current = ws;
@@ -137,6 +168,7 @@ export default function SimulatePage() {
     }
     const data = await r.json();
     setSessionId(data.session_id);
+    sessionIdRef.current = data.session_id;
 
     // 2) Camera+Mic, 3) WS, 4) ASR, 5) Recording
     await startCamera();
@@ -148,7 +180,10 @@ export default function SimulatePage() {
   const finish = async () => {
     setRunning(false);
     setProcessing(true);
+    finishingRef.current = true;
     if (silenceTimerRef.current) { window.clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
+    if (questionTimerRef.current) { window.clearTimeout(questionTimerRef.current); questionTimerRef.current = null; }
+    if (nextAwaitTimerRef.current) { window.clearTimeout(nextAwaitTimerRef.current); nextAwaitTimerRef.current = null; }
     try { wsRef.current?.send(JSON.stringify({ type: 'control', action: 'finish' })); } catch {}
     try { wsRef.current?.close(); } catch {}
     wsRef.current = null;
@@ -157,8 +192,9 @@ export default function SimulatePage() {
     stopRecording();
     if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
 
-    if (!sessionId) { setProcessing(false); return; }
-    const r = await fetch(`http://localhost:8000/api/v1/interview/session/${sessionId}/finalize`, { method: 'POST' });
+    const sid = sessionIdRef.current || sessionId;
+    if (!sid) { setProcessing(false); return; }
+    const r = await fetch(`http://localhost:8000/api/v1/interview/session/${sid}/finalize`, { method: 'POST' });
     const data = await r.json();
     setReport(data);
     setProcessing(false);
@@ -171,6 +207,8 @@ export default function SimulatePage() {
       stopRecording();
       if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
       if (silenceTimerRef.current) { window.clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
+      if (questionTimerRef.current) { window.clearTimeout(questionTimerRef.current); questionTimerRef.current = null; }
+      if (nextAwaitTimerRef.current) { window.clearTimeout(nextAwaitTimerRef.current); nextAwaitTimerRef.current = null; }
     };
   }, []);
 

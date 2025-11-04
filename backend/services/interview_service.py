@@ -11,13 +11,13 @@ class InterviewService:
     async def create_session(self, session_id: str, cv_pdf_bytes: bytes, job_description: str) -> List[str]:
         cv_text = pdf_service.parse_text(cv_pdf_bytes)
         seed_prompt = f"""
-        Tu es un recruteur RH (non technique). Produis exactement TROIS questions comportementales concises en FRANÇAIS.
+        Tu es un recruteur RH (non technique). Produis exactement DEUX questions comportementales concises en FRANÇAIS.
         Aucune question technique et pas d'approfondissement de projets spécifiques.
         Concentre-toi sur les soft skills, le travail d'équipe, la gestion de conflit, la motivation, la communication,
         la gestion du temps, l'alignement avec le rôle et l'état d'esprit de progression.
 
         Renvoie UNIQUEMENT ce JSON:
-        {{ "questions": ["Q1", "Q2", "Q3"] }}
+        {{ "questions": ["Q1", "Q2"] }}
 
         Contexte (pour personnaliser sans citer de projet précis):
         CV:
@@ -34,22 +34,20 @@ class InterviewService:
         initial: List[str] = []
         try:
             data = loads(gemini_service._clean_json_response(resp.text))
-            initial = (data.get("questions", []) or [])[:3]
+            initial = (data.get("questions", []) or [])[:2]   # <- 2 max
         except Exception:
             initial = [
                 "Parle-moi d’un conflit que tu as géré au sein d’une équipe et ce que tu en as retenu.",
                 "Qu’est-ce qui te motive dans ce poste et comment gardes-tu cette motivation face aux difficultés ?",
-                "Comment organises-tu ton temps quand plusieurs priorités et délais entrent en conflit ?"
             ]
-
         self.sessions[session_id] = {
             "cv_text": cv_text,
             "jd_text": job_description,
-            "history": [],           # list of {role, text}
-            "asked": initial[:],     # fixed set of 3 HR questions
-            "q_index": 0,            # next question index to send
-            "transcript": [],        # list of {text, ts}
-            "metrics": []            # list of metrics snapshots
+            "history": [],
+            "asked": initial[:],     # now 2 questions
+            "q_index": 0,
+            "transcript": [],
+            "metrics": []
         }
         return initial
 
