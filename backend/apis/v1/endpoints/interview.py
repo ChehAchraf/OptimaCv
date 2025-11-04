@@ -22,9 +22,13 @@ async def interview_ws(websocket: WebSocket, session_id: str):
         await websocket.send_text(json.dumps({"type": "info", "text": "Invalid session."}))
         await websocket.close()
         return
-    # send first question if any
-    for q in (s["asked"][:1] or ["Tell me about yourself."]):
+
+    # Send first question
+    if s["asked"]:
+        q = s["asked"][s["q_index"]]
         await websocket.send_text(json.dumps({"type": "question", "text": q}))
+    else:
+        await websocket.send_text(json.dumps({"type": "info", "text": "No questions available."}))
 
     try:
         while True:
@@ -37,13 +41,20 @@ async def interview_ws(websocket: WebSocket, session_id: str):
             if msg.type == "transcript" and msg.text:
                 s["transcript"].append({"text": msg.text, "ts": msg.timestamp_ms or 0})
                 s["history"].append({"role": "candidate", "text": msg.text})
-                # After each answer, ask a follow-up
-                question = await interview_service.next_question(session_id)
-                s["history"].append({"role": "interviewer", "text": question})
-                await websocket.send_text(json.dumps({"type": "question", "text": question, "followup": True}))
 
             elif msg.type == "metrics" and msg.payload:
                 s["metrics"].append(msg.payload)
+
+            elif msg.type == "control" and msg.action in {"next"}:
+                # advance to next question
+                s["q_index"] += 1
+                if s["q_index"] >= len(s["asked"]):
+                    await websocket.send_text(json.dumps({"type": "info", "text": "done"}))
+                    await websocket.close()
+                    break
+                q = s["asked"][s["q_index"]]
+                s["history"].append({"role": "interviewer", "text": q})
+                await websocket.send_text(json.dumps({"type": "question", "text": q}))
 
             elif msg.type == "control" and msg.action in {"finish"}:
                 await websocket.send_text(json.dumps({"type": "info", "text": "Finishing..."}))
@@ -58,3 +69,11 @@ async def finalize_interview(session_id: str):
     if not data:
         raise HTTPException(status_code=404, detail="Session not found.")
     return data
+@router.post("/session/{session_id}/media", tags=["Interview Simulation"])
+async def upload_media(session_id: str, file: UploadFile = File(...)):
+    if session_id not in interview_service.sessions:
+        raise HTTPException(status_code=404, detail="Session not found.")
+    # Save to disk or cloud as needed (MVP: discard or save to /tmp)
+    data = await file.read()
+    # with open(f"/tmp/{session_id}.webm", "wb") as f: f.write(data)
+    return {"ok": True, "filename": file.filename, "size": len(data)}

@@ -19,83 +19,141 @@ export default function SimulatePage() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [jd, setJd] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<string[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<string>('');
   const [report, setReport] = useState<Report | null>(null);
-  const [listening, setListening] = useState(false);
+  const [running, setRunning] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
   const recRef = useRef<any>(null);
+  const silenceTimerRef = useRef<number | null>(null);
+  const lastResultAtRef = useRef<number>(0);
 
   const speak = (text: string) => {
     const u = new SpeechSynthesisUtterance(text);
-    speechSynthesis.cancel();
+    try { speechSynthesis.cancel(); } catch {}
     speechSynthesis.speak(u);
   };
 
-  const startRecognition = () => {
+  const startCamera = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    streamRef.current = stream;
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+      await videoRef.current.play();
+    }
+  };
+
+  const startRecording = () => {
+    if (!streamRef.current) return;
+    chunksRef.current = [];
+    const mr = new MediaRecorder(streamRef.current, { mimeType: 'video/webm;codecs=vp9,opus' });
+    mr.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunksRef.current.push(e.data); };
+    mr.onstop = async () => {
+      const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+      // optional upload:
+      // if (sessionId) { const fd = new FormData(); fd.append('file', blob, 'interview.webm');
+      // await fetch(`http://localhost:8000/api/v1/interview/session/${sessionId}/media`, { method: 'POST', body: fd }); }
+    };
+    mr.start(1000);
+    recorderRef.current = mr;
+  };
+
+  const stopRecording = () => { try { recorderRef.current?.stop(); } catch {} };
+
+  const startASR = () => {
     const SR: any = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     if (!SR) return;
     const rec = new SR();
     rec.continuous = true;
     rec.interimResults = true;
     rec.lang = 'en-US';
+
+    const resetSilenceTimer = () => {
+      if (silenceTimerRef.current) window.clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = window.setTimeout(() => {
+        // If no new results for 1500ms, consider the answer done -> ask next question
+        if (wsRef.current) {
+          wsRef.current.send(JSON.stringify({ type: 'control', action: 'next' }));
+        }
+      }, 1500);
+    };
+
     rec.onresult = (e: any) => {
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const res = e.results[i];
-        if (res.isFinal) {
-          const text = res[0].transcript.trim();
-          if (wsRef.current) {
-            wsRef.current.send(JSON.stringify({ type: 'transcript', text, timestamp_ms: Date.now() }));
+        const text = res[0].transcript.trim();
+        if (text) {
+          lastResultAtRef.current = Date.now();
+          if (res.isFinal) {
+            if (wsRef.current) wsRef.current.send(JSON.stringify({ type: 'transcript', text, timestamp_ms: Date.now() }));
+            resetSilenceTimer();
           }
         }
       }
     };
-    rec.onend = () => setListening(false);
+    rec.onend = () => {
+      // auto-restart for robustness while running
+      if (running) startASR();
+    };
     rec.start();
     recRef.current = rec;
-    setListening(true);
   };
 
-  const stopRecognition = () => {
-    try { recRef.current?.stop(); } catch {}
-    setListening(false);
-  };
+  const stopASR = () => { try { recRef.current?.stop(); } catch {} };
 
-  const createSession = async () => {
-    if (!cvFile || !jd) return;
-    const fd = new FormData();
-    fd.append('cv_pdf', cvFile);
-    fd.append('job_description', jd);
-    const r = await fetch('http://localhost:8000/api/v1/interview/session/create', { method: 'POST', body: fd });
-    const data = await r.json();
-    setSessionId(data.session_id);
-    setQuestions(data.initial_questions || []);
-    setCurrentQuestion((data.initial_questions && data.initial_questions[0]) || '');
-  };
-
-  const connectWS = () => {
-    if (!sessionId) return;
-    const ws = new WebSocket(`ws://localhost:8000/api/v1/interview/session/${sessionId}/ws`);
+  const connectWS = (id: string) => {
+    const ws = new WebSocket(`ws://localhost:8000/api/v1/interview/session/${id}/ws`);
     ws.onmessage = (ev) => {
       const msg = JSON.parse(ev.data);
       if (msg.type === 'question') {
         setCurrentQuestion(msg.text);
         speak(msg.text);
       }
-    };
-    ws.onopen = () => {
-      // Send initial metrics snapshot (optional)
-      ws.send(JSON.stringify({ type: 'metrics', payload: { wpm: 0 } }));
+      if (msg.type === 'info' && msg.text === 'done') {
+        finish(); // auto-finish when server says done (after 3 questions)
+      }
     };
     wsRef.current = ws;
   };
 
-  const finish = async () => {
-    if (wsRef.current) {
-      wsRef.current.send(JSON.stringify({ type: 'control', action: 'finish' }));
-      wsRef.current.close();
+  const startAll = async () => {
+    if (!cvFile || !jd || running) return;
+    setRunning(true);
+    // 1) Create session
+    const fd = new FormData();
+    fd.append('cv_pdf', cvFile);
+    fd.append('job_description', jd);
+    const r = await fetch('http://localhost:8000/api/v1/interview/session/create', { method: 'POST', body: fd });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      setRunning(false);
+      throw new Error(err.detail || 'Failed to create session');
     }
-    stopRecognition();
+    const data = await r.json();
+    setSessionId(data.session_id);
+
+    // 2) Camera+Mic, 3) WS, 4) ASR, 5) Recording
+    await startCamera();
+    connectWS(data.session_id);
+    startASR();
+    startRecording();
+  };
+
+  const finish = async () => {
+    setRunning(false);
+    if (silenceTimerRef.current) { window.clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
+    try { wsRef.current?.send(JSON.stringify({ type: 'control', action: 'finish' })); } catch {}
+    try { wsRef.current?.close(); } catch {}
+    wsRef.current = null;
+
+    stopASR();
+    stopRecording();
+    if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
+
     if (!sessionId) return;
     const r = await fetch(`http://localhost:8000/api/v1/interview/session/${sessionId}/finalize`, { method: 'POST' });
     const data = await r.json();
@@ -105,7 +163,10 @@ export default function SimulatePage() {
   useEffect(() => {
     return () => {
       try { wsRef.current?.close(); } catch {}
-      stopRecognition();
+      stopASR();
+      stopRecording();
+      if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
+      if (silenceTimerRef.current) { window.clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
     };
   }, []);
 
@@ -113,10 +174,10 @@ export default function SimulatePage() {
     <div className="container max-w-4xl mx-auto px-4 py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Interview Simulation</CardTitle>
+          <CardTitle>Interview Simulation (HR, 3 questions)</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {!sessionId && (
+          {!sessionId && !running && !report && (
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Upload CV (PDF)</Label>
@@ -126,24 +187,16 @@ export default function SimulatePage() {
                 <Label>Job Description</Label>
                 <Textarea rows={8} value={jd} onChange={(e) => setJd(e.target.value)} />
               </div>
-              <Button onClick={createSession} disabled={!cvFile || !jd}>Create Session</Button>
+              <Button onClick={startAll} disabled={!cvFile || !jd}>Start</Button>
             </div>
           )}
 
-          {sessionId && !report && (
+          {(sessionId || running) && !report && (
             <div className="space-y-4">
+              <video ref={videoRef} className="w-full max-h-80 rounded bg-black" muted playsInline />
               <div className="p-4 rounded border">
                 <div className="font-semibold mb-2">Current Question</div>
                 <div>{currentQuestion || 'Waiting for the interviewer...'}</div>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={connectWS} disabled={!!wsRef.current}>Connect</Button>
-                {!listening ? (
-                  <Button variant="outline" onClick={startRecognition}>Start Answering</Button>
-                ) : (
-                  <Button variant="outline" onClick={stopRecognition}>Pause</Button>
-                )}
-                <Button variant="destructive" onClick={finish}>Finish & Get Report</Button>
               </div>
             </div>
           )}
