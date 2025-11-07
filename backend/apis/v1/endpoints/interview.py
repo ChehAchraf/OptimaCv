@@ -7,12 +7,20 @@ router = APIRouter()
 
 @router.post("/session/create", response_model=InterviewInitResponse, tags=["Interview Simulation"])
 async def create_interview_session(cv_pdf: UploadFile = File(...), job_description: str = Form(...)):
-    if cv_pdf.content_type != "application/pdf":
-        raise HTTPException(status_code=400, detail="CV must be a PDF.")
-    pdf_bytes = await cv_pdf.read()
-    session_id = str(uuid.uuid4())
-    initial_questions = await interview_service.create_session(session_id, pdf_bytes, job_description)
-    return {"session_id": session_id, "initial_questions": initial_questions}
+    try:
+        if cv_pdf.content_type != "application/pdf":
+            raise HTTPException(status_code=400, detail="CV must be a PDF.")
+        pdf_bytes = await cv_pdf.read()
+        session_id = str(uuid.uuid4())
+        initial_questions = await interview_service.create_session(session_id, pdf_bytes, job_description)
+        return {"session_id": session_id, "initial_questions": initial_questions}
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        print(f"Error creating interview session: {e}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @router.websocket("/session/{session_id}/ws")
 async def interview_ws(websocket: WebSocket, session_id: str):
