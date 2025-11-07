@@ -1,0 +1,8 @@
+# For Ollama (current setup)
+AI_PROVIDER="ollama"
+OLLAMA_HOST="http://localhost:11434"
+OLLAMA_MODEL="gemma3:4b"
+
+# For Google Gemini
+AI_PROVIDER="gemini"
+GOOGLE_API_KEY="your-key-here"

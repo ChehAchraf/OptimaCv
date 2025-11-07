@@ -54,6 +54,15 @@ class GeminiService:
             print(f"--- 🔴 ERROR: Failed to parse cleaned CV-ONLY JSON: {cleaned_text} 🔴 ---")
             return {}
 
+    async def generate_text(self, prompt: str) -> str:
+        """
+        Generic text generation using Gemini.
+        """
+        # Use a model without the JSON-only config for plain text generation
+        text_model = genai.GenerativeModel('models/gemini-pro-latest')
+        response = await text_model.generate_content_async(prompt)
+        return response.text
+
     async def analyze_cv_vs_jd(self, cv_text: str, jd_text: str) -> dict:
         
         prompt_in_english = f"""

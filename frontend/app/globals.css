@@ -120,3 +120,64 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Print styles to fix image width issues */
+@media print {
+  .modern-black-template img,
+  .colored-sidebar-template img,
+  .minimal-template img {
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: cover !important;
+  }
+  
+  /* Ensure circular photo containers maintain size */
+  .modern-black-template .w-32.h-32 {
+    width: 8rem !important;
+    height: 8rem !important;
+  }
+  
+  .colored-sidebar-template .w-40.h-40 {
+    width: 10rem !important;
+    height: 10rem !important;
+  }
+  
+  .minimal-template .w-24.h-24 {
+    width: 6rem !important;
+    height: 6rem !important;
+  }
+  
+  /* Prevent any image from taking full page width */
+  img {
+    max-width: 300px !important;
+    width: auto !important;
+    height: auto !important;
+  }
+}
+
+/* CV Preview specific styles */
+.cv-preview-content {
+  /* Better image handling in preview */
+  .w-32.h-32 img,
+  .w-24.h-24 img,
+  .w-40.h-40 img {
+    border-radius: 50% !important;
+    object-fit: cover !important;
+  }
+  
+  /* Scale down large profile photos in preview */
+  .w-40.h-40 {
+    width: 8rem !important;
+    height: 8rem !important;
+  }
+  
+  .w-32.h-32 {
+    width: 6rem !important;
+    height: 6rem !important;
+  }
+  
+  .w-24.h-24 {
+    width: 4rem !important;
+    height: 4rem !important;
+  }
+}

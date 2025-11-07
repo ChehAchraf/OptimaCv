@@ -28,13 +28,32 @@ if (-not (Test-Path $envFile)) {
 }
 
 $envContent = Get-Content $envFile
-if ($envContent -notmatch "GOOGLE_API_KEY=") {
-    Write-Host "   [ERROR] 'GOOGLE_API_KEY=' not found in your .env file!" -ForegroundColor $Color_Red
-    Read-Host "Press Enter to exit"
-    exit
-}
 
-Write-Host "   [SUCCESS] GOOGLE_API_KEY found." -ForegroundColor $Color_Green
+# Check for AI provider configuration
+if ($envContent -match "AI_PROVIDER=") {
+    $aiProvider = ($envContent | Where-Object {$_ -match "AI_PROVIDER="}) -replace "AI_PROVIDER=", "" -replace '"', ""
+    Write-Host "   [SUCCESS] AI Provider: $aiProvider" -ForegroundColor $Color_Green
+    
+    if ($aiProvider -eq "ollama") {
+        # Check Ollama configuration
+        if ($envContent -match "OLLAMA_MODEL=") {
+            $ollamaModel = ($envContent | Where-Object {$_ -match "OLLAMA_MODEL="}) -replace "OLLAMA_MODEL=", "" -replace '"', ""
+            Write-Host "   [SUCCESS] Ollama Model: $ollamaModel" -ForegroundColor $Color_Green
+        } else {
+            Write-Host "   [WARN] OLLAMA_MODEL not found, using default" -ForegroundColor $Color_Yellow
+        }
+    } elseif ($aiProvider -eq "gemini") {
+        # Check Google API key for Gemini
+        if ($envContent -notmatch "GOOGLE_API_KEY=") {
+            Write-Host "   [ERROR] 'GOOGLE_API_KEY=' not found for Gemini provider!" -ForegroundColor $Color_Red
+            Read-Host "Press Enter to exit"
+            exit
+        }
+        Write-Host "   [SUCCESS] Google API Key found for Gemini." -ForegroundColor $Color_Green
+    }
+} else {
+    Write-Host "   [WARN] AI_PROVIDER not found, defaulting to Ollama" -ForegroundColor $Color_Yellow
+}
 Write-Host ""
 
 

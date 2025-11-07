@@ -61,10 +61,10 @@ const HeroSection = () => {
             variants={itemVariants}
           >
             <Button size="lg" asChild className="shadow-lg shadow-blue-500/20">
-              <Link href="#demo">{content.ctaPrimary}</Link>
+              <Link href="/analyzer">{content.ctaPrimary}</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="#analyze">{content.ctaSecondary}</Link>
+              <Link href="/analyzer">{content.ctaSecondary}</Link>
             </Button>
           </motion.div>
           

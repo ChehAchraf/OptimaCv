@@ -91,3 +91,72 @@ class FullRankingResponse(BaseModel):
     """
     total_processed: int
     ranked_results: List[RankedAnalysisItem]
+
+
+# --- Schemas for generating CV from user-provided structured info ---
+class CVPersonalInfoSchema(BaseModel):
+    fullName: str
+    email: EmailStr
+    phoneNumber: Optional[str] = None
+    linkedin: Optional[str] = None
+    github: Optional[str] = None
+    website: Optional[str] = None
+    portfolio: Optional[str] = None
+    location: Optional[str] = None
+    profilePhoto: Optional[str] = None
+    title: Optional[str] = None
+    summary: Optional[str] = None
+
+
+class CVEducationSchema(BaseModel):
+    school: str
+    degree: Optional[str] = None
+    startDate: Optional[str] = None
+    endDate: Optional[str] = None
+
+
+class CVExperienceSchema(BaseModel):
+    company: str
+    role: Optional[str] = None
+    startDate: Optional[str] = None
+    endDate: Optional[str] = None
+    description: Optional[str] = None
+
+
+class CVProjectSchema(BaseModel):
+    name: str
+    description: Optional[str] = None
+    url: Optional[str] = None
+
+
+class CVLanguageSchema(BaseModel):
+    name: str
+    level: str
+
+
+class CVSkillsSchema(BaseModel):
+    hard: List[str] = []
+    soft: List[str] = []
+    languages: List[CVLanguageSchema] = []
+    certifications: List[str] = []
+
+
+class CVDataSchema(BaseModel):
+    personalInfo: CVPersonalInfoSchema
+    education: List[CVEducationSchema] = []
+    experience: List[CVExperienceSchema] = []
+    projects: List[CVProjectSchema] = []
+    skills: CVSkillsSchema = CVSkillsSchema()
+
+
+class CVGenerateRequest(BaseModel):
+    cv_data: CVDataSchema
+    job_description: Optional[str] = None
+    template: Optional[str] = None
+
+
+class GeneratedCVResponse(BaseModel):
+    organized_data: CVDataSchema
+    ai_summary: Optional[str] = None
+    strengths: List[str] = []
+    weaknesses: List[str] = []
