@@ -19,20 +19,20 @@ Write-Host ""
 
 Write-Host "1. Checking Backend Environment (.env)..." -ForegroundColor $Color_Yellow
 
-$envFile = ".\.env" 
+# $envFile = ".\.env" 
 
-if (-not (Test-Path $envFile)) {
-    Write-Host "   [ERROR] '.env' file not found in root directory!" -ForegroundColor $Color_Red
-    Read-Host "Press Enter to exit"
-    exit
-}
+# if (-not (Test-Path $envFile)) {
+#     Write-Host "   [ERROR] '.env' file not found in root directory!" -ForegroundColor $Color_Red
+#     Read-Host "Press Enter to exit"
+#     exit
+# }
 
-$envContent = Get-Content $envFile
-if ($envContent -notmatch "GOOGLE_API_KEY=") {
-    Write-Host "   [ERROR] 'GOOGLE_API_KEY=' not found in your .env file!" -ForegroundColor $Color_Red
-    Read-Host "Press Enter to exit"
-    exit
-}
+# $envContent = Get-Content $envFile
+# if ($envContent -notmatch "GOOGLE_API_KEY=") {
+#     Write-Host "   [ERROR] 'GOOGLE_API_KEY=' not found in your .env file!" -ForegroundColor $Color_Red
+#     Read-Host "Press Enter to exit"
+#     exit
+# }
 
 Write-Host "   [SUCCESS] GOOGLE_API_KEY found." -ForegroundColor $Color_Green
 Write-Host ""

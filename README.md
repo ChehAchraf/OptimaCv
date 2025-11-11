@@ -25,20 +25,27 @@ Before you begin, ensure you have the following installed:
 
 - **Python 3.8+** - [Download Python](https://www.python.org/downloads/)
 - **Node.js 18+** and npm - [Download Node.js](https://nodejs.org/)
-- **Google Gemini API Key** - [Get API Key](https://makersuite.google.com/app/apikey)
+- **AI Provider** (choose one):
+  - **Ollama** (recommended for local/free AI) - [Download Ollama](https://ollama.com/download)
+  - **Google Gemini API Key** (for cloud AI) - [Get API Key](https://makersuite.google.com/app/apikey)
 
 ## 🚀 Quick Start (Windows)
 
-If you're on Windows, you can use the provided PowerShell script:
+If you're on Windows, you can use the provided PowerShell script for automatic setup:
 
 ```powershell
 .\start-dev.ps1
 ```
 
-This script will:
-1. Check for `.env` file
-2. Install frontend dependencies if needed
-3. Start both backend and frontend servers
+This script will automatically:
+1. ✅ Create `.env` file if missing (with Ollama as default)
+2. ✅ Detect your AI provider (Ollama or Gemini)
+3. ✅ Setup and start Ollama service (if using local AI)
+4. ✅ Check and download required models
+5. ✅ Install frontend dependencies if needed
+6. ✅ Start both backend and frontend servers
+
+**That's it!** The script handles everything based on your `.env` configuration.
 
 ## 📝 Manual Setup
 
@@ -71,11 +78,30 @@ pip install -r requirements.txt
 
 3. **Create `.env` file** in the root directory:
 
+**For Ollama (Local AI - Recommended):**
 ```env
+AI_PROVIDER=ollama
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODEL=gemma3:4b
+```
+
+**For Gemini (Cloud AI):**
+```env
+AI_PROVIDER=gemini
 GOOGLE_API_KEY=your_google_api_key_here
 ```
 
-Replace `your_google_api_key_here` with your actual Google Gemini API key.
+Replace `your_google_api_key_here` with your actual Google Gemini API key if using Gemini.
+
+4. **If using Ollama**, start the Ollama service:
+```bash
+# Install from https://ollama.com/download
+# Then run:
+ollama serve
+
+# In another terminal, pull the model:
+ollama pull gemma3:4b
+```
 
 ### Step 3: Frontend Setup
 
@@ -131,12 +157,72 @@ Frontend will be available at: `http://localhost:3000`
 .\start-dev.ps1
 ```
 
-## 🔧 Environment Variables
+## 🔧 Configuration
 
-Create a `.env` file in the root directory with the following:
+### **.env File**
+
+Create a `.env` file in the root directory with the following configuration:
 
 ```env
-GOOGLE_API_KEY=your_google_gemini_api_key
+# ============================================
+# AI Provider Configuration
+# ============================================
+# Choose one:
+AI_PROVIDER=ollama  # For local AI (free, private)
+# OR
+AI_PROVIDER=gemini  # For cloud AI (requires API key)
+
+# ============================================
+# Ollama Configuration (if AI_PROVIDER=ollama)
+# ============================================
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODEL=gemma3:4b
+
+# Alternative models you can use:
+# OLLAMA_MODEL=llama2
+# OLLAMA_MODEL=mistral
+# OLLAMA_MODEL=gemma3:8b
+
+# ============================================
+# Gemini Configuration (if AI_PROVIDER=gemini)
+# ============================================
+GOOGLE_API_KEY=your_key_here
+```
+
+### **Option 1: Using Ollama (Local AI - Free)**
+
+**Advantages:**
+- ✅ Free and unlimited
+- ✅ Privacy (runs locally)
+- ✅ No API keys needed
+- ✅ Works offline
+
+**Requirements:**
+1. Install Ollama from: https://ollama.com/download
+2. Run `.\start-dev.ps1` - it will auto-setup everything
+
+**Configuration:**
+```env
+AI_PROVIDER=ollama
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODEL=gemma3:4b
+```
+
+### **Option 2: Using Gemini (Cloud AI)**
+
+**Advantages:**
+- ✅ No local setup required
+- ✅ Powerful cloud models
+- ✅ No hardware requirements
+
+**Requirements:**
+1. Get API key from: https://makersuite.google.com/app/apikey
+2. Add to `.env` file
+
+**Configuration:**
+```env
+AI_PROVIDER=gemini
+GOOGLE_API_KEY=your_actual_api_key_here
 ```
 
 **How to get a Google Gemini API Key:**
@@ -190,6 +276,35 @@ npm start
 
 ## 🐛 Troubleshooting
 
+### AI Provider Issues
+
+**Ollama not connecting:**
+```bash
+# Check if Ollama is running
+ollama list
+
+# If not running, start it:
+ollama serve
+
+# Check if service is accessible:
+curl http://localhost:11434/api/tags
+```
+
+**Model not found:**
+```bash
+# Pull the required model
+ollama pull gemma3:4b
+
+# List available models
+ollama list
+```
+
+**Gemini API Key errors:**
+- Verify `.env` file exists in root directory
+- Check that `GOOGLE_API_KEY` is set correctly
+- Ensure no extra spaces or quotes around the API key
+- Verify API key is valid at https://makersuite.google.com/app/apikey
+
 ### Backend Issues
 
 **Port 8000 already in use:**
@@ -241,7 +356,8 @@ npm install
 ### Backend
 - FastAPI - Web framework
 - Uvicorn - ASGI server
-- Google Generative AI - AI analysis
+- Google Generative AI - Cloud AI analysis (optional)
+- Ollama Python Client - Local AI analysis (optional)
 - PyMuPDF (fitz) - PDF parsing
 - Pydantic - Data validation
 

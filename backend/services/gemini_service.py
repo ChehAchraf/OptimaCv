@@ -1,16 +1,23 @@
+"""Google Gemini provider integration.
+
+This module configures the Google Generative AI client and exposes async
+methods for the app to request text/JSON or visual analyses. The service
+implements structured-response patterns (attempting to return JSON for
+analysis endpoints) and a plain-text `generate_text` helper for free-form
+generation.
+
+Notes:
+- Methods attempt to clean markdown code fences before parsing JSON.
+- If API credentials are missing or misconfigured an exception is raised at
+    construction time so callers can fail-fast.
+"""
+
 import google.generativeai as genai
-
 from backend.core.config import settings
-
 import json
-
 import PIL.Image
-
 import io
-
 import asyncio
-
-
 
 class GeminiService:
 
@@ -69,40 +76,44 @@ class GeminiService:
 
 
     async def analyze_cv_only(self, cv_text: str) -> dict:
-
         prompt = f"""
         Analyze the following CV text and return a JSON object with this *exact* structure:
-        { 
+        {{
             "full_name": "Full Name", "email": "email@example.com", "phone": "+123456",
             "summary": "...", "skills": ["Skill 1"],
-            "experience": [{  "company": "Company", "title": "Job Title", "duration": "Date - Date", "details": "..." } ],
-            "education": [{  "institution": "University", "degree": "Degree", "duration": "Date - Date" } ]
-        } 
+            "experience": [{{ "company": "Company", "title": "Job Title", "duration": "Date - Date", "details": "..." }}],
+            "education": [{{ "institution": "University", "degree": "Degree", "duration": "Date - Date" }}]
+        }}
         CV Text: --- {cv_text} ---
         """
-
         response = await self.model_flash.generate_content_async(prompt) 
-
         print("--- 💡 RAW GEMINI (CV Only) RESPONSE 💡 ---")
-
         cleaned_text = self._clean_json_response(response.text)
-
         try:
-
             return json.loads(cleaned_text)
-
         except json.JSONDecodeError:
-
             print(f"--- 🔴 ERROR: Failed to parse cleaned CV-ONLY JSON: {cleaned_text} 🔴 ---")
-
             return {}
+
+    async def generate_text(self, prompt: str) -> str:
+        """
+        Generic text generation using Gemini.
+        """
+        # Use a model without the JSON-only config for plain text generation
+        text_model = genai.GenerativeModel('models/gemini-pro-latest')
+        response = await text_model.generate_content_async(prompt)
+        return response.text
+
+    async def query(self, prompt: str) -> str:
+        """
+        Alias for generate_text to maintain compatibility with ai_service facade.
+        """
+        return await self.generate_text(prompt)
 
 
 
     async def analyze_cv_vs_jd(self, cv_text: str, jd_text: str) -> dict:
-
         
-
         prompt_in_english = f"""
         You are an expert ATS (Applicant Tracking System) analyzer and a professional career coach.
         Your task is to analyze the given CV text and compare it against the provided Job Description.
@@ -110,13 +121,13 @@ class GeminiService:
         Return a JSON object with this *exact* structure. Do not add any other text.
         The "match_score" must be an integer (number) between 0 and 100.
         
-        { 
-            "contact_info": { 
+        {{
+            "contact_info": {{
                 "name": "Full Name",
                 "email": "email@example.com",
                 "phone": "+123456",
                 "location": "City, Country"
-            } ,
+            }},
             "summary": "A brief one-paragraph summary of the candidate's fit for the role.",
             "strengths": [
                 "A list of strings highlighting what matches well."
@@ -125,18 +136,18 @@ class GeminiService:
                 "A list of strings identifying key missing elements."
             ],
             "match_score": 85, 
-            "detailed_analysis": { 
+            "detailed_analysis": {{
                 "hard_skills": [
-                    {  "skill": "Skill Name from CV", "match": "High/Medium/Low/No", "comment": "Your reasoning." } 
+                    {{ "skill": "Skill Name from CV", "match": "High/Medium/Low/No", "comment": "Your reasoning." }}
                 ],
                 "soft_skills": [
-                    {  "skill": "Skill Requirement from JD", "match": "High/Medium/Low/No", "comment": "Your reasoning." } 
+                    {{ "skill": "Skill Requirement from JD", "match": "High/Medium/Low/No", "comment": "Your reasoning." }}
                 ],
                 "experience": [
-                    {  "requirement": "Job Requirement (e.g., '3+ years')", "match": "Yes/No/Partial", "comment": "Your reasoning." } 
+                    {{ "requirement": "Job Requirement (e.g., '3+ years')", "match": "Yes/No/Partial", "comment": "Your reasoning." }}
                 ]
-            } 
-        } 
+            }}
+        }}
 
         Here is the CV text:
         ---
@@ -148,39 +159,15 @@ class GeminiService:
         {jd_text}
         ---
         """
-
         
-
         response = await self.model_pro.generate_content_async(prompt_in_english)
-
         
-
         print("--- 💡 RAW GEMINI (Text vs JD) RESPONSE 💡 ---")
-
         cleaned_text = self._clean_json_response(response.text)
-
         try:
-
             return json.loads(cleaned_text)
-
         except json.JSONDecodeError:
-
             print(f"--- 🔴 ERROR: Failed to parse cleaned CV-vs-JD JSON: {cleaned_text} 🔴 ---")
-
-            return {}
-
-        print("---------------------------------------------")
-
-
-
-        try:
-
-            return json.loads(response.text)
-
-        except json.JSONDecodeError:
-
-            print("--- 🔴 ERROR: Gemini did not return valid JSON! 🔴 ---")
-
             return {}
 
 
@@ -188,22 +175,16 @@ class GeminiService:
 
 
     async def analyze_cv_visuals(self, image_bytes: bytes) -> dict:
-
         try:
-
             img = PIL.Image.open(io.BytesIO(image_bytes))
-
         except Exception as e:
-
             raise ValueError(f"Invalid image file: {e}")
-
-
 
         prompt = f"""
         You are an expert UI/UX designer and professional resume reviewer. 
         Analyze the *visual design and layout* of this CV image. 
         Return a JSON object with this *exact* structure:
-        { 
+        {{
             "layout_score": 8,
             "layout_notes": "Your analysis on whitespace, alignment, and structure.",
             "font_choice_notes": "Your analysis on font type, size, and readability.",
@@ -213,56 +194,30 @@ class GeminiService:
                 "Actionable suggestion 1.",
                 "Actionable suggestion 2."
             ]
-        } 
+        }}
         """
-
         try:
-
             response = await self.model_pro_vision.generate_content_async([prompt, img])
-
             
-
             print("--- 💡 RAW GEMINI (Visual) RESPONSE 💡 ---")
-
             cleaned_text = self._clean_json_response(response.text)
-
             try:
-
                 return json.loads(cleaned_text)
-
             except json.JSONDecodeError:
-
                 print(f"--- 🔴 ERROR: Failed to parse cleaned VISUAL JSON: {cleaned_text} 🔴 ---")
-
-                return None
-
-            print("--------------------------------------------")
-
-
-
-            try:
-
-                return json.loads(response.text)
-
-            except json.JSONDecodeError:
-
-                print(f"--- 🔴 ERROR: Gemini (Visual) returned invalid JSON: {response.text} 🔴 ---")
-
-                return None
-
+                return {}
         
-
         except Exception as e:
-
             print(f"Gemini content generation error: {e}")
-
-            return None
+            return {}
 
 
 
     async def generate_cv_from_data(self, user_data: dict) -> dict:
-                                                         
-
+        """
+        Generate a professional CV structure from raw user data.
+        This method analyzes certificates and descriptions to infer the user's professional profile.
+        """
         prompt = f"""
         You are an expert HR consultant and professional CV writer.
         A user has provided raw data and wants you to build a professional CV profile from it.
@@ -279,59 +234,45 @@ class GeminiService:
         Return a *single* JSON object with the following *exact* structure.
         Do not add any text outside the JSON block.
 
-        { 
-          "generated_cv": { 
+        {{
+          "generated_cv": {{
             "professional_title": "(Infer this from the data, e.g., 'Développeur Full Stack spécialisé React')",
             "summary": "(Write a compelling, professional summary based on the raw description and certificates)",
             "skills_categories": [
-              {  
+              {{
                 "category": "(e.g., 'Cloud & DevOps')", 
-                "skills": ["(e.g., 'AWS', 'Docker', 'Kubernetes')"] 
-              } ,
-              {  
+                "skills": ["(e.g., 'AWS', 'Docker', 'Kubernetes')"]
+              }},
+              {{
                 "category": "(e.g., 'Backend')", 
-                "skills": ["(e.g., 'Node.js', 'Python')"] 
-              } 
+                "skills": ["(e.g., 'Node.js', 'Python')"]
+              }}
             ],
             "experience": ["(Re-write the user's 'experience' list professionally)"],
             "education": ["(Re-write the user's 'education' list professionally)"],
             "certifications": ["(List the user's 'certificates' here)"]
-          } ,
-          "analysis": { 
+          }},
+          "analysis": {{
             "key_selling_points": [
                 "(List 3-4 key strengths of the CV you just generated. e.g., 'Forte spécialisation en...', 'Cohérence entre les certifications et les projets.')"
             ],
             "profile_focus": "(The main focus area, e.g., 'Cloud & DevOps')"
-          } 
-        } 
+          }}
+        }}
         """
 
-
-
-                                          
-
-        
-
-                                                   
-
         response = await self.model_pro.generate_content_async(prompt)
-
         
-
         print(f"--- 💡 RAW CV BUILDER RESPONSE 💡 ---\n{response.text}\n---------------------------------")
-
         
-
         cleaned_text = self._clean_json_response(response.text)
-
         try:
-
             return json.loads(cleaned_text)
-
         except json.JSONDecodeError:
-
             print(f"--- 🔴 ERROR: Failed to parse CV Builder JSON: {cleaned_text} 🔴 ---")
+            return {}
 
-            return {}                        
-
-gemini_service = GeminiService(api_key=settings.GOOGLE_API_KEY)
+# Only initialize if Gemini is the selected provider
+gemini_service = None
+if settings.AI_PROVIDER == "gemini" and settings.GOOGLE_API_KEY:
+    gemini_service = GeminiService(api_key=settings.GOOGLE_API_KEY)
