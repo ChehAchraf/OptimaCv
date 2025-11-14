@@ -72,20 +72,13 @@ fi
 echo ""
 echo "📋 Step 5: Configuring Nginx..."
 
-# Get domain or IP
-read -p "Enter your domain name (or press Enter to use IP): " DOMAIN
-if [ -z "$DOMAIN" ]; then
-    read -p "Enter your server IP: " SERVER_IP
-    DOMAIN="$SERVER_IP"
-    SERVER_NAME="_"
-else
-    SERVER_NAME="$DOMAIN www.$DOMAIN"
-fi
+# Use pre-configured domain
+DOMAIN="cv10dh1.vps.webdock.cloud"
+SERVER_NAME="cv10dh1.vps.webdock.cloud"
+echo "Using domain: $DOMAIN"
 
-# Update nginx config
+# Copy nginx config (already configured with domain)
 sudo cp deploy/nginx.conf /etc/nginx/sites-available/optimacv
-sudo sed -i "s|your-domain.com|$DOMAIN|g" /etc/nginx/sites-available/optimacv
-sudo sed -i "s|server_name your-domain.com www.your-domain.com;|server_name $SERVER_NAME;|g" /etc/nginx/sites-available/optimacv
 
 # Enable site
 sudo ln -sf /etc/nginx/sites-available/optimacv /etc/nginx/sites-enabled/
