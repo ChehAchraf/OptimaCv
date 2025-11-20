@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/config/lib/utils"
 import { Check } from "lucide-react"
 
 interface StepperProps {
