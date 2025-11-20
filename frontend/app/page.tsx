@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'; 
 import { HiExclamation, HiCheckCircle, HiXCircle } from 'react-icons/hi';
-
+import api from "@/app/axios/path"
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,49 +41,53 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!filePDF || !jobDescription) {
-      setError('Veuillez fournir un CV (PDF) et une description de poste.');
-      return;
-    }
-    if (analyzeVisuals && !fileImage) {
-      setError("Veuillez télécharger l'image de votre CV pour l'analyse visuelle.");
-      return;
-    }
 
-    setIsLoading(true);
-    setError(null);
-    setAnalysisResult(null);
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    const formData = new FormData();
-    formData.append('cv_pdf', filePDF);
-    formData.append('job_description', jobDescription);
-    
-    if (analyzeVisuals && fileImage) {
-      formData.append('cv_image', fileImage);
-    }
+  if (!filePDF || !jobDescription) {
+    setError("Veuillez fournir un CV (PDF) et une description de poste.");
+    return;
+  }
 
-    try {
-      const response = await fetch('http://localhost:8000/api/v1/analysis/analyze-full-cv/', {
-        method: 'POST',
-        body: formData,
-      });
+  if (analyzeVisuals && !fileImage) {
+    setError("Veuillez télécharger l'image de votre CV pour l'analyse visuelle.");
+    return;
+  }
 
-      const data = await response.json();
+  setIsLoading(true);
+  setError(null);
+  setAnalysisResult(null);
 
-      if (!response.ok) {
-        throw new Error(data.detail || 'Une erreur est survenue.');
-      }
-
-      setAnalysisResult(data);
-
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+  // We send pure object — interceptor will detect the File and convert to FormData.
+  const payload: Record<string, any> = {
+    cv_pdf: filePDF,
+    job_description: jobDescription,
   };
+
+  if (analyzeVisuals && fileImage) {
+    payload.cv_image = fileImage;
+  }
+
+  try {
+    const response = await api.post(
+      "/analysis/analyze-full-cv/",
+      payload
+    );
+
+    setAnalysisResult(response.data);
+
+  } catch (err: any) {
+    const message =
+      err.response?.data?.detail ||
+      err.message ||
+      "Une erreur est survenue.";
+
+    setError(message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const VisualFeedbackDisplay = ({ feedback }: { feedback: any }) => (
     <Card className="mt-6 bg-gray-50 dark:bg-gray-800">
