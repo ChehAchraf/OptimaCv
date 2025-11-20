@@ -10,10 +10,12 @@ import { Label } from '@/components/ui/label';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge'; // غانحتاجوه
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {  } from "module";
+import path from '@/app/axios/path';
 
 export default function BuildCVPage() {
   const [currentStep, setCurrentStep] = useState(1);
-  
+
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -27,48 +29,43 @@ export default function BuildCVPage() {
 
 
   const steps = ["Infos Perso", "Profil", "Génération"];
-
   const handleGenerateCV = async () => {
     setIsLoading(true);
     setError(null);
     setResult(null);
-    setCurrentStep(3); // (كنمشيو لصفحة التحميل)
+    setCurrentStep(3); // moving to loading step
 
     const payload = {
       full_name: fullName,
-      email: email,
-      phone: phone,
+      email,
+      phone,
       raw_description: rawDescription,
-      certificates: certificates,
-      education: [], 
-      experience: [], 
+      certificates,
+      education: [],
+      experience: [],
     };
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/analysis/generator/build-cv/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || 'Erreur du serveur');
-      
+      const { data } = await path.post('/analysis/generator/build-cv/', payload);
       setResult(data);
-
     } catch (err: any) {
-      setError(err.message);
-      setCurrentStep(2); // (كنرجعوه للخطوة لي قبل)
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError(err.message || 'Erreur du serveur');
+      }
+      setCurrentStep(2);
     } finally {
       setIsLoading(false);
     }
   };
 
+
   return (
     <div className="container max-w-3xl mx-auto px-4 py-16">
       <Stepper currentStep={currentStep} steps={steps}>
-        
-        {}
+
+        { }
         <Card>
           <CardHeader>
             <CardTitle>Étape 1: Informations de base</CardTitle>
@@ -92,7 +89,7 @@ export default function BuildCVPage() {
           </CardContent>
         </Card>
 
-        {}
+        { }
         <Card>
           <CardHeader>
             <CardTitle>Étape 2: Votre Profil</CardTitle>
@@ -113,7 +110,7 @@ export default function BuildCVPage() {
             <div className="space-y-2">
               <Label>Vos Certificats (Optionnel)</Label>
               <div className="flex space-x-2">
-                <Input 
+                <Input
                   value={tempCert}
                   onChange={(e) => setTempCert(e.target.value)}
                   placeholder="Ex: 'AWS Certified Cloud Practitioner'"
@@ -138,7 +135,7 @@ export default function BuildCVPage() {
           </CardContent>
         </Card>
 
-        {}
+        { }
         <Card>
           <CardHeader>
             <CardTitle>Étape 3: Génération...</CardTitle>
@@ -150,7 +147,7 @@ export default function BuildCVPage() {
                 <p className="text-muted-foreground">L'IA rédige votre CV...</p>
               </div>
             )}
-            
+
             {error && (
               <Alert variant="destructive">
                 <AlertTriangle className="h-4 w-4" />
@@ -162,7 +159,7 @@ export default function BuildCVPage() {
             {result && (
               <div className="space-y-4">
                 <h3 className="text-xl font-bold">Votre nouveau profil (Titre): {result.analysis.profile_focus}</h3>
-                
+
                 <h4 className="font-semibold">Points forts de ce CV :</h4>
                 <ul className="list-disc list-inside text-green-700">
                   {result.analysis.key_selling_points.map((pt: string, i: number) => <li key={i}>{pt}</li>)}

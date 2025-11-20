@@ -27,8 +27,13 @@ if (-not (Test-Path $envFile)) {
     exit
 }
 
-$envContent = Get-Content $envFile
-if ($envContent -notmatch "GOOGLE_API_KEY=") {
+try {
+    $hasKey = Select-String -Path $envFile -Pattern '^\s*GOOGLE_API_KEY=' -Quiet
+} catch {
+    $hasKey = $false
+}
+
+if (-not $hasKey) {
     Write-Host "   [ERROR] 'GOOGLE_API_KEY=' not found in your .env file!" -ForegroundColor $Color_Red
     Read-Host "Press Enter to exit"
     exit
@@ -66,6 +71,7 @@ $backendArgs = @(
 
     "& { 
         `$host.UI.RawUI.WindowTitle = 'OptimaCV Backend (FastAPI)'; 
+        cd (Split-Path -Parent `$MyInvocation.MyCommand.Path);
         python -m uvicorn backend.main:app --reload --port 8000 
     }"
 )

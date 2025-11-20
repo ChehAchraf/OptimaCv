@@ -12,15 +12,9 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
-type AnalysisResult = {
-  filename: string;
-  analysis: {
-    contact_info: { name: string; email: string };
-    summary: string;
-    match_score: number;
-    strengths: string[];
-  };
-};
+import { AnalysisResult } from '@/types/type';
+import path from '@/app/axios/path';
+
 
 export default function CompanyPage() {
   const [files, setFiles] = useState<FileList | null>(null);
@@ -37,30 +31,25 @@ export default function CompanyPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (!files || files.length === 0 || !jobDescription) {
       setError('Veuillez fournir une description de poste et au moins un CV (PDF).');
       return;
     }
+
     setIsLoading(true);
     setError(null);
     setResults([]);
-    const formData = new FormData();
-    formData.append('job_description', jobDescription);
-    Array.from(files).forEach((file) => {
-      formData.append('cv_pdfs', file);
-    });
+
     try {
-      const response = await fetch('http://localhost:8000/api/v1/analysis/companies/rank-candidates/', {
-        method: 'POST',
-        body: formData,
+      const { data } = await path.post('/analysis/companies/rank-candidates/', {
+        job_description: jobDescription,
+        cv_pdfs: files, 
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.detail || 'Une erreur est survenue.');
-      }
+
       setResults(data.ranked_results);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.response?.data?.detail || err.message || 'Une erreur est survenue.');
     } finally {
       setIsLoading(false);
     }
@@ -78,11 +67,11 @@ export default function CompanyPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" /> 
+                <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Erreur</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -92,9 +81,9 @@ export default function CompanyPage() {
               <Label htmlFor="jd-company" className="font-medium text-lg">
                 1. Collez la description de poste (JD)
               </Label>
-              <Textarea 
+              <Textarea
                 id="jd-company"
-                rows={10} 
+                rows={10}
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 placeholder="Collez la description de poste complète ici..."
@@ -107,18 +96,18 @@ export default function CompanyPage() {
               <Label htmlFor="cv-files" className="font-medium text-lg">
                 2. Téléchargez les CVs (PDF)
               </Label>
-              <Input 
+              <Input
                 id="cv-files"
-                type="file" 
+                type="file"
                 accept="application/pdf"
-                onChange={handleFileChange} 
+                onChange={handleFileChange}
                 required
                 multiple
                 className="pt-2 h-auto"
               />
               {files && <p className="text-sm text-muted-foreground">{files.length} fichier(s) sélectionné(s)</p>}
             </div>
-            
+
             <Button type="submit" disabled={isLoading} size="lg" className="w-full text-lg">
               {isLoading ? 'Analyse en cours (cela peut prendre du temps)...' : `Lancer l'analyse de ${files?.length || 0} CVs`}
             </Button>
@@ -157,22 +146,22 @@ export default function CompanyPage() {
                           </CardDescription>
                         </div>
                       </div>
-                      
+
                       <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
                         {item.analysis.summary || "Pas de résumé."}
                       </p>
-                      
+
                       <h5 className="font-semibold text-sm mb-2">Points forts identifiés :</h5>
                       <div className="flex flex-wrap gap-2">
                         {item.analysis.strengths.length > 0 ? (
                           item.analysis.strengths.slice(0, 3).map((strength, i) => (
-                            
-                            <Badge 
-                              key={i} 
-                              variant="default" 
+
+                            <Badge
+                              key={i}
+                              variant="default"
                               className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
                             >
-                              <CheckCircle2 className="mr-1 h-4 w-4" /> 
+                              <CheckCircle2 className="mr-1 h-4 w-4" />
                               {strength}
                             </Badge>
                           ))
