@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -53,7 +53,7 @@ const features = [
 
 const TrustSection = () => {
   return (
-    <section className="relative py-24 lg:py-32 bg-gradient-to-b from-white via-gray-50/50 to-white dark:from-gray-950 dark:via-black dark:to-gray-950 overflow-hidden">
+    <section className="relative py-24 lg:py-32 bg-linear-to-b from-white via-gray-50/50 to-white dark:from-gray-950 dark:via-black dark:to-gray-950 overflow-hidden">
       {}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-gray-200 dark:bg-gray-900 rounded-full blur-3xl opacity-20" />
@@ -102,7 +102,7 @@ const TrustSection = () => {
                   whileInView={{ scaleX: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: 0.8 }}
-                  className="absolute bottom-2 left-0 right-0 h-4 bg-gray-300 dark:bg-gray-700 -z-0 opacity-40"
+                  className="absolute bottom-2 left-0 right-0 h-4 bg-gray-300 dark:bg-gray-700 z-0 opacity-40"
                 />
               </span>{' '}
               à réussir
@@ -259,7 +259,7 @@ const TrustSection = () => {
                 quality={90}
               />
               {}
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/20 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-gray-900/20 via-transparent to-transparent" />
               
               {}
               <motion.div
