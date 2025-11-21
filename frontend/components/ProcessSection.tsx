@@ -82,7 +82,7 @@ const ProcessSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="relative py-24 lg:py-32 overflow-hidden bg-gradient-to-b from-white via-gray-50/50 to-white dark:from-gray-950 dark:via-black dark:to-gray-950">
+    <section className="relative py-24 lg:py-32 overflow-hidden bg-linear-to-b from-white via-gray-50/50 to-white dark:from-gray-950 dark:via-black dark:to-gray-950">
       {}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-200 dark:bg-gray-900 rounded-full blur-3xl opacity-20 animate-pulse" />
@@ -124,7 +124,7 @@ const ProcessSection = () => {
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="absolute bottom-2 left-0 right-0 h-3 bg-gradient-to-r from-gray-300 to-gray-200 dark:from-gray-700 dark:to-gray-600 -z-0 opacity-40"
+                className="absolute bottom-2 left-0 right-0 h-3 bg-linear-to-r from-gray-300 to-gray-200 dark:from-gray-700 dark:to-gray-600 -z-0 opacity-40"
               />
             </span>{' '}
             et efficace
