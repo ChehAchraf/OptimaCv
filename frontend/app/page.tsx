@@ -1,4 +1,4 @@
-'use client'; 
+'use client';
 
 import { useState } from 'react';
 import HeroSection from '@/components/HeroSection';
@@ -6,23 +6,25 @@ import ProcessSection from '@/components/ProcessSection';
 import TrustSection from '@/components/TrustSection';
 import CompanySection from '@/components/CompanySection';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input'; 
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'; 
-import { HiExclamation, HiCheckCircle, HiXCircle } from 'react-icons/hi';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { HiExclamation } from 'react-icons/hi';
 import api from "@/app/axios/path"
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from 'framer-motion';
+import { CVPayload } from '@/types/type';
+import { analyzeCv } from '@/app/actions/analyzeCv';
 
 export default function Home() {
   const [filePDF, setFilePDF] = useState<File | null>(null);
   const [fileImage, setFileImage] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState<string>('');
-  
+
   const [analysisResult, setAnalysisResult] = useState<any>(null);
-  
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,52 +44,47 @@ export default function Home() {
   };
 
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  if (!filePDF || !jobDescription) {
-    setError("Veuillez fournir un CV (PDF) et une description de poste.");
-    return;
-  }
+    if (!filePDF || !jobDescription) {
+      setError("Veuillez fournir un CV (PDF) et une description de poste.");
+      return;
+    }
 
-  if (analyzeVisuals && !fileImage) {
-    setError("Veuillez télécharger l'image de votre CV pour l'analyse visuelle.");
-    return;
-  }
+    if (analyzeVisuals && !fileImage) {
+      setError("Veuillez télécharger l'image de votre CV pour l'analyse visuelle.");
+      return;
+    }
 
-  setIsLoading(true);
-  setError(null);
-  setAnalysisResult(null);
+    setIsLoading(true);
+    setError(null);
+    setAnalysisResult(null);
 
-  // We send pure object — interceptor will detect the File and convert to FormData.
-  const payload: Record<string, any> = {
-    cv_pdf: filePDF,
-    job_description: jobDescription,
+    const payload: CVPayload = {
+      cv_pdf: filePDF,
+      job_description: jobDescription,
+    };
+
+    if (analyzeVisuals && fileImage) {
+      payload.cv_image = fileImage;
+    }
+    try {
+      const response = await analyzeCv(payload);
+      console.log("API Response:", response);
+      setAnalysisResult(response);
+
+    } catch (err: any) {
+      const message =
+        err.response?.data?.detail ||
+        err.message ||
+        "Une erreur est survenue.";
+
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  if (analyzeVisuals && fileImage) {
-    payload.cv_image = fileImage;
-  }
-
-  try {
-    const response = await api.post(
-      "/analysis/analyze-full-cv/",
-      payload
-    );
-
-    setAnalysisResult(response.data);
-
-  } catch (err: any) {
-    const message =
-      err.response?.data?.detail ||
-      err.message ||
-      "Une erreur est survenue.";
-
-    setError(message);
-  } finally {
-    setIsLoading(false);
-  }
-};
 
   const VisualFeedbackDisplay = ({ feedback }: { feedback: any }) => (
     <Card className="mt-6 bg-gray-50 dark:bg-gray-800">
@@ -121,7 +118,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   return (
     <>
       <HeroSection />
-      
+
       <ProcessSection />
 
       <TrustSection />
@@ -138,7 +135,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                
+
                 {error && (
                   <Alert variant="destructive">
                     <HiExclamation className="h-5 w-5" />
@@ -151,29 +148,29 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                   <Label htmlFor="cv-file" className="font-medium">
                     1. Téléchargez votre CV (PDF) <span className="text-red-500">*</span>
                   </Label>
-                  <Input 
+                  <Input
                     id="cv-file"
-                    type="file" 
+                    type="file"
                     accept="application/pdf"
-                    onChange={handlePdfChange} 
+                    onChange={handlePdfChange}
                     required
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="jd" className="font-medium">
                     2. Collez la description de poste <span className="text-red-500">*</span>
                   </Label>
-                  <Textarea 
+                  <Textarea
                     id="jd"
-                    rows={10} 
+                    rows={10}
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                     placeholder="Collez la description de poste ici..."
                     required
                   />
                 </div>
-                
+
                 <div className="space-y-4 rounded-md border p-4">
                   <div className="flex items-center space-x-2">
                     <Checkbox
@@ -185,7 +182,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                       Analyser aussi le Design (Template) ? (Optionnel)
                     </Label>
                   </div>
-                  
+
                   <AnimatePresence>
                     {analyzeVisuals && (
                       <motion.div
@@ -197,9 +194,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                         <Label htmlFor="cv-image" className="text-muted-foreground">
                           Téléchargez une image de votre CV (PNG, JPG)
                         </Label>
-                        <Input 
+                        <Input
                           id="cv-image"
-                          type="file" 
+                          type="file"
                           accept="image/png, image/jpeg, image/webp"
                           onChange={handleImageChange}
                         />
@@ -207,37 +204,38 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                     )}
                   </AnimatePresence>
                 </div>
-                
-                <Button type="submit" disabled={isLoading} size="lg" className="w-full">
-                  {isLoading ? 'Analyse en cours...' : 'Lancer l\'analyse complète'}
+
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Analyse en cours..." : "Analyser CV"}
                 </Button>
+
               </form>
 
               {analysisResult && (
                 <div className="mt-10 border-t pt-6">
-                  
+
                   <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-md overflow-x-auto">
                     <h3 className="text-2xl font-bold">Résultat de l'analyse (Texte vs ATS)</h3>
                     <h4 className="text-xl font-semibold mt-4">
                       Score de correspondance : {analysisResult.analysis_vs_jd.match_score}%
                     </h4>
-                    
+
                     <h5 className="font-semibold mt-4">Points forts :</h5>
                     <ul className="list-disc list-inside text-green-600">
                       {analysisResult.analysis_vs_jd.strengths.map((s: string, i: number) => <li key={i}>{s}</li>)}
                     </ul>
-                    
+
                     <h5 className="font-semibold mt-4">Points faibles :</h5>
                     <ul className="list-disc list-inside text-red-600">
                       {analysisResult.analysis_vs_jd.weaknesses.map((w: string, i: number) => <li key={i}>{w}</li>)}
                     </ul>
-                    
+
                     <h5 className="font-semibold mt-4">Analyse détaillée (JSON) :</h5>
                     <pre className="bg-gray-900 dark:bg-black text-white p-4 rounded-md mt-2">
                       {JSON.stringify(analysisResult.analysis_vs_jd.detailed_analysis, null, 2)}
                     </pre>
                   </div>
-                  
+
                   {analysisResult.visual_analysis && (
                     <VisualFeedbackDisplay feedback={analysisResult.visual_analysis} />
                   )}
