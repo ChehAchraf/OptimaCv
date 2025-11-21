@@ -1,7 +1,12 @@
 import axios, { InternalAxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 
+const baseURL =
+    typeof window === 'undefined' && process.env.INTERNAL_API_BASE_URL
+        ? process.env.INTERNAL_API_BASE_URL
+        : process.env.NEXT_PUBLIC_APP_BASE_URL;
+
 const path = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_APP_BASE_URL,
+    baseURL,
     headers: { Accept: 'application/json' },
 });
 
