@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { AnalysisResult } from '@/types/type';
-import path from '@/app/axios/path';
+import path from '@/lib/axios';
 
 
 export default function CompanyPage() {
