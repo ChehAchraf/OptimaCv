@@ -1,9 +1,11 @@
+export type NavItem = {
+  name: string;
+  href: string;
+};
+
 export type NavigationContent = {
   logoText: string;
-  links: {
-    name: string;
-    href: string;
-  }[];
+  links: NavItem[];
   loginButton: string;
   ctaButton: string;
   openMenu: string;
