@@ -1,0 +1,163 @@
+{
+    "HomePage": {
+        "title": "Créez votre CV professionnel avec l'IA",
+        "subtitle": "Générez des CV optimisés et professionnels en quelques secondes grâce à notre intelligence artificielle avancée.",
+        "cta": "Créer mon CV",
+        "analysis": {
+            "title": "Testez l'analyseur complet",
+            "form": {
+                "cvLabel": "1. Téléchargez votre CV (PDF)",
+                "jdLabel": "2. Collez la description de poste",
+                "jdPlaceholder": "Collez la description de poste ici...",
+                "visualLabel": "Analyser aussi le Design (Template) ? (Optionnel)",
+                "imageLabel": "Téléchargez une image de votre CV (PNG, JPG)",
+                "submitLoading": "Analyse en cours...",
+                "submitDefault": "Analyser CV",
+                "errorMissing": "Veuillez fournir un CV (PDF) et une description de poste.",
+                "errorVisual": "Veuillez télécharger l'image de votre CV pour l'analyse visuelle."
+            },
+            "results": {
+                "title": "Résultat de l'analyse (Texte vs ATS)",
+                "matchScore": "Score de correspondance : {score}%",
+                "strengths": "Points forts :",
+                "weaknesses": "Points faibles :",
+                "detailed": "Analyse détaillée (JSON) :",
+                "visualTitle": "Analyse du Design (Template)",
+                "presentationScore": "Score de Présentation",
+                "layout": "Mise en page (Layout)",
+                "fonts": "Choix de Police (Fonts)",
+                "suggestions": "Suggestions d'amélioration"
+            }
+        }
+    },
+    "PaymentPage": {
+        "title": "Choisissez le plan parfait pour votre carrière",
+        "subtitle": "Des options flexibles pour tous les besoins, du débutant au professionnel.",
+        "recommended": "Recommandé",
+        "securePayment": "Paiement sécurisé via Stripe. Annulation possible à tout moment.",
+        "selectPlan": "Choisir ce plan",
+        "selected": "Sélectionné",
+        "studentOffer": "2 mois offerts avec email école",
+        "plans": {
+            "Basic": {
+                "name": "Basique",
+                "price": "€9.99 / mois",
+                "features": [
+                    "1 CV",
+                    "Support Email",
+                    "Templates limités"
+                ]
+            },
+            "VIP": {
+                "name": "VIP",
+                "price": "€29.99 / mois",
+                "features": [
+                    "CV illimités",
+                    "Support Prioritaire",
+                    "Accès à tous les templates"
+                ]
+            },
+            "Entreprise": {
+                "name": "Entreprise",
+                "price": "€99.99 / mois",
+                "features": [
+                    "CV illimités",
+                    "Gestion équipe",
+                    "Statistiques avancées"
+                ]
+            },
+            "Students": {
+                "name": "Étudiants",
+                "price": "€4.99 / mois",
+                "features": [
+                    "1 CV",
+                    "Support Email",
+                    "Templates limités",
+                    "Prix étudiant"
+                ]
+            }
+        }
+    },
+    "Navbar": {
+        "home": "Accueil",
+        "pricing": "Tarifs",
+        "about": "À propos",
+        "contact": "Contact"
+    },
+    "CompanyPage": {
+        "title": "Tableau de Bord Entreprise",
+        "description": "Importez plusieurs CVs et comparez-les à une seule offre d'emploi.",
+        "form": {
+            "jdLabel": "1. Collez la description de poste (JD)",
+            "jdPlaceholder": "Collez la description de poste complète ici...",
+            "cvLabel": "2. Téléchargez les CVs (PDF)",
+            "fileCount": "{count} fichier(s) sélectionné(s)",
+            "submitLoading": "Analyse en cours (cela peut prendre du temps)...",
+            "submitDefault": "Lancer l'analyse de {count} CVs",
+            "error": "Veuillez fournir une description de poste et au moins un CV (PDF)."
+        },
+        "results": {
+            "title": "Résultats: {count} Candidats Classés",
+            "rank": "Rang #{rank}",
+            "matchScore": "Score de correspondance",
+            "nameNotFound": "Nom non trouvé",
+            "emailNotFound": "Email non trouvé",
+            "noSummary": "Pas de résumé.",
+            "strengths": "Points forts identifiés :",
+            "noStrengths": "Aucun point fort majeur détecté."
+        }
+    },
+    "BuildCVPage": {
+        "steps": {
+            "info": "Infos Perso",
+            "profile": "Profil",
+            "generation": "Génération"
+        },
+        "step1": {
+            "title": "Étape 1: Informations de base",
+            "name": "Nom complet",
+            "email": "Email",
+            "phone": "Téléphone",
+            "next": "Suivant"
+        },
+        "step2": {
+            "title": "Étape 2: Votre Profil",
+            "description": "Décrivez-vous et listez vos certificats. L'IA s'occupe du reste.",
+            "descLabel": "Décrivez-vous (ou vos objectifs)",
+            "descPlaceholder": "Ex: 'Développeur passionné par le cloud, je viens de terminer un stage...' ou 'Cloud, DevOps, Java...'",
+            "certLabel": "Vos Certificats (Optionnel)",
+            "certPlaceholder": "Ex: 'AWS Certified Cloud Practitioner'",
+            "add": "Ajouter",
+            "prev": "Précédent",
+            "generate": "Générer mon CV"
+        },
+        "step3": {
+            "title": "Étape 3: Génération...",
+            "loading": "L'IA rédige votre CV...",
+            "resultTitle": "Votre nouveau profil (Titre): {title}",
+            "keyPoints": "Points forts de ce CV :",
+            "content": "Contenu du CV (JSON) :",
+            "restart": "Recommencer"
+        }
+    },
+    "AboutPage": {
+        "hero": {
+            "title": "Notre Mission",
+            "subtitle": "Révolutionner la recherche d'emploi grâce à l'intelligence artificielle."
+        },
+        "story": {
+            "title": "Notre Histoire",
+            "description": "Né de la frustration de voir des talents ignorés à cause de CV mal formatés, OptimaCv a été créé pour donner à chacun une chance équitable. Nous combinons expertise RH et technologie de pointe."
+        },
+        "values": {
+            "title": "Nos Valeurs",
+            "innovation": "Innovation constante",
+            "accessibility": "Accessibilité pour tous",
+            "professionalism": "Excellence professionnelle"
+        },
+        "cta": {
+            "title": "Prêt à booster votre carrière ?",
+            "button": "Commencer maintenant"
+        }
+    }
+}

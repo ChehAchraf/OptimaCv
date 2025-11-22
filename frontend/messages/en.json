@@ -1,0 +1,163 @@
+{
+    "HomePage": {
+        "title": "Create your professional CV with AI",
+        "subtitle": "Generate optimized and professional CVs in seconds with our advanced artificial intelligence.",
+        "cta": "Create my CV",
+        "analysis": {
+            "title": "Try the Full Analyzer",
+            "form": {
+                "cvLabel": "1. Upload your CV (PDF)",
+                "jdLabel": "2. Paste the Job Description",
+                "jdPlaceholder": "Paste the job description here...",
+                "visualLabel": "Also analyze Design (Template)? (Optional)",
+                "imageLabel": "Upload an image of your CV (PNG, JPG)",
+                "submitLoading": "Analyzing...",
+                "submitDefault": "Analyze CV",
+                "errorMissing": "Please provide a CV (PDF) and a job description.",
+                "errorVisual": "Please upload an image of your CV for visual analysis."
+            },
+            "results": {
+                "title": "Analysis Result (Text vs ATS)",
+                "matchScore": "Match Score: {score}%",
+                "strengths": "Strengths:",
+                "weaknesses": "Weaknesses:",
+                "detailed": "Detailed Analysis (JSON):",
+                "visualTitle": "Design Analysis (Template)",
+                "presentationScore": "Presentation Score",
+                "layout": "Layout",
+                "fonts": "Font Choice",
+                "suggestions": "Improvement Suggestions"
+            }
+        }
+    },
+    "PaymentPage": {
+        "title": "Choose the perfect plan for your career",
+        "subtitle": "Flexible options for all needs, from beginner to professional.",
+        "recommended": "Recommended",
+        "securePayment": "Secure payment via Stripe. Cancel anytime.",
+        "selectPlan": "Select this plan",
+        "selected": "Selected",
+        "studentOffer": "2 months free with school email",
+        "plans": {
+            "Basic": {
+                "name": "Basic",
+                "price": "€9.99 / month",
+                "features": [
+                    "1 CV",
+                    "Email Support",
+                    "Limited Templates"
+                ]
+            },
+            "VIP": {
+                "name": "VIP",
+                "price": "€29.99 / month",
+                "features": [
+                    "Unlimited CVs",
+                    "Priority Support",
+                    "Access to all templates"
+                ]
+            },
+            "Entreprise": {
+                "name": "Enterprise",
+                "price": "€99.99 / month",
+                "features": [
+                    "Unlimited CVs",
+                    "Team Management",
+                    "Advanced Statistics"
+                ]
+            },
+            "Students": {
+                "name": "Students",
+                "price": "€4.99 / month",
+                "features": [
+                    "1 CV",
+                    "Email Support",
+                    "Limited Templates",
+                    "Student Price"
+                ]
+            }
+        }
+    },
+    "Navbar": {
+        "home": "Home",
+        "pricing": "Pricing",
+        "about": "About",
+        "contact": "Contact"
+    },
+    "CompanyPage": {
+        "title": "Company Dashboard",
+        "description": "Import multiple CVs and compare them to a single job offer.",
+        "form": {
+            "jdLabel": "1. Paste the Job Description (JD)",
+            "jdPlaceholder": "Paste the complete job description here...",
+            "cvLabel": "2. Upload CVs (PDF)",
+            "fileCount": "{count} file(s) selected",
+            "submitLoading": "Analysis in progress (this may take some time)...",
+            "submitDefault": "Start analysis of {count} CVs",
+            "error": "Please provide a job description and at least one CV (PDF)."
+        },
+        "results": {
+            "title": "Results: {count} Ranked Candidates",
+            "rank": "Rank #{rank}",
+            "matchScore": "Match Score",
+            "nameNotFound": "Name not found",
+            "emailNotFound": "Email not found",
+            "noSummary": "No summary.",
+            "strengths": "Identified Strengths:",
+            "noStrengths": "No major strengths detected."
+        }
+    },
+    "BuildCVPage": {
+        "steps": {
+            "info": "Personal Info",
+            "profile": "Profile",
+            "generation": "Generation"
+        },
+        "step1": {
+            "title": "Step 1: Basic Information",
+            "name": "Full Name",
+            "email": "Email",
+            "phone": "Phone",
+            "next": "Next"
+        },
+        "step2": {
+            "title": "Step 2: Your Profile",
+            "description": "Describe yourself and list your certificates. AI handles the rest.",
+            "descLabel": "Describe yourself (or your goals)",
+            "descPlaceholder": "Ex: 'Cloud developer, just finished an internship...' or 'Cloud, DevOps, Java...'",
+            "certLabel": "Your Certificates (Optional)",
+            "certPlaceholder": "Ex: 'AWS Certified Cloud Practitioner'",
+            "add": "Add",
+            "prev": "Previous",
+            "generate": "Generate my CV"
+        },
+        "step3": {
+            "title": "Step 3: Generation...",
+            "loading": "AI is writing your CV...",
+            "resultTitle": "Your new profile (Title): {title}",
+            "keyPoints": "Key points of this CV:",
+            "content": "CV Content (JSON):",
+            "restart": "Restart"
+        }
+    },
+    "AboutPage": {
+        "hero": {
+            "title": "Our Mission",
+            "subtitle": "Revolutionizing job search through artificial intelligence."
+        },
+        "story": {
+            "title": "Our Story",
+            "description": "Born from the frustration of seeing talent ignored due to poorly formatted CVs, OptimaCv was created to give everyone a fair chance. We combine HR expertise with cutting-edge technology."
+        },
+        "values": {
+            "title": "Our Values",
+            "innovation": "Constant Innovation",
+            "accessibility": "Accessibility for All",
+            "professionalism": "Professional Excellence"
+        },
+        "cta": {
+            "title": "Ready to boost your career?",
+            "button": "Start Now"
+        }
+    }
+}
