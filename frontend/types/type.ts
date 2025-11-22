@@ -56,6 +56,19 @@ export interface FormData {
 
 
 export interface NavItem {
-  name: string;
-  href: string;
+    name: string;
+    href: string;
 }
+
+
+
+
+export interface Plan {
+    name: string;
+    price: string;
+    features: string[];
+    popular?: boolean;
+    note?: string;
+}
+
+
