@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion, Variants } from 'framer-motion';
 import { frHeroContent } from '@/config/heroContent';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { HiStar } from 'react-icons/hi2';
 import { Badge } from './ui/badge';
@@ -23,14 +23,20 @@ const itemVariants: Variants = {
   },
 };
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  title?: string;
+  subtitle?: string;
+  cta?: string;
+}
+
+const HeroSection = ({ title, subtitle, cta }: HeroSectionProps) => {
   const content = frHeroContent;
 
   return (
     <section className="bg-white dark:bg-gray-950 py-20 md:py-32">
       <div className="container max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        
-        <motion.div 
+
+        <motion.div
           className="flex flex-col space-y-8"
           initial="hidden"
           animate="visible"
@@ -41,33 +47,33 @@ const HeroSection = () => {
               {content.tryNowBadge}
             </Badge>
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tighter text-gray-900 dark:text-white"
             variants={itemVariants}
           >
-            {content.heading}
+            {title || content.heading}
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             className="text-lg text-muted-foreground"
             variants={itemVariants}
           >
-            {content.subheading}
+            {subtitle || content.subheading}
           </motion.p>
-          
-          <motion.div 
+
+          <motion.div
             className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4"
             variants={itemVariants}
           >
             <Button size="lg" asChild className="shadow-lg shadow-blue-500/20">
-              <Link href="#demo">{content.ctaPrimary}</Link>
+              <Link href="#demo">{cta || content.ctaPrimary}</Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
               <Link href="#analyze">{content.ctaSecondary}</Link>
             </Button>
           </motion.div>
-          
+
           <motion.div className="flex items-center space-x-4" variants={itemVariants}>
             <div className="flex -space-x-2 overflow-hidden">
               {content.socialProof.avatars.map((src, index) => (
