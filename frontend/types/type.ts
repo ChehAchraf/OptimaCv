@@ -89,6 +89,7 @@ export interface StatCard {
     label: string;
     icon: LucideIcon;
     description?: string;
+    progress?: number;
 }
 
 

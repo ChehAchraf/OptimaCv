@@ -9,7 +9,8 @@ import {
     Target,
     BarChart3,
     Sparkles,
-    Shield
+    Shield,
+    Star
 } from "lucide-react";
 
 export const benefits: FeatureCard[] = [
@@ -43,6 +44,32 @@ export const benefits: FeatureCard[] = [
     },
 ];
 
+
+export const stats: StatCard[] = [
+    {
+        value: '95%',
+        label: 'stats.success.label',
+        icon: TrendingUp,
+        progress: 95,
+        description: 'stats.success.description'
+    },
+    {
+        value: '10K+',
+        label: 'stats.optimized.label',
+        icon: Users,
+        progress: 100,
+        description: 'stats.optimized.description'
+    },
+    {
+        value: '4.9/5',
+        label: 'stats.satisfaction.label',
+        icon: Star,
+        progress: 98,
+        description: 'stats.satisfaction.description'
+    },
+];
+
+
 export const metrics: StatCard[] = [
     {
         value: '5 min',
@@ -72,18 +99,18 @@ export const metrics: StatCard[] = [
 
 export const features: IFeatures[] = [
     {
-        title: 'Classement intelligent automatique',
-        description: 'Tous les candidats sont automatiquement classés par ordre de pertinence grâce à notre IA.',
+        title: 'features.ranking.title',
+        description: 'features.ranking.description',
         icon: BarChart3,
     },
     {
-        title: 'Analyse multi-critères',
-        description: 'Expérience, compétences, éducation, soft skills - tout est analysé en profondeur.',
+        title: 'features.analysis.title',
+        description: 'features.analysis.description',
         icon: Sparkles,
     },
     {
-        title: 'Rapports détaillés',
-        description: 'Obtenez des insights actionnables sur chaque candidat en un seul clic.',
+        title: 'features.reports.title',
+        description: 'features.reports.description',
         icon: Shield,
     },
 ];
