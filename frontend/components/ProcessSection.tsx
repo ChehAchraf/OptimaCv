@@ -41,14 +41,14 @@ const ProcessSection = () => {
 
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden bg-linear-to-b from-white via-gray-50/50 to-white dark:from-gray-950 dark:via-black dark:to-gray-950">
-      {/* Background Elements */}
+      
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-200 dark:bg-gray-900 rounded-full blur-3xl opacity-20 animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gray-200 dark:bg-gray-900 rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
       <div className="container max-w-7xl mx-auto px-4 relative z-10">
-        {/* Header */}
+        
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -101,7 +101,7 @@ const ProcessSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* Steps Grid */}
+        
         <div ref={ref}>
           <motion.div
             variants={containerVariants}
@@ -109,7 +109,7 @@ const ProcessSection = () => {
             animate={isInView ? "visible" : "hidden"}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 relative"
           >
-            {/* Connecting Line (Desktop) */}
+           
             <div className="hidden lg:block absolute top-24 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-700 to-transparent" />
 
             {steps.map((step, index) => {
@@ -118,7 +118,6 @@ const ProcessSection = () => {
 
               return (
                 <div key={step.number} className="relative">
-                  {/* Connecting Line (Animated) */}
                   {!isLast && (
                     <div className="hidden lg:block absolute top-24 left-full w-full h-0.5 z-0">
                       <motion.div
@@ -146,19 +145,15 @@ const ProcessSection = () => {
                       className="h-full"
                     >
                       <Card className="h-full relative overflow-hidden border-2 border-gray-200/80 dark:border-gray-800/80 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm hover:border-gray-900 dark:hover:border-gray-100 transition-all duration-500 hover:shadow-2xl group">
-                        {/* Hover Gradient Background */}
                         <motion.div
                           className="absolute inset-0 bg-gradient-to-br from-gray-900/5 via-gray-800/5 to-gray-900/5 dark:from-gray-100/5 dark:via-gray-200/5 dark:to-gray-100/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                         />
 
-                        {/* Corner Decoration */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-100 to-transparent dark:from-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-bl-full" />
 
-                        {/* Border Glow */}
                         <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-900/20 via-gray-800/20 to-gray-900/20 dark:from-gray-100/20 dark:via-gray-200/20 dark:to-gray-100/20 rounded-lg opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10" />
 
                         <CardHeader className="relative p-6 pb-4">
-                          {/* Icon */}
                           <div className="flex items-start justify-between mb-6">
                             <motion.div
                               whileHover={{ scale: 1.1, rotate: 5 }}
@@ -196,7 +191,6 @@ const ProcessSection = () => {
                               </div>
                             </motion.div>
 
-                            {/* Step Icon */}
                             <motion.div
                               whileHover={{ scale: 1.15, rotate: 10 }}
                               transition={{ type: 'spring', stiffness: 400 }}
@@ -224,7 +218,6 @@ const ProcessSection = () => {
                             {t(step.description)}
                           </CardDescription>
 
-                          {/* Progress Bar Decoration */}
                           <motion.div
                             initial={{ scaleX: 0 }}
                             whileInView={{ scaleX: 1 }}
@@ -250,7 +243,6 @@ const ProcessSection = () => {
           </motion.div>
         </div>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -273,7 +265,6 @@ const ProcessSection = () => {
             whileTap={{ scale: 0.98 }}
             className="group relative inline-flex items-center gap-3 px-10 py-5 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-xl shadow-2xl transition-all duration-300 overflow-hidden"
           >
-            {/* Button Shine Effect */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
               initial={{ x: '-100%' }}
