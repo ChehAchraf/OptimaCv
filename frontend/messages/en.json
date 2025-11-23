@@ -82,7 +82,33 @@
         "home": "Home",
         "pricing": "Pricing",
         "about": "About",
-        "contact": "Contact"
+        "contact": "Contact",
+        "company": "Company"
+    },
+    "ProcessSection": {
+        "badge": "How it works",
+        "title": "A <span class='relative inline-block'><span class='relative z-10'>simple</span><span class='absolute bottom-2 left-0 right-0 h-3 bg-linear-to-r from-gray-300 to-gray-200 dark:from-gray-700 dark:to-gray-600 -z-0 opacity-40'></span></span> and effective process",
+        "subtitle": "In a few simple steps, get a complete analysis of your CV and optimize your chances of landing your dream job.",
+        "ctaText": "Ready to optimize your CV?",
+        "ctaButton": "Start Now",
+        "steps": {
+            "upload": {
+                "title": "Upload your CV",
+                "description": "Upload your CV in PDF format. Our system automatically parses it to extract all relevant information."
+            },
+            "paste": {
+                "title": "Paste Job Description",
+                "description": "Copy and paste the full job description you are targeting. Our AI will compare your CV with these requirements."
+            },
+            "visual": {
+                "title": "Visual Analysis (Optional)",
+                "description": "For a complete analysis, upload an image of your CV. We will analyze the design, layout, and visual professionalism."
+            },
+            "results": {
+                "title": "Get Your Results",
+                "description": "Receive a detailed report with your match score, strengths, areas for improvement, and concrete suggestions."
+            }
+        }
     },
     "CompanyPage": {
         "title": "Company Dashboard",
