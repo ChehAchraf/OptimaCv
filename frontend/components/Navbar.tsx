@@ -22,6 +22,7 @@ const Navbar = () => {
 
   const mainLinks = [
     { name: t('home'), href: '/' },
+    { name: t('company'), href: '/entreprise' },
     { name: t('pricing'), href: '/payment' },
     { name: t('about'), href: '/about' },
     { name: t('contact'), href: '/contact' },
