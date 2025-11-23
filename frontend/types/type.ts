@@ -1,3 +1,4 @@
+import { LucideIcon } from "lucide-react";
 export interface AnalysisResult {
     filename: string;
     analysis: Analysis
@@ -71,4 +72,40 @@ export interface Plan {
     note?: string;
 }
 
+
+
+
+export interface FeatureCard {
+    icon: LucideIcon;
+    title: string;
+    description: string;
+    stat?: string;
+    color?: string;
+}
+
+
+export interface StatCard {
+    value: string;
+    label: string;
+    icon: LucideIcon;
+    description?: string;
+}
+
+
+export interface IFeatures {
+    title: string;
+    description: string;
+    icon: LucideIcon;
+}
+
+
+export interface StepItem {
+    number: number;
+    title: string;
+    description: string;
+    icon: React.ElementType;
+    iconBg: string;
+    iconColor: string;
+    delay?: number;
+}
 

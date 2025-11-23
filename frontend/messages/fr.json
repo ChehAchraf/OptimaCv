@@ -82,7 +82,33 @@
         "home": "Accueil",
         "pricing": "Tarifs",
         "about": "À propos",
-        "contact": "Contact"
+        "contact": "Contact",
+        "company": "Entreprise"
+    },
+    "ProcessSection": {
+        "badge": "Comment ça marche",
+        "title": "Un processus <span class='relative inline-block'><span class='relative z-10'>simple</span><span class='absolute bottom-2 left-0 right-0 h-3 bg-linear-to-r from-gray-300 to-gray-200 dark:from-gray-700 dark:to-gray-600 -z-0 opacity-40'></span></span> et efficace",
+        "subtitle": "En quelques étapes simples, obtenez une analyse complète de votre CV et optimisez vos chances de décrocher l'emploi de vos rêves.",
+        "ctaText": "Prêt à optimiser votre CV ?",
+        "ctaButton": "Commencer maintenant",
+        "steps": {
+            "upload": {
+                "title": "Téléchargez votre CV",
+                "description": "Uploadez votre CV au format PDF. Notre système le parse automatiquement pour extraire toutes les informations pertinentes."
+            },
+            "paste": {
+                "title": "Collez la description de poste",
+                "description": "Copiez et collez la description complète du poste que vous visez. Notre IA va comparer votre CV avec ces exigences."
+            },
+            "visual": {
+                "title": "Analyse visuelle (optionnel)",
+                "description": "Pour une analyse complète, téléchargez une image de votre CV. Nous analyserons le design, la mise en page et le professionnalisme visuel."
+            },
+            "results": {
+                "title": "Obtenez vos résultats",
+                "description": "Recevez un rapport détaillé avec votre score de correspondance, vos points forts, vos points à améliorer et des suggestions concrètes."
+            }
+        }
     },
     "CompanyPage": {
         "title": "Tableau de Bord Entreprise",

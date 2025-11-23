@@ -4,80 +4,16 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ArrowRight, 
-  Zap, 
   Filter, 
-  TrendingUp, 
-  Clock, 
-  DollarSign, 
   Shield, 
   CheckCircle2,
-  Sparkles,
-  BarChart3,
-  Users,
-  Target
 } from 'lucide-react';
 import Link from 'next/link';
-
-const benefits = [
-  {
-    icon: Zap,
-    title: 'Analyse instantanée',
-    description: 'Traitez des centaines de CVs en secondes, pas en heures',
-    stat: '90% plus rapide',
-    color: 'text-yellow-600 dark:text-yellow-400',
-  },
-  {
-    icon: Filter,
-    title: 'Filtrage en un clic',
-    description: 'Trouvez le candidat idéal instantanément avec notre IA avancée',
-    stat: '1 clic = résultats',
-    color: 'text-blue-600 dark:text-blue-400',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Précision maximale',
-    description: 'Notre IA analyse 50+ critères pour un matching parfait',
-    stat: '95% de précision',
-    color: 'text-green-600 dark:text-green-400',
-  },
-  {
-    icon: DollarSign,
-    title: 'ROI garanti',
-    description: 'Réduisez vos coûts de recrutement de 70%',
-    stat: '70% d\'économies',
-    color: 'text-emerald-600 dark:text-emerald-400',
-  },
-];
-
-const metrics = [
-  { value: '5 min', label: 'Temps moyen d\'analyse', icon: Clock, description: 'vs 2 heures manuellement' },
-  { value: '10K+', label: 'CVs traités', icon: Users, description: 'par nos clients entreprises' },
-  { value: '95%', label: 'Taux de précision', icon: Target, description: 'dans le matching candidat-poste' },
-  { value: '70%', label: 'Réduction des coûts', icon: DollarSign, description: 'de recrutement en moyenne' },
-];
-
-const features = [
-  {
-    title: 'Classement intelligent automatique',
-    description: 'Tous les candidats sont automatiquement classés par ordre de pertinence grâce à notre IA.',
-    icon: BarChart3,
-  },
-  {
-    title: 'Analyse multi-critères',
-    description: 'Expérience, compétences, éducation, soft skills - tout est analysé en profondeur.',
-    icon: Sparkles,
-  },
-  {
-    title: 'Rapports détaillés',
-    description: 'Obtenez des insights actionnables sur chaque candidat en un seul clic.',
-    icon: Shield,
-  },
-];
+import { benefits, metrics,features } from '@/config/company';
 
 const CompanySection = () => {
   return (
@@ -215,9 +151,8 @@ const CompanySection = () => {
                       initial={{ opacity: 0, y: 50 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ delay: 0.6 + i * 0.2 }}
                       animate={{ y: [0, -5, 0] }}
-                      transition={{ duration: 2 + i * 0.3, repeat: Infinity, delay: i * 0.2 }}
+                      transition={{ delay: 0.6 + i * 0.2, duration: 2 + i * 0.3, repeat: Infinity, ease: 'easeInOut' }}
                       className="absolute"
                       style={{
                         left: `${20 + i * 30}%`,
