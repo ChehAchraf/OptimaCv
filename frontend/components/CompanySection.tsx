@@ -6,26 +6,28 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  ArrowRight, 
-  Filter, 
-  Shield, 
+import {
+  ArrowRight,
+  Filter,
+  Shield,
   CheckCircle2,
 } from 'lucide-react';
 import Link from 'next/link';
-import { benefits, metrics,features } from '@/config/company';
+import { benefits, metrics, features } from '@/config/company';
+import { useTranslations } from 'next-intl';
 
 const CompanySection = () => {
+  const t = useTranslations('CompanySection');
   return (
     <section className="relative py-24 lg:py-32 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-black dark:via-gray-950 dark:to-black overflow-hidden">
-      {}
+      { }
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-gray-200 dark:bg-gray-900 rounded-full blur-3xl opacity-10" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-gray-200 dark:bg-gray-900 rounded-full blur-3xl opacity-10" />
       </div>
 
       <div className="container max-w-7xl mx-auto px-4 relative z-10">
-        {}
+        { }
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -38,35 +40,39 @@ const CompanySection = () => {
             className="mb-6 text-sm font-semibold text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2"
           >
             <Shield className="mr-2 h-4 w-4" />
-            Solution Entreprise
+            {t('badge')}
           </Badge>
 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
-            Recrutez{' '}
-            <span className="relative inline-block">
-              <span className="relative z-10">intelligemment</span>
-              <motion.span
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                className="absolute bottom-2 left-0 right-0 h-4 bg-gray-300 dark:bg-gray-700 -z-0 opacity-40"
-              />
-            </span>
-            {' '}avec notre{' '}
-            <span className="text-gray-900 dark:text-white bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
-              ATS alimenté par IA
-            </span>
+            {t.rich('title', {
+              span: (chunks) => (
+                <span className="relative inline-block">
+                  <span className="relative z-10">{chunks}</span>
+                  <motion.span
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                    className="absolute bottom-2 left-0 right-0 h-4 bg-gray-300 dark:bg-gray-700 -z-0 opacity-40"
+                  />
+                </span>
+              ),
+              highlight: (chunks) => (
+                <span className="text-gray-900 dark:text-white bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
+                  {chunks}
+                </span>
+              )
+            })}
           </h2>
 
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Gagnez du temps, réduisez vos coûts et trouvez les meilleurs candidats en{' '}
-            <strong className="text-gray-900 dark:text-white">un seul clic</strong>. 
-            Notre technologie d'IA avancée analyse et classe automatiquement tous vos CVs.
+            {t.rich('subtitle', {
+              strong: (chunks) => <strong className="text-gray-900 dark:text-white">{chunks}</strong>
+            })}
           </p>
         </motion.div>
 
-        {}
+        { }
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -82,25 +88,27 @@ const CompanySection = () => {
                     <Filter className="h-8 w-8 text-white dark:text-gray-900" />
                   </div>
                   <Badge className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-4 py-1 text-sm font-bold">
-                    Fonctionnalité phare
+                    {t('featureCard.badge')}
                   </Badge>
                 </div>
                 <CardTitle className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-                  Filtrage en{' '}
-                  <span className="text-gray-900 dark:text-white bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
-                    un seul clic
-                  </span>
+                  {t.rich('featureCard.title', {
+                    highlight: (chunks) => (
+                      <span className="text-gray-900 dark:text-white bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
+                        {chunks}
+                      </span>
+                    )
+                  })}
                 </CardTitle>
                 <CardDescription className="text-lg mb-6">
-                  Uploadez vos CVs, collez votre description de poste, et obtenez instantanément 
-                  un classement intelligent de tous vos candidats par ordre de pertinence.
+                  {t('featureCard.description')}
                 </CardDescription>
                 <div className="space-y-4">
                   {[
-                    'Analyse automatique de tous les CVs',
-                    'Classement intelligent par score de correspondance',
-                    'Rapports détaillés sur chaque candidat',
-                    'Gain de temps : de 2 heures à 5 minutes',
+                    'autoAnalysis',
+                    'smartRanking',
+                    'detailedReports',
+                    'timeSaving',
                   ].map((feature, index) => (
                     <motion.div
                       key={feature}
@@ -111,7 +119,7 @@ const CompanySection = () => {
                       className="flex items-center gap-3"
                     >
                       <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
-                      <span className="text-gray-700 dark:text-gray-300 font-medium">{feature}</span>
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">{t(`featureCard.features.${feature}`)}</span>
                     </motion.div>
                   ))}
                 </div>
@@ -122,14 +130,14 @@ const CompanySection = () => {
                     className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 font-semibold text-lg px-8 py-6 rounded-xl shadow-xl group"
                   >
                     <Link href="/entreprise">
-                      Essayer maintenant
+                      {t('featureCard.cta')}
                       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
                 </div>
               </CardContent>
               <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-8 lg:p-12 flex items-center justify-center">
-                {}
+                { }
                 <div className="relative w-full max-w-md">
                   <motion.div
                     animate={{ y: [0, -10, 0] }}
@@ -143,8 +151,8 @@ const CompanySection = () => {
                       </div>
                     </Card>
                   </motion.div>
-                  
-                  {}
+
+                  { }
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
@@ -176,7 +184,7 @@ const CompanySection = () => {
           </Card>
         </motion.div>
 
-        {}
+        { }
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -202,16 +210,16 @@ const CompanySection = () => {
                         <Icon className={`h-6 w-6 ${benefit.color}`} />
                       </div>
                       <Badge variant="outline" className="text-xs font-semibold">
-                        {benefit.stat}
+                        {t(benefit.stat as any)}
                       </Badge>
                     </div>
                     <CardTitle className="text-xl font-bold mb-2">
-                      {benefit.title}
+                      {t(benefit.title as any)}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-base">
-                      {benefit.description}
+                      {t(benefit.description as any)}
                     </CardDescription>
                   </CardContent>
                 </Card>
@@ -220,7 +228,7 @@ const CompanySection = () => {
           })}
         </motion.div>
 
-        {}
+        { }
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -231,10 +239,10 @@ const CompanySection = () => {
           <Card className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 border-0 shadow-2xl">
             <CardHeader className="text-center pb-8">
               <CardTitle className="text-3xl font-bold mb-2">
-                Des résultats qui parlent
+                {t('metricsTitle')}
               </CardTitle>
               <CardDescription className="text-gray-300 dark:text-gray-700 text-lg">
-                Nos clients entreprises constatent des améliorations immédiates
+                {t('metricsSubtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -256,8 +264,8 @@ const CompanySection = () => {
                         </div>
                       </div>
                       <div className="text-4xl font-bold mb-2">{metric.value}</div>
-                      <div className="text-sm font-semibold mb-1">{metric.label}</div>
-                      <div className="text-xs opacity-80">{metric.description}</div>
+                      <div className="text-sm font-semibold mb-1">{t(metric.label as any)}</div>
+                      <div className="text-xs opacity-80">{t(metric.description as any)}</div>
                     </motion.div>
                   );
                 })}
@@ -266,7 +274,7 @@ const CompanySection = () => {
           </Card>
         </motion.div>
 
-        {}
+        { }
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -276,23 +284,23 @@ const CompanySection = () => {
         >
           <div className="text-center mb-10">
             <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Pourquoi choisir notre solution ?
+              {t('whyChooseTitle')}
             </h3>
             <p className="text-lg text-muted-foreground">
-              Une technologie d'IA de pointe au service de votre recrutement
+              {t('whyChooseSubtitle')}
             </p>
           </div>
 
           <Tabs defaultValue="ranking" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="ranking" className="text-sm md:text-base">
-                Classement IA
+                {t('tabs.ranking')}
               </TabsTrigger>
               <TabsTrigger value="analysis" className="text-sm md:text-base">
-                Analyse multi-critères
+                {t('tabs.analysis')}
               </TabsTrigger>
               <TabsTrigger value="reports" className="text-sm md:text-base">
-                Rapports détaillés
+                {t('tabs.reports')}
               </TabsTrigger>
             </TabsList>
             {features.map((feature, index) => {
@@ -307,24 +315,24 @@ const CompanySection = () => {
                           <Icon className="h-6 w-6 text-white dark:text-gray-900" />
                         </div>
                         <CardTitle className="text-2xl font-bold">
-                          {feature.title}
+                          {t(feature.title)}
                         </CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <CardDescription className="text-lg">
-                        {feature.description}
+                        {t(feature.description)}
                       </CardDescription>
                       <Separator className="my-6" />
                       <div className="grid md:grid-cols-3 gap-4">
                         {[
-                          'Automatisation complète',
-                          'Traitement en masse',
-                          'Résultats instantanés',
+                          'complete',
+                          'bulk',
+                          'instant',
                         ].map((item, i) => (
                           <div key={i} className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-                            <span className="text-sm text-muted-foreground">{item}</span>
+                            <span className="text-sm text-muted-foreground">{t(`tabsFeatures.${item}`)}</span>
                           </div>
                         ))}
                       </div>
@@ -336,7 +344,7 @@ const CompanySection = () => {
           </Tabs>
         </motion.div>
 
-        {}
+        { }
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -347,10 +355,10 @@ const CompanySection = () => {
           <Card className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-100 dark:to-gray-200 text-white dark:text-gray-900 border-0 shadow-2xl">
             <CardContent className="p-12">
               <h3 className="text-3xl md:text-4xl font-bold mb-4">
-                Prêt à transformer votre recrutement ?
+                {t('ctaTitle')}
               </h3>
               <p className="text-xl mb-8 opacity-90">
-                Rejoignez les entreprises qui recrutent plus vite et plus intelligemment
+                {t('ctaSubtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -359,7 +367,7 @@ const CompanySection = () => {
                   className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 font-semibold text-lg px-8 py-6 rounded-xl shadow-xl"
                 >
                   <Link href="/entreprise">
-                    Démarrer l'essai gratuit
+                    {t('ctaButtons.startTrial')}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
@@ -368,7 +376,7 @@ const CompanySection = () => {
                   variant="outline"
                   className="border-2 border-white/30 dark:border-gray-700 text-white dark:text-gray-900 bg-transparent hover:bg-white/10 dark:hover:bg-gray-800/50 font-semibold text-lg px-8 py-6 rounded-xl"
                 >
-                  Demander une démo
+                  {t('ctaButtons.requestDemo')}
                 </Button>
               </div>
             </CardContent>

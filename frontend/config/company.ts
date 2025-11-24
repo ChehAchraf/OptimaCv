@@ -16,30 +16,30 @@ import {
 export const benefits: FeatureCard[] = [
     {
         icon: Zap,
-        title: 'Analyse instantanée',
-        description: 'Traitez des centaines de CVs en secondes, pas en heures',
-        stat: '90% plus rapide',
+        title: 'benefits.instantAnalysis.title',
+        description: 'benefits.instantAnalysis.description',
+        stat: 'benefits.instantAnalysis.stat',
         color: 'text-yellow-600 dark:text-yellow-400',
     },
     {
         icon: Filter,
-        title: 'Filtrage en un clic',
-        description: 'Trouvez le candidat idéal instantanément avec notre IA avancée',
-        stat: '1 clic = résultats',
+        title: 'benefits.oneClickFiltering.title',
+        description: 'benefits.oneClickFiltering.description',
+        stat: 'benefits.oneClickFiltering.stat',
         color: 'text-blue-600 dark:text-blue-400',
     },
     {
         icon: TrendingUp,
-        title: 'Précision maximale',
-        description: 'Notre IA analyse 50+ critères pour un matching parfait',
-        stat: '95% de précision',
+        title: 'benefits.maxPrecision.title',
+        description: 'benefits.maxPrecision.description',
+        stat: 'benefits.maxPrecision.stat',
         color: 'text-green-600 dark:text-green-400',
     },
     {
         icon: DollarSign,
-        title: 'ROI garanti',
-        description: 'Réduisez vos coûts de recrutement de 70%',
-        stat: '70% d\'économies',
+        title: 'benefits.guaranteedROI.title',
+        description: 'benefits.guaranteedROI.description',
+        stat: 'benefits.guaranteedROI.stat',
         color: 'text-emerald-600 dark:text-emerald-400',
     },
 ];
@@ -73,27 +73,27 @@ export const stats: StatCard[] = [
 export const metrics: StatCard[] = [
     {
         value: '5 min',
-        label: 'Temps moyen d\'analyse',
+        label: 'metrics.analysisTime.label',
         icon: Clock,
-        description: 'vs 2 heures manuellement'
+        description: 'metrics.analysisTime.description'
     },
     {
         value: '10K+',
-        label: 'CVs traités',
+        label: 'metrics.cvsProcessed.label',
         icon: Users,
-        description: 'par nos clients entreprises'
+        description: 'metrics.cvsProcessed.description'
     },
     {
         value: '95%',
-        label: 'Taux de précision',
+        label: 'metrics.accuracyRate.label',
         icon: Target,
-        description: 'dans le matching candidat-poste'
+        description: 'metrics.accuracyRate.description'
     },
     {
         value: '70%',
-        label: 'Réduction des coûts',
+        label: 'metrics.costReduction.label',
         icon: DollarSign,
-        description: 'de recrutement en moyenne'
+        description: 'metrics.costReduction.description'
     },
 ];
 
