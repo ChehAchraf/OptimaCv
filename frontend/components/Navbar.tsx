@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,12 +43,12 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200">
+    <nav className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
           <div className="flex items-center space-x-6">
-            <Link href="/" className="text-2xl font-bold text-gray-900">OptimaCv</Link>
+            <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white">OptimaCv</Link>
             <div className="hidden md:flex md:items-center md:space-x-2">
               {mainLinks.map((link) => (
                 <Link key={link.name} href={link.href}>
@@ -58,6 +59,7 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-2">
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -87,6 +89,7 @@ const Navbar = () => {
 
 
           <div className="md:hidden flex items-center space-x-2">
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -110,7 +113,7 @@ const Navbar = () => {
 
 
       {isOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
+        <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {mainLinks.map((link) => (
               <Link key={link.name} href={link.href} onClick={handleCloseMenu}>
