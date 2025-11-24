@@ -172,237 +172,147 @@
             "subtitle": "Révolutionner la recherche d'emploi grâce à l'intelligence artificielle."
         },
         "story": {
-            "form": {
-                "cvLabel": "1. Téléchargez votre CV (PDF)",
-                "jdLabel": "2. Collez la description de poste",
-                "jdPlaceholder": "Collez la description de poste ici...",
-                "visualLabel": "Analyser aussi le Design (Template) ? (Optionnel)",
-                "imageLabel": "Téléchargez une image de votre CV (PNG, JPG)",
-                "submitLoading": "Analyse en cours...",
-                "submitDefault": "Analyser CV",
-                "errorMissing": "Veuillez fournir un CV (PDF) et une description de poste.",
-                "errorVisual": "Veuillez télécharger l'image de votre CV pour l'analyse visuelle."
-            },
-            "results": {
-                "title": "Résultat de l'analyse (Texte vs ATS)",
-                "matchScore": "Score de correspondance : {score}%",
-                "strengths": "Points forts :",
-                "weaknesses": "Points faibles :",
-                "detailed": "Analyse détaillée (JSON) :",
-                "visualTitle": "Analyse du Design (Template)",
-                "presentationScore": "Score de Présentation",
-                "layout": "Mise en page (Layout)",
-                "fonts": "Choix de Police (Fonts)",
-                "suggestions": "Suggestions d'amélioration"
-            }
-        }
-    },
-    "PaymentPage": {
-        "title": "Choisissez le plan parfait pour votre carrière",
-        "subtitle": "Des options flexibles pour tous les besoins, du débutant au professionnel.",
-        "recommended": "Recommandé",
-        "securePayment": "Paiement sécurisé via Stripe. Annulation possible à tout moment.",
-        "selectPlan": "Choisir ce plan",
-        "selected": "Sélectionné",
-        "studentOffer": "2 mois offerts avec email école",
-        "plans": {
-            "Basic": {
-                "name": "Basique",
-                "price": "€9.99 / mois",
-                "features": [
-                    "1 CV",
-                    "Support Email",
-                    "Templates limités"
-                ]
-            },
-            "VIP": {
-                "name": "VIP",
-                "price": "€29.99 / mois",
-                "features": [
-                    "CV illimités",
-                    "Support Prioritaire",
-                    "Accès à tous les templates"
-                ]
-            },
-            "Entreprise": {
-                "name": "Entreprise",
-                "price": "€99.99 / mois",
-                "features": [
-                    "CV illimités",
-                    "Gestion équipe",
-                    "Statistiques avancées"
-                ]
-            },
-            "Students": {
-                "name": "Étudiants",
-                "price": "€4.99 / mois",
-                "features": [
-                    "1 CV",
-                    "Support Email",
-                    "Templates limités",
-                    "Prix étudiant"
-                ]
-            }
-        }
-    },
-    "Navbar": {
-        "home": "Accueil",
-        "pricing": "Tarifs",
-        "about": "À propos",
-        "contact": "Contact",
-        "company": "Entreprise"
-    },
-    "ProcessSection": {
-        "badge": "Comment ça marche",
-        "title": "Un processus <span>simple</span> et efficace",
-        "subtitle": "En quelques étapes simples, obtenez une analyse complète de votre CV et optimisez vos chances de décrocher l'emploi de vos rêves.",
-        "ctaText": "Prêt à optimiser votre CV ?",
-        "ctaButton": "Commencer maintenant",
-        "steps": {
-            "upload": {
-                "title": "Téléchargez votre CV",
-                "description": "Uploadez votre CV au format PDF. Notre système le parse automatiquement pour extraire toutes les informations pertinentes."
-            },
-            "paste": {
-                "title": "Collez la description de poste",
-                "description": "Copiez et collez la description complète du poste que vous visez. Notre IA va comparer votre CV avec ces exigences."
-            },
-            "visual": {
-                "title": "Analyse visuelle (optionnel)",
-                "description": "Pour une analyse complète, téléchargez une image de votre CV. Nous analyserons le design, la mise en page et le professionnalisme visuel."
-            },
-            "results": {
-                "title": "Obtenez vos résultats",
-                "description": "Recevez un rapport détaillé avec votre score de correspondance, vos points forts, vos points à améliorer et des suggestions concrètes."
-            }
-        }
-    },
-    "CompanyPage": {
-        "title": "Tableau de Bord Entreprise",
-        "description": "Importez plusieurs CVs et comparez-les à une seule offre d'emploi.",
-        "form": {
-            "jdLabel": "1. Collez la description de poste (JD)",
-            "jdPlaceholder": "Collez la description de poste complète ici...",
-            "cvLabel": "2. Téléchargez les CVs (PDF)",
-            "fileCount": "{count} fichier(s) sélectionné(s)",
-            "submitLoading": "Analyse en cours (cela peut prendre du temps)...",
-            "submitDefault": "Lancer l'analyse de {count} CVs",
-            "error": "Veuillez fournir une description de poste et au moins un CV (PDF)."
-        },
-        "results": {
-            "title": "Résultats: {count} Candidats Classés",
-            "rank": "Rang #{rank}",
-            "matchScore": "Score de correspondance",
-            "nameNotFound": "Nom non trouvé",
-            "emailNotFound": "Email non trouvé",
-            "noSummary": "Pas de résumé.",
-            "strengths": "Points forts identifiés :",
-            "noStrengths": "Aucun point fort majeur détecté."
-        }
-    },
-    "BuildCVPage": {
-        "steps": {
-            "info": "Infos Perso",
-            "profile": "Profil",
-            "generation": "Génération"
-        },
-        "step1": {
-            "title": "Étape 1: Informations de base",
-            "name": "Nom complet",
-            "email": "Email",
-            "phone": "Téléphone",
-            "next": "Suivant"
-        },
-        "step2": {
-            "title": "Étape 2: Votre Profil",
-            "description": "Décrivez-vous et listez vos certificats. L'IA s'occupe du reste.",
-            "descLabel": "Décrivez-vous (ou vos objectifs)",
-            "descPlaceholder": "Ex: 'Développeur passionné par le cloud, je viens de terminer un stage...' ou 'Cloud, DevOps, Java...'",
-            "certLabel": "Vos Certificats (Optionnel)",
-            "certPlaceholder": "Ex: 'AWS Certified Cloud Practitioner'",
-            "add": "Ajouter",
-            "prev": "Précédent",
-            "generate": "Générer mon CV"
-        },
-        "step3": {
-            "title": "Étape 3: Génération...",
-            "loading": "L'IA rédige votre CV...",
-            "resultTitle": "Votre nouveau profil (Titre): {title}",
-            "keyPoints": "Points forts de ce CV :",
-            "content": "Contenu du CV (JSON) :",
-            "restart": "Recommencer"
-        }
-    },
-    "AboutPage": {
-        "hero": {
-            "title": "Notre Mission",
-            "subtitle": "Révolutionner la recherche d'emploi grâce à l'intelligence artificielle."
-        },
-        "story": {
             "title": "Notre Histoire",
-
-                "resultTitle": "Votre nouveau profil (Titre): {title}",
-                "keyPoints": "Points forts de ce CV :",
-                "content": "Contenu du CV (JSON) :",
-                "restart": "Recommencer"
+            "description": "Né de la frustration de voir des talents ignorés à cause de CV mal formatés, OptimaCv a été créé pour donner à chacun une chance équitable. Nous combinons expertise RH et technologie de pointe."
+        },
+        "values": {
+            "title": "Nos Valeurs",
+            "innovation": "Innovation constante",
+            "accessibility": "Accessibilité pour tous",
+            "professionalism": "Excellence professionnelle"
+        },
+        "cta": {
+            "title": "Prêt à booster votre carrière ?",
+            "button": "Commencer maintenant"
+        }
+    },
+    "TrustSection": {
+        "badge": "Rejoignez des milliers de professionnels satisfaits",
+        "title": "Nous vous <span>aiderons</span> à réussir",
+        "description": "Rejoignez ces professionnels qui ont transformé leur carrière grâce à notre technologie d'analyse intelligente de CV.",
+        "cta": "Commencer maintenant",
+        "floatingCard": {
+            "title": "+500 candidats",
+            "description": "ont trouvé leur emploi idéal ce mois-ci"
+        },
+        "stats": {
+            "success": {
+                "label": "Taux de réussite",
+                "description": "de nos utilisateurs décrochent un entretien"
+            },
+            "optimized": {
+                "label": "CV optimisés",
+                "description": "candidats nous font confiance"
+            },
+            "satisfaction": {
+                "label": "Satisfaction",
+                "description": "note moyenne de nos utilisateurs"
             }
         },
-        "AboutPage": {
-            "hero": {
-                "title": "Notre Mission",
-                "subtitle": "Révolutionner la recherche d'emploi grâce à l'intelligence artificielle."
+        "features": {
+            "ranking": {
+                "title": "Classement intelligent automatique",
+                "description": "Tous les candidats sont automatiquement classés par ordre de pertinence grâce à notre IA."
             },
-            "story": {
-                "title": "Notre Histoire",
-                "description": "Né de la frustration de voir des talents ignorés à cause de CV mal formatés, OptimaCv a été créé pour donner à chacun une chance équitable. Nous combinons expertise RH et technologie de pointe."
+            "analysis": {
+                "title": "Analyse multi-critères",
+                "description": "Expérience, compétences, éducation, soft skills - tout est analysé en profondeur."
             },
-            "values": {
-                "title": "Nos Valeurs",
-                "innovation": "Innovation constante",
-                "accessibility": "Accessibilité pour tous",
-                "professionalism": "Excellence professionnelle"
-            },
-            "cta": {
-                "title": "Prêt à booster votre carrière ?",
-                "button": "Commencer maintenant"
+            "reports": {
+                "title": "Rapports détaillés",
+                "description": "Obtenez des insights actionnables sur chaque candidat en un seul clic."
             }
-        },
-        "TrustSection": {
-            "badge": "Rejoignez des milliers de professionnels satisfaits",
-            "title": "Nous vous <span>aiderons</span> à réussir",
-            "description": "Rejoignez ces professionnels qui ont transformé leur carrière grâce à notre technologie d'analyse intelligente de CV.",
-            "cta": "Commencer maintenant",
-            "floatingCard": {
-                "title": "+500 candidats",
-                "description": "ont trouvé leur emploi idéal ce mois-ci"
-            },
-            "stats": {
-                "success": {
-                    "label": "Taux de réussite",
-                    "description": "de nos utilisateurs décrochent un entretien"
-                },
-                "optimized": {
-                    "label": "CV optimisés",
-                    "description": "candidats nous font confiance"
-                },
-                "satisfaction": {
-                    "label": "Satisfaction",
-                    "description": "note moyenne de nos utilisateurs"
-                }
-            },
+        }
+    },
+    "CompanySection": {
+        "badge": "Solution Entreprise",
+        "title": "Recrutez <span>intelligemment</span> avec notre <highlight>ATS alimenté par IA</highlight>",
+        "subtitle": "Gagnez du temps, réduisez vos coûts et trouvez les meilleurs candidats en <strong>un seul clic</strong>. Notre technologie d'IA avancée analyse et classe automatiquement tous vos CVs.",
+        "featureCard": {
+            "badge": "Fonctionnalité phare",
+            "title": "Filtrage en <highlight>un seul clic</highlight>",
+            "description": "Uploadez vos CVs, collez votre description de poste, et obtenez instantanément un classement intelligent de tous vos candidats par ordre de pertinence.",
             "features": {
-                "ranking": {
-                    "title": "Classement intelligent automatique",
-                    "description": "Tous les candidats sont automatiquement classés par ordre de pertinence grâce à notre IA."
-                },
-                "analysis": {
-                    "title": "Analyse multi-critères",
-                    "description": "Expérience, compétences, éducation, soft skills - tout est analysé en profondeur."
-                },
-                "reports": {
-                    "title": "Rapports détaillés",
-                    "description": "Obtenez des insights actionnables sur chaque candidat en un seul clic."
-                }
+                "autoAnalysis": "Analyse automatique de tous les CVs",
+                "smartRanking": "Classement intelligent par score de correspondance",
+                "detailedReports": "Rapports détaillés sur chaque candidat",
+                "timeSaving": "Gain de temps : de 2 heures à 5 minutes"
+            },
+            "cta": "Essayer maintenant"
+        },
+        "benefits": {
+            "instantAnalysis": {
+                "title": "Analyse instantanée",
+                "description": "Traitez des centaines de CVs en secondes, pas en heures",
+                "stat": "90% plus rapide"
+            },
+            "oneClickFiltering": {
+                "title": "Filtrage en un clic",
+                "description": "Trouvez le candidat idéal instantanément avec notre IA avancée",
+                "stat": "1 clic = résultats"
+            },
+            "maxPrecision": {
+                "title": "Précision maximale",
+                "description": "Notre IA analyse plus de 50 critères pour un matching parfait",
+                "stat": "95% de précision"
+            },
+            "guaranteedROI": {
+                "title": "ROI garanti",
+                "description": "Réduisez vos coûts de recrutement de 70%",
+                "stat": "70% d'économies"
             }
+        },
+        "metricsTitle": "Des résultats qui parlent",
+        "metricsSubtitle": "Nos clients entreprises constatent des améliorations immédiates",
+        "metrics": {
+            "analysisTime": {
+                "label": "Temps d'analyse moyen",
+                "description": "vs 2 heures manuellement"
+            },
+            "cvsProcessed": {
+                "label": "CVs traités",
+                "description": "par nos clients entreprises"
+            },
+            "accuracyRate": {
+                "label": "Taux de précision",
+                "description": "dans le matching candidat-poste"
+            },
+            "costReduction": {
+                "label": "Réduction des coûts",
+                "description": "en recrutement en moyenne"
+            }
+        },
+        "whyChooseTitle": "Pourquoi choisir notre solution ?",
+        "whyChooseSubtitle": "Une technologie d'IA de pointe au service de votre recrutement",
+        "tabs": {
+            "ranking": "Classement IA",
+            "analysis": "Analyse multi-critères",
+            "reports": "Rapports détaillés"
+        },
+        "tabsFeatures": {
+            "complete": "Automatisation complète",
+            "bulk": "Traitement en masse",
+            "instant": "Résultats instantanés"
+        },
+        "features": {
+            "ranking": {
+                "title": "Classement intelligent automatique",
+                "description": "Tous les candidats sont automatiquement classés par pertinence grâce à notre IA."
+            },
+            "analysis": {
+                "title": "Analyse multi-critères",
+                "description": "Expérience, compétences, formation, soft skills - tout est analysé en profondeur."
+            },
+            "reports": {
+                "title": "Rapports détaillés",
+                "description": "Obtenez des insights actionnables sur chaque candidat en un clic."
+            }
+        },
+        "ctaTitle": "Prêt à transformer votre recrutement ?",
+        "ctaSubtitle": "Rejoignez les entreprises qui recrutent plus vite et plus intelligemment",
+        "ctaButtons": {
+            "startTrial": "Démarrer l'essai gratuit",
+            "requestDemo": "Demander une démo"
         }
     }
+}
