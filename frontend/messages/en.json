@@ -172,355 +172,6 @@
             "subtitle": "Revolutionizing job search through artificial intelligence."
         },
         "story": {
-            "form": {
-                "cvLabel": "1. Upload your CV (PDF)",
-                "jdLabel": "2. Paste the Job Description",
-                "jdPlaceholder": "Paste the job description here...",
-                "visualLabel": "Also analyze Design (Template)? (Optional)",
-                "imageLabel": "Upload an image of your CV (PNG, JPG)",
-                "submitLoading": "Analyzing...",
-                "submitDefault": "Analyze CV",
-                "errorMissing": "Please provide a CV (PDF) and a job description.",
-                "errorVisual": "Please upload an image of your CV for visual analysis."
-            },
-            "results": {
-                "title": "Analysis Result (Text vs ATS)",
-                "matchScore": "Match Score: {score}%",
-                "strengths": "Strengths:",
-                "weaknesses": "Weaknesses:",
-                "detailed": "Detailed Analysis (JSON):",
-                "visualTitle": "Design Analysis (Template)",
-                "presentationScore": "Presentation Score",
-                "layout": "Layout",
-                "fonts": "Font Choice",
-                "suggestions": "Improvement Suggestions"
-            }
-        }
-    },
-    "PaymentPage": {
-        "title": "Choose the perfect plan for your career",
-        "subtitle": "Flexible options for all needs, from beginner to professional.",
-        "recommended": "Recommended",
-        "securePayment": "Secure payment via Stripe. Cancel anytime.",
-        "selectPlan": "Select this plan",
-        "selected": "Selected",
-        "studentOffer": "2 months free with school email",
-        "plans": {
-            "Basic": {
-                "name": "Basic",
-                "price": "€9.99 / month",
-                "features": [
-                    "1 CV",
-                    "Email Support",
-                    "Limited Templates"
-                ]
-            },
-            "VIP": {
-                "name": "VIP",
-                "price": "€29.99 / month",
-                "features": [
-                    "Unlimited CVs",
-                    "Priority Support",
-                    "Access to all templates"
-                ]
-            },
-            "Entreprise": {
-                "name": "Enterprise",
-                "price": "€99.99 / month",
-                "features": [
-                    "Unlimited CVs",
-                    "Team Management",
-                    "Advanced Statistics"
-                ]
-            },
-            "Students": {
-                "name": "Students",
-                "price": "€4.99 / month",
-                "features": [
-                    "1 CV",
-                    "Email Support",
-                    "Limited Templates",
-                    "Student Price"
-                ]
-            }
-        }
-    },
-    "Navbar": {
-        "home": "Home",
-        "pricing": "Pricing",
-        "about": "About",
-        "contact": "Contact",
-        "company": "Company"
-    },
-    "ProcessSection": {
-        "badge": "How it works",
-        "title": "A <span>simple</span> and effective process",
-        "subtitle": "In a few simple steps, get a complete analysis of your CV and optimize your chances of landing your dream job.",
-        "ctaText": "Ready to optimize your CV?",
-        "ctaButton": "Start Now",
-        "steps": {
-            "upload": {
-                "title": "Upload your CV",
-                "description": "Upload your CV in PDF format. Our system automatically parses it to extract all relevant information."
-            },
-            "paste": {
-                "title": "Paste Job Description",
-                "description": "Copy and paste the full job description you are targeting. Our AI will compare your CV with these requirements."
-            },
-            "visual": {
-                "title": "Visual Analysis (Optional)",
-                "description": "For a complete analysis, upload an image of your CV. We will analyze the design, layout, and visual professionalism."
-            },
-            "results": {
-                "title": "Get Your Results",
-                "description": "Receive a detailed report with your match score, strengths, areas for improvement, and concrete suggestions."
-            }
-        }
-    },
-    "CompanyPage": {
-        "title": "Company Dashboard",
-        "description": "Import multiple CVs and compare them to a single job offer.",
-        "form": {
-            "jdLabel": "1. Paste the Job Description (JD)",
-            "jdPlaceholder": "Paste the complete job description here...",
-            "cvLabel": "2. Upload CVs (PDF)",
-            "fileCount": "{count} file(s) selected",
-            "submitLoading": "Analysis in progress (this may take some time)...",
-            "submitDefault": "Start analysis of {count} CVs",
-            "error": "Please provide a job description and at least one CV (PDF)."
-        },
-        "results": {
-            "title": "Results: {count} Ranked Candidates",
-            "rank": "Rank #{rank}",
-            "matchScore": "Match Score",
-            "nameNotFound": "Name not found",
-            "emailNotFound": "Email not found",
-            "noSummary": "No summary.",
-            "strengths": "Identified Strengths:",
-            "noStrengths": "No major strengths detected."
-        }
-    },
-    "BuildCVPage": {
-        "steps": {
-            "info": "Personal Info",
-            "profile": "Profile",
-            "generation": "Generation"
-        },
-        "step1": {
-            "title": "Step 1: Basic Information",
-            "name": "Full Name",
-            "email": "Email",
-            "phone": "Phone",
-            "next": "Next"
-        },
-        "step2": {
-            "title": "Step 2: Your Profile",
-            "description": "Describe yourself and list your certificates. AI handles the rest.",
-            "descLabel": "Describe yourself (or your goals)",
-            "descPlaceholder": "Ex: 'Cloud developer, just finished an internship...' or 'Cloud, DevOps, Java...'",
-            "certLabel": "Your Certificates (Optional)",
-            "certPlaceholder": "Ex: 'AWS Certified Cloud Practitioner'",
-            "add": "Add",
-            "prev": "Previous",
-            "generate": "Generate my CV"
-        },
-        "step3": {
-            "title": "Step 3: Generation...",
-            "loading": "AI is writing your CV...",
-            "resultTitle": "Your new profile (Title): {title}",
-            "keyPoints": "Key points of this CV:",
-            "content": "CV Content (JSON):",
-            "restart": "Restart"
-        }
-    },
-    "AboutPage": {
-        "hero": {
-            "title": "Our Mission",
-            "subtitle": "Revolutionizing job search through artificial intelligence."
-        },
-        "story": {
-            "title": "Our Story",
-
-            "loading": "AI is writing your CV...",
-            "resultTitle": "Your new profile (Title): {title}",
-            "keyPoints": "Key points of this CV:",
-            "content": "CV Content (JSON):",
-            "restart": "Restart"
-        }
-    },
-    "HomePage": {
-        "title": "Create your professional CV with AI",
-        "subtitle": "Generate optimized and professional CVs in seconds with our advanced artificial intelligence.",
-        "cta": "Create my CV",
-        "analysis": {
-            "title": "Try the Full Analyzer",
-            "form": {
-                "cvLabel": "1. Upload your CV (PDF)",
-                "jdLabel": "2. Paste the Job Description",
-                "jdPlaceholder": "Paste the job description here...",
-                "visualLabel": "Also analyze Design (Template)? (Optional)",
-                "imageLabel": "Upload an image of your CV (PNG, JPG)",
-                "submitLoading": "Analyzing...",
-                "submitDefault": "Analyze CV",
-                "errorMissing": "Please provide a CV (PDF) and a job description.",
-                "errorVisual": "Please upload an image of your CV for visual analysis."
-            },
-            "results": {
-                "title": "Analysis Result (Text vs ATS)",
-                "matchScore": "Match Score: {score}%",
-                "strengths": "Strengths:",
-                "weaknesses": "Weaknesses:",
-                "detailed": "Detailed Analysis (JSON):",
-                "visualTitle": "Design Analysis (Template)",
-                "presentationScore": "Presentation Score",
-                "layout": "Layout",
-                "fonts": "Font Choice",
-                "suggestions": "Improvement Suggestions"
-            }
-        }
-    },
-    "PaymentPage": {
-        "title": "Choose the perfect plan for your career",
-        "subtitle": "Flexible options for all needs, from beginner to professional.",
-        "recommended": "Recommended",
-        "securePayment": "Secure payment via Stripe. Cancel anytime.",
-        "selectPlan": "Select this plan",
-        "selected": "Selected",
-        "studentOffer": "2 months free with school email",
-        "plans": {
-            "Basic": {
-                "name": "Basic",
-                "price": "€9.99 / month",
-                "features": [
-                    "1 CV",
-                    "Email Support",
-                    "Limited Templates"
-                ]
-            },
-            "VIP": {
-                "name": "VIP",
-                "price": "€29.99 / month",
-                "features": [
-                    "Unlimited CVs",
-                    "Priority Support",
-                    "Access to all templates"
-                ]
-            },
-            "Entreprise": {
-                "name": "Enterprise",
-                "price": "€99.99 / month",
-                "features": [
-                    "Unlimited CVs",
-                    "Team Management",
-                    "Advanced Statistics"
-                ]
-            },
-            "Students": {
-                "name": "Students",
-                "price": "€4.99 / month",
-                "features": [
-                    "1 CV",
-                    "Email Support",
-                    "Limited Templates",
-                    "Student Price"
-                ]
-            }
-        }
-    },
-    "Navbar": {
-        "home": "Home",
-        "pricing": "Pricing",
-        "about": "About",
-        "contact": "Contact",
-        "company": "Company"
-    },
-    "ProcessSection": {
-        "badge": "How it works",
-        "title": "A <span>simple</span> and effective process",
-        "subtitle": "In a few simple steps, get a complete analysis of your CV and optimize your chances of landing your dream job.",
-        "ctaText": "Ready to optimize your CV?",
-        "ctaButton": "Start Now",
-        "steps": {
-            "upload": {
-                "title": "Upload your CV",
-                "description": "Upload your CV in PDF format. Our system automatically parses it to extract all relevant information."
-            },
-            "paste": {
-                "title": "Paste Job Description",
-                "description": "Copy and paste the full job description you are targeting. Our AI will compare your CV with these requirements."
-            },
-            "visual": {
-                "title": "Visual Analysis (Optional)",
-                "description": "For a complete analysis, upload an image of your CV. We will analyze the design, layout, and visual professionalism."
-            },
-            "results": {
-                "title": "Get Your Results",
-                "description": "Receive a detailed report with your match score, strengths, areas for improvement, and concrete suggestions."
-            }
-        }
-    },
-    "CompanyPage": {
-        "title": "Company Dashboard",
-        "description": "Import multiple CVs and compare them to a single job offer.",
-        "form": {
-            "jdLabel": "1. Paste the Job Description (JD)",
-            "jdPlaceholder": "Paste the complete job description here...",
-            "cvLabel": "2. Upload CVs (PDF)",
-            "fileCount": "{count} file(s) selected",
-            "submitLoading": "Analysis in progress (this may take some time)...",
-            "submitDefault": "Start analysis of {count} CVs",
-            "error": "Please provide a job description and at least one CV (PDF)."
-        },
-        "results": {
-            "title": "Results: {count} Ranked Candidates",
-            "rank": "Rank #{rank}",
-            "matchScore": "Match Score",
-            "nameNotFound": "Name not found",
-            "emailNotFound": "Email not found",
-            "noSummary": "No summary.",
-            "strengths": "Identified Strengths:",
-            "noStrengths": "No major strengths detected."
-        }
-    },
-    "BuildCVPage": {
-        "steps": {
-            "info": "Personal Info",
-            "profile": "Profile",
-            "generation": "Generation"
-        },
-        "step1": {
-            "title": "Step 1: Basic Information",
-            "name": "Full Name",
-            "email": "Email",
-            "phone": "Phone",
-            "next": "Next"
-        },
-        "step2": {
-            "title": "Step 2: Your Profile",
-            "description": "Describe yourself and list your certificates. AI handles the rest.",
-            "descLabel": "Describe yourself (or your goals)",
-            "descPlaceholder": "Ex: 'Cloud developer, just finished an internship...' or 'Cloud, DevOps, Java...'",
-            "certLabel": "Your Certificates (Optional)",
-            "certPlaceholder": "Ex: 'AWS Certified Cloud Practitioner'",
-            "add": "Add",
-            "prev": "Previous",
-            "generate": "Generate my CV"
-        },
-        "step3": {
-            "title": "Step 3: Generation...",
-            "loading": "AI is writing your CV...",
-            "resultTitle": "Your new profile (Title): {title}",
-            "keyPoints": "Key points of this CV:",
-            "content": "CV Content (JSON):",
-            "restart": "Restart"
-        }
-    },
-    "AboutPage": {
-        "hero": {
-            "title": "Our Mission",
-            "subtitle": "Revolutionizing job search through artificial intelligence."
-        },
-        "story": {
             "title": "Our Story",
             "description": "Born from the frustration of seeing talent ignored due to poorly formatted CVs, OptimaCv was created to give everyone a fair chance. We combine HR expertise with cutting-edge technology."
         },
@@ -572,5 +223,96 @@
                 "description": "Get actionable insights on each candidate in a single click."
             }
         }
+    },
+    "CompanySection": {
+        "badge": "Enterprise Solution",
+        "title": "Recruit <span>intelligently</span> with our <highlight>AI-powered ATS</highlight>",
+        "subtitle": "Save time, reduce costs, and find the best candidates in <strong>one click</strong>. Our advanced AI technology automatically analyzes and ranks all your CVs.",
+        "featureCard": {
+            "badge": "Key Feature",
+            "title": "Filtering in <highlight>one click</highlight>",
+            "description": "Upload your CVs, paste your job description, and instantly get an intelligent ranking of all your candidates by relevance.",
+            "features": {
+                "autoAnalysis": "Automatic analysis of all CVs",
+                "smartRanking": "Intelligent ranking by match score",
+                "detailedReports": "Detailed reports on each candidate",
+                "timeSaving": "Time saving: from 2 hours to 5 minutes"
+            },
+            "cta": "Try now"
+        },
+        "benefits": {
+            "instantAnalysis": {
+                "title": "Instant Analysis",
+                "description": "Process hundreds of CVs in seconds, not hours",
+                "stat": "90% faster"
+            },
+            "oneClickFiltering": {
+                "title": "One-click filtering",
+                "description": "Find the ideal candidate instantly with our advanced AI",
+                "stat": "1 click = results"
+            },
+            "maxPrecision": {
+                "title": "Maximum precision",
+                "description": "Our AI analyzes 50+ criteria for perfect matching",
+                "stat": "95% accuracy"
+            },
+            "guaranteedROI": {
+                "title": "Guaranteed ROI",
+                "description": "Reduce your recruitment costs by 70%",
+                "stat": "70% savings"
+            }
+        },
+        "metricsTitle": "Results that speak for themselves",
+        "metricsSubtitle": "Our enterprise clients see immediate improvements",
+        "metrics": {
+            "analysisTime": {
+                "label": "Average analysis time",
+                "description": "vs 2 hours manually"
+            },
+            "cvsProcessed": {
+                "label": "CVs processed",
+                "description": "by our enterprise clients"
+            },
+            "accuracyRate": {
+                "label": "Accuracy rate",
+                "description": "in candidate-job matching"
+            },
+            "costReduction": {
+                "label": "Cost reduction",
+                "description": "in recruitment on average"
+            }
+        },
+        "whyChooseTitle": "Why choose our solution?",
+        "whyChooseSubtitle": "Cutting-edge AI technology serving your recruitment",
+        "tabs": {
+            "ranking": "AI Ranking",
+            "analysis": "Multi-criteria analysis",
+            "reports": "Detailed reports"
+        },
+        "tabsFeatures": {
+            "complete": "Complete automation",
+            "bulk": "Bulk processing",
+            "instant": "Instant results"
+        },
+        "features": {
+            "ranking": {
+                "title": "Automatic smart ranking",
+                "description": "All candidates are automatically ranked by relevance thanks to our AI."
+            },
+            "analysis": {
+                "title": "Multi-criteria analysis",
+                "description": "Experience, skills, education, soft skills - everything is analyzed in depth."
+            },
+            "reports": {
+                "title": "Detailed reports",
+                "description": "Get actionable insights on each candidate with one click."
+            }
+        },
+        "ctaTitle": "Ready to transform your recruitment?",
+        "ctaSubtitle": "Join companies that recruit faster and smarter",
+        "ctaButtons": {
+            "startTrial": "Start free trial",
+            "requestDemo": "Request a demo"
+        }
     }
-    }
+}
