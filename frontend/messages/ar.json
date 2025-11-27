@@ -83,7 +83,8 @@
     "pricing": "الأسعار",
     "about": "عنا",
     "contact": "اتصل بنا",
-    "company": "شركات"
+    "company": "شركات",
+    "analyze": "تحليل السيرة الذاتية"
   },
   "ProcessSection": {
     "badge": "كيف يعمل",
@@ -313,6 +314,32 @@
     "ctaButtons": {
       "startTrial": "ابدأ التجربة المجانية",
       "requestDemo": "اطلب عرضًا توضيحيًا"
+    }
+  },
+  "CVAnalyze": {
+    "title": "تحليل السيرة الذاتية",
+    "form": {
+      "cvLabel": "قم بتحميل سيرتك الذاتية (PDF)",
+      "jdLabel": "الصق الوصف الوظيفي",
+      "jdPlaceholder": "الصق الوصف الوظيفي الكامل هنا...",
+      "visualLabel": "تحليل التصميم (القالب) أيضًا؟ (اختياري)",
+      "imageLabel": "قم بتحميل صورة لسيرتك الذاتية (PNG, JPG)",
+      "submitLoading": "جاري التحليل...",
+      "submitDefault": "تحليل السيرة الذاتية",
+      "errorMissing": "يرجى تقديم سيرة ذاتية (PDF) ووصف وظيفي.",
+      "errorVisual": "يرجى تحميل صورة لسيرتك الذاتية للتحليل المرئي."
+    },
+    "results": {
+      "title": "نتيجة التحليل",
+      "matchScore": "درجة التطابق: {score}%",
+      "strengths": "نقاط القوة:",
+      "weaknesses": "نقاط الضعف:",
+      "detailed": "تحليل مفصل:",
+      "visualTitle": "تحليل التصميم",
+      "presentationScore": "درجة العرض",
+      "layout": "التخطيط",
+      "fonts": "اختيار الخط",
+      "suggestions": "اقتراحات للتحسين"
     }
   }
 }
