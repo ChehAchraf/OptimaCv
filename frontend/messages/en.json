@@ -83,7 +83,8 @@
         "pricing": "Pricing",
         "about": "About",
         "contact": "Contact",
-        "company": "Company"
+        "company": "Company",
+        "analyze": "Analyze CV"
     },
     "ProcessSection": {
         "badge": "How it works",
@@ -313,6 +314,32 @@
         "ctaButtons": {
             "startTrial": "Start free trial",
             "requestDemo": "Request a demo"
+        }
+    },
+    "CVAnalyze": {
+        "title": "CV Analysis",
+        "form": {
+            "cvLabel": "Upload your CV (PDF)",
+            "jdLabel": "Paste Job Description",
+            "jdPlaceholder": "Paste the full job description here...",
+            "visualLabel": "Also analyze Design (Template)? (Optional)",
+            "imageLabel": "Upload an image of your CV (PNG, JPG)",
+            "submitLoading": "Analyzing...",
+            "submitDefault": "Analyze CV",
+            "errorMissing": "Please provide a CV (PDF) and a job description.",
+            "errorVisual": "Please upload an image of your CV for visual analysis."
+        },
+        "results": {
+            "title": "Analysis Result",
+            "matchScore": "Match Score: {score}%",
+            "strengths": "Strengths:",
+            "weaknesses": "Weaknesses:",
+            "detailed": "Detailed Analysis:",
+            "visualTitle": "Design Analysis",
+            "presentationScore": "Presentation Score",
+            "layout": "Layout",
+            "fonts": "Font Choice",
+            "suggestions": "Improvement Suggestions"
         }
     }
 }

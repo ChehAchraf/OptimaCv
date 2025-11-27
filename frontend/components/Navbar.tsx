@@ -20,6 +20,7 @@ const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+  const isAuthenticated: boolean = true;
 
   const mainLinks = [
     { name: t('home'), href: '/' },
@@ -27,12 +28,19 @@ const Navbar = () => {
     { name: t('pricing'), href: '/payment' },
     { name: t('about'), href: '/about' },
     { name: t('contact'), href: '/contact' },
+    { name: t('analyze'), href: '/CV_analyze' },
   ];
 
-  const authLinks = [
+  let authLinks = [
     { name: 'Login', href: '/login' },
     { name: 'Sign Up', href: '/signup' },
   ];
+
+  if (isAuthenticated) {
+    authLinks = [
+      { name: 'Dashboard', href: '/dashboard' },
+    ];
+  }
 
   const handleCloseMenu = () => setIsOpen(false);
 

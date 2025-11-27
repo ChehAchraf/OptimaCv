@@ -3,22 +3,35 @@ export interface AnalysisResult {
     filename: string;
     analysis: Analysis
 };
-
-
 export interface Analysis {
     contact_info: ContactInfo;
     summary: string;
     match_score: number;
     strengths: string[];
+    weaknesses: string[];
+    detailed_analysis: DetailedAnalysis;
 }
-
-
+export interface DetailedAnalysis {
+    hard_skills: SkillAnalysis[];
+    soft_skills: SkillAnalysis[];
+    experience: ExperienceAnalysis[];
+}
+export interface SkillAnalysis {
+    skill: string;
+    requirement: string | null;
+    match: string;
+    comment: string;
+}
+export interface ExperienceAnalysis {
+    skill: string | null;
+    requirement: string;
+    match: string;
+    comment: string;
+}
 export interface ContactInfo {
     name: string;
     email: string
 }
-
-
 export interface CVBuildResponse {
     analysis: {
         profile_focus: string;
@@ -26,14 +39,11 @@ export interface CVBuildResponse {
     };
     generated_cv: any;
 }
-
-
 export interface CVPayload {
     cv_pdf: File;
     job_description: string;
     cv_image?: File;
 }
-
 export interface CVBuildPayload {
     full_name: string;
     email: string;
@@ -43,8 +53,6 @@ export interface CVBuildPayload {
     education: any[];
     experience: any[];
 }
-
-
 export interface FormData {
     fullName: string;
     email: string;
@@ -53,17 +61,10 @@ export interface FormData {
     certificates: string[];
     tempCert: string;
 }
-
-
-
 export interface NavItem {
     name: string;
     href: string;
 }
-
-
-
-
 export interface Plan {
     name: string;
     price: string;
@@ -71,10 +72,6 @@ export interface Plan {
     popular?: boolean;
     note?: string;
 }
-
-
-
-
 export interface FeatureCard {
     icon: LucideIcon;
     title: string;
@@ -82,8 +79,6 @@ export interface FeatureCard {
     stat?: string;
     color?: string;
 }
-
-
 export interface StatCard {
     value: string;
     label: string;
@@ -91,15 +86,11 @@ export interface StatCard {
     description?: string;
     progress?: number;
 }
-
-
 export interface IFeatures {
     title: string;
     description: string;
     icon: LucideIcon;
 }
-
-
 export interface StepItem {
     number: number;
     title: string;
