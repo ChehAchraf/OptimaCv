@@ -83,7 +83,8 @@
         "pricing": "Tarifs",
         "about": "À propos",
         "contact": "Contact",
-        "company": "Entreprise"
+        "company": "Entreprise",
+        "analyze": "Analyser CV"
     },
     "ProcessSection": {
         "badge": "Comment ça marche",
@@ -313,6 +314,32 @@
         "ctaButtons": {
             "startTrial": "Démarrer l'essai gratuit",
             "requestDemo": "Demander une démo"
+        }
+    },
+    "CVAnalyze": {
+        "title": "Analyse de CV",
+        "form": {
+            "cvLabel": "Téléchargez votre CV (PDF)",
+            "jdLabel": "Collez la description de poste",
+            "jdPlaceholder": "Collez la description de poste complète ici...",
+            "visualLabel": "Analyser aussi le Design (Template) ? (Optionnel)",
+            "imageLabel": "Téléchargez une image de votre CV (PNG, JPG)",
+            "submitLoading": "Analyse en cours...",
+            "submitDefault": "Analyser CV",
+            "errorMissing": "Veuillez fournir un CV (PDF) et une description de poste.",
+            "errorVisual": "Veuillez télécharger l'image de votre CV pour l'analyse visuelle."
+        },
+        "results": {
+            "title": "Résultat de l'analyse",
+            "matchScore": "Score de correspondance : {score}%",
+            "strengths": "Points forts :",
+            "weaknesses": "Points faibles :",
+            "detailed": "Analyse détaillée :",
+            "visualTitle": "Analyse du Design",
+            "presentationScore": "Score de Présentation",
+            "layout": "Mise en page",
+            "fonts": "Choix de Police",
+            "suggestions": "Suggestions d'amélioration"
         }
     }
 }
