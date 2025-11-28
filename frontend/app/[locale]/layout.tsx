@@ -7,8 +7,8 @@ import { Inter, Cairo } from "next/font/google";
 import "../globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import QueryProvider from '@/components/providers/QueryProvider';
 
-// Optimized font loading with display swap
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
@@ -85,10 +85,12 @@ export default async function RootLayout({
           disableTransitionOnChange={false}
         >
           <NextIntlClientProvider messages={messages}>
-            <Navbar />
-            <main>
-              {children}
-            </main>
+            <QueryProvider>
+              <Navbar />
+              <main>
+                {children}
+              </main>
+            </QueryProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
