@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+
+import { Suspense, useState } from 'react';
 import { analyzeCv } from "@/app/actions/analyzeCv";
 import { CVPayload } from "@/types/type";
 import { useTranslations } from 'next-intl';
@@ -11,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { HiExclamation, HiUpload, HiDocumentText, HiPhotograph, HiCheckCircle } from 'react-icons/hi';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { CardLoader } from '@/components/loading';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CVAnalyze() {
@@ -126,20 +128,20 @@ export default function CVAnalyze() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto space-y-8 relative z-10">
-                <div className="text-center space-y-4">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+        <div className="min-h-screen bg-gray-50 dark:bg-black py-6 sm:py-12 px-3 sm:px-4 lg:px-8">
+            <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 relative z-10">
+                <div className="text-center space-y-3 sm:space-y-4">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
                         {t('title')}
                     </h1>
-                    <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                    <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
                         Get detailed insights and AI-powered recommendations to improve your CV.
                     </p>
                 </div>
 
                 <Card className="shadow-xl border-0 ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-gray-900">
-                    <CardContent className="p-6 sm:p-8">
-                        <form onSubmit={handleSubmit} className="space-y-8">
+                    <CardContent className="p-4 sm:p-6 lg:p-8">
+                        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
                             {error && (
                                 <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-2">
                                     <HiExclamation className="h-5 w-5" />
@@ -148,11 +150,11 @@ export default function CVAnalyze() {
                                 </Alert>
                             )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                                 <div className="space-y-4">
-                                    <div className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/20">
-                                        <Label htmlFor="cv-file" className="font-semibold text-lg flex items-center gap-2 mb-2">
-                                            <HiUpload className="h-5 w-5 text-blue-500" />
+                                    <div className="bg-blue-50 dark:bg-blue-900/10 p-3 sm:p-4 rounded-xl border border-blue-100 dark:border-blue-900/20">
+                                        <Label htmlFor="cv-file" className="font-semibold text-base sm:text-lg flex items-center gap-2 mb-2">
+                                            <HiUpload className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
                                             {t('form.cvLabel')} <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
@@ -161,7 +163,7 @@ export default function CVAnalyze() {
                                             accept="application/pdf"
                                             onChange={handlePdfChange}
                                             required
-                                            className="bg-white dark:bg-black/50"
+                                            className="bg-white dark:bg-black/50 text-sm"
                                         />
                                     </div>
 
@@ -177,7 +179,7 @@ export default function CVAnalyze() {
                                             </Label>
                                         </div>
 
-                                        <AnimatePresence>
+                                        <Suspense fallback={null}>
                                             {analyzeVisuals && (
                                                 <motion.div
                                                     initial={{ opacity: 0, height: 0 }}
@@ -197,18 +199,18 @@ export default function CVAnalyze() {
                                                     />
                                                 </motion.div>
                                             )}
-                                        </AnimatePresence>
+                                        </Suspense>
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="jd" className="font-semibold text-lg flex items-center gap-2">
-                                        <HiDocumentText className="h-5 w-5 text-green-500" />
+                                    <Label htmlFor="jd" className="font-semibold text-base sm:text-lg flex items-center gap-2">
+                                        <HiDocumentText className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                                         {t('form.jdLabel')} <span className="text-red-500">*</span>
                                     </Label>
                                     <Textarea
                                         id="jd"
-                                        className="min-h-[280px] resize-none bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500"
+                                        className="min-h-[200px] sm:min-h-[280px] resize-none bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 text-sm"
                                         value={jobDescription}
                                         onChange={(e) => setJobDescription(e.target.value)}
                                         placeholder={t('form.jdPlaceholder')}
@@ -220,12 +222,12 @@ export default function CVAnalyze() {
                             <Button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                                className="w-full h-11 sm:h-12 text-base sm:text-lg font-semibold transition-all duration-300 shadow-lg"
                             >
                                 {isLoading ? (
                                     <div className="flex items-center gap-2">
-                                        <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        {t('form.submitLoading')}
+                                        <div className="h-4 w-4 sm:h-5 sm:w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        <span className="text-sm sm:text-base">{t('form.submitLoading')}</span>
                                     </div>
                                 ) : (
                                     t('form.submitDefault')
@@ -235,150 +237,152 @@ export default function CVAnalyze() {
                     </CardContent>
                 </Card>
 
-                <AnimatePresence>
-                    {analysisResult && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="space-y-8"
-                        >
-                            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-                                <div className="p-6 sm:p-8 border-b border-gray-200 dark:border-gray-800">
-                                    <h3 className="text-2xl font-bold flex items-center gap-3">
-                                        {t('results.title')}
-                                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${analysisResult.analysis_vs_jd.match_score >= 70 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                                            analysisResult.analysis_vs_jd.match_score >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                            } `}>
-                                            {t('results.matchScore', { score: analysisResult.analysis_vs_jd.match_score })}
-                                        </span>
-                                    </h3>
-                                </div>
-
-                                <div className="p-6 sm:p-8 space-y-8">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div>
-                                            <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-green-600 dark:text-green-400">
-                                                <HiCheckCircle className="h-5 w-5" />
-                                                {t('results.strengths')}
-                                            </h5>
-                                            <ul className="space-y-2">
-                                                {analysisResult.analysis_vs_jd.strengths.map((s: string, i: number) => (
-                                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
-                                                        {s}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-
-                                        <div>
-                                            <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-red-600 dark:text-red-400">
-                                                <HiExclamation className="h-5 w-5" />
-                                                {t('results.weaknesses')}
-                                            </h5>
-                                            <ul className="space-y-2">
-                                                {analysisResult.analysis_vs_jd.weaknesses.map((w: string, i: number) => (
-                                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
-                                                        {w}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
+                <Suspense fallback={<CardLoader />}>
+                    <AnimatePresence>
+                        {analysisResult && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="space-y-8"
+                            >
+                                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+                                    <div className="p-6 sm:p-8 border-b border-gray-200 dark:border-gray-800">
+                                        <h3 className="text-2xl font-bold flex items-center gap-3">
+                                            {t('results.title')}
+                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${analysisResult.analysis_vs_jd.match_score >= 70 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                                                analysisResult.analysis_vs_jd.match_score >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                                } `}>
+                                                {t('results.matchScore', { score: analysisResult.analysis_vs_jd.match_score })}
+                                            </span>
+                                        </h3>
                                     </div>
 
-                                    <div>
-                                        <h5 className="font-semibold text-lg mb-4">{t('results.detailed')}</h5>
-                                        <div className="space-y-6">
-                                            {/* Hard Skills */}
-                                            <div className="space-y-3">
-                                                <h6 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                                                    <span className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
-                                                        <HiDocumentText className="w-4 h-4" />
-                                                    </span>
-                                                    Hard Skills
-                                                </h6>
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    {analysisResult.analysis_vs_jd.detailed_analysis.hard_skills.map((skill: any, i: number) => (
-                                                        <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
-                                                            <div className="flex justify-between items-start mb-1">
-                                                                <span className="font-medium text-gray-900 dark:text-gray-100">{skill.skill}</span>
-                                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${skill.match === 'High' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                                    skill.match === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                                    }`}>
-                                                                    {skill.match}
-                                                                </span>
-                                                            </div>
-                                                            <p className="text-sm text-gray-600 dark:text-gray-400">{skill.comment}</p>
-                                                        </div>
+                                    <div className="p-6 sm:p-8 space-y-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div>
+                                                <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-green-600 dark:text-green-400">
+                                                    <HiCheckCircle className="h-5 w-5" />
+                                                    {t('results.strengths')}
+                                                </h5>
+                                                <ul className="space-y-2">
+                                                    {analysisResult.analysis_vs_jd.strengths.map((s: string, i: number) => (
+                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                                            <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
+                                                            {s}
+                                                        </li>
                                                     ))}
-                                                </div>
+                                                </ul>
                                             </div>
 
-                                            {/* Soft Skills */}
-                                            <div className="space-y-3">
-                                                <h6 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                                                    <span className="p-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
-                                                        <HiCheckCircle className="w-4 h-4" />
-                                                    </span>
-                                                    Soft Skills
-                                                </h6>
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    {analysisResult.analysis_vs_jd.detailed_analysis.soft_skills.map((skill: any, i: number) => (
-                                                        <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
-                                                            <div className="flex justify-between items-start mb-1">
-                                                                <span className="font-medium text-gray-900 dark:text-gray-100">{skill.skill}</span>
-                                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${skill.match === 'High' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                                    skill.match === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                                    }`}>
-                                                                    {skill.match}
-                                                                </span>
-                                                            </div>
-                                                            <p className="text-sm text-gray-600 dark:text-gray-400">{skill.comment}</p>
-                                                        </div>
+                                            <div>
+                                                <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-red-600 dark:text-red-400">
+                                                    <HiExclamation className="h-5 w-5" />
+                                                    {t('results.weaknesses')}
+                                                </h5>
+                                                <ul className="space-y-2">
+                                                    {analysisResult.analysis_vs_jd.weaknesses.map((w: string, i: number) => (
+                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                                            <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                                                            {w}
+                                                        </li>
                                                     ))}
-                                                </div>
+                                                </ul>
                                             </div>
+                                        </div>
 
-                                            {/* Experience */}
-                                            <div className="space-y-3">
-                                                <h6 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                                                    <span className="p-1.5 bg-orange-100 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400">
-                                                        <HiDocumentText className="w-4 h-4" />
-                                                    </span>
-                                                    Experience
-                                                </h6>
-                                                <div className="grid grid-cols-1 gap-3">
-                                                    {analysisResult.analysis_vs_jd.detailed_analysis.experience.map((exp: any, i: number) => (
-                                                        <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
-                                                            <div className="flex justify-between items-start mb-1">
-                                                                <span className="font-medium text-gray-900 dark:text-gray-100">{exp.requirement}</span>
-                                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${exp.match === 'Yes' || exp.match === 'High' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                                    exp.match === 'Partial' || exp.match === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                                    }`}>
-                                                                    {exp.match}
-                                                                </span>
+                                        <div>
+                                            <h5 className="font-semibold text-lg mb-4">{t('results.detailed')}</h5>
+                                            <div className="space-y-6">
+                                                {/* Hard Skills */}
+                                                <div className="space-y-3">
+                                                    <h6 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                                        <span className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+                                                            <HiDocumentText className="w-4 h-4" />
+                                                        </span>
+                                                        Hard Skills
+                                                    </h6>
+                                                    <div className="grid grid-cols-1 gap-3">
+                                                        {analysisResult.analysis_vs_jd.detailed_analysis.hard_skills.map((skill: any, i: number) => (
+                                                            <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
+                                                                <div className="flex justify-between items-start mb-1">
+                                                                    <span className="font-medium text-gray-900 dark:text-gray-100">{skill.skill}</span>
+                                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${skill.match === 'High' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                                        skill.match === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                                            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                                        }`}>
+                                                                        {skill.match}
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-sm text-gray-600 dark:text-gray-400">{skill.comment}</p>
                                                             </div>
-                                                            <p className="text-sm text-gray-600 dark:text-gray-400">{exp.comment}</p>
-                                                        </div>
-                                                    ))}
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Soft Skills */}
+                                                <div className="space-y-3">
+                                                    <h6 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                                        <span className="p-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
+                                                            <HiCheckCircle className="w-4 h-4" />
+                                                        </span>
+                                                        Soft Skills
+                                                    </h6>
+                                                    <div className="grid grid-cols-1 gap-3">
+                                                        {analysisResult.analysis_vs_jd.detailed_analysis.soft_skills.map((skill: any, i: number) => (
+                                                            <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
+                                                                <div className="flex justify-between items-start mb-1">
+                                                                    <span className="font-medium text-gray-900 dark:text-gray-100">{skill.skill}</span>
+                                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${skill.match === 'High' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                                        skill.match === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                                            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                                        }`}>
+                                                                        {skill.match}
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-sm text-gray-600 dark:text-gray-400">{skill.comment}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* Experience */}
+                                                <div className="space-y-3">
+                                                    <h6 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                                        <span className="p-1.5 bg-orange-100 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400">
+                                                            <HiDocumentText className="w-4 h-4" />
+                                                        </span>
+                                                        Experience
+                                                    </h6>
+                                                    <div className="grid grid-cols-1 gap-3">
+                                                        {analysisResult.analysis_vs_jd.detailed_analysis.experience.map((exp: any, i: number) => (
+                                                            <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
+                                                                <div className="flex justify-between items-start mb-1">
+                                                                    <span className="font-medium text-gray-900 dark:text-gray-100">{exp.requirement}</span>
+                                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${exp.match === 'Yes' || exp.match === 'High' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                                        exp.match === 'Partial' || exp.match === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                                            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                                        }`}>
+                                                                        {exp.match}
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-sm text-gray-600 dark:text-gray-400">{exp.comment}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {analysisResult.visual_analysis && (
-                                <VisualFeedbackDisplay feedback={analysisResult.visual_analysis} />
-                            )}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                                {analysisResult.visual_analysis && (
+                                    <VisualFeedbackDisplay feedback={analysisResult.visual_analysis} />
+                                )}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </Suspense>
             </div>
         </div>
     );
