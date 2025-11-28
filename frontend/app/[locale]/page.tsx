@@ -1,10 +1,26 @@
 'use client';
 
+import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import HeroSection from '@/components/HeroSection';
-import ProcessSection from '@/components/ProcessSection';
-import TrustSection from '@/components/TrustSection';
-import CompanySection from '@/components/CompanySection';
 import { useTranslations } from 'next-intl';
+import { SectionLoader } from '@/components/loading';
+
+// Lazy load components that are below the fold with Suspense
+const ProcessSection = dynamic(() => import('@/components/ProcessSection'), {
+  loading: () => <SectionLoader />,
+  ssr: false,
+});
+
+const TrustSection = dynamic(() => import('@/components/TrustSection'), {
+  loading: () => <SectionLoader />,
+  ssr: false,
+});
+
+const CompanySection = dynamic(() => import('@/components/CompanySection'), {
+  loading: () => <SectionLoader />,
+  ssr: false,
+});
 
 export default function Home() {
   const t = useTranslations('HomePage');
@@ -16,9 +32,15 @@ export default function Home() {
         subtitle={t('subtitle')}
         cta={t('cta')}
       />
-      <ProcessSection />
-      <TrustSection />
-      <CompanySection />
+      <Suspense fallback={<SectionLoader />}>
+        <ProcessSection />
+      </Suspense>
+      <Suspense fallback={<SectionLoader />}>
+        <TrustSection />
+      </Suspense>
+      <Suspense fallback={<SectionLoader />}>
+        <CompanySection />
+      </Suspense>
     </>
   );
 }
