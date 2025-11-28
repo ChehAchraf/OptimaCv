@@ -44,6 +44,10 @@ export interface CVPayload {
     job_description: string;
     cv_image?: File;
 }
+export interface CompanyRankPayload {
+    jobDescription: string;
+    files: FileList | File[];
+}
 export interface CVBuildPayload {
     full_name: string;
     email: string;
@@ -101,3 +105,6 @@ export interface StepItem {
     delay?: number;
 }
 
+export interface CompanyRankResponse {
+    ranked_results: AnalysisResult[];
+}
