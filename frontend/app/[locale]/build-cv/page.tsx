@@ -1,20 +1,34 @@
 'use client';
 
-import { useState } from 'react';
-import { Stepper } from '@/components/ui/stepper';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, Loader2 } from 'lucide-react';
-import { CVBuildPayload, CVBuildResponse } from '@/types/type';
-import { generateCV } from '@/app/actions/generateCv';
-import { FormData } from '@/types/type';
+import { Suspense, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
+import { CardLoader } from '@/components/loading';
+import { CVBuildPayload, CVBuildResponse, FormData } from '@/types/type';
+import { buildCV } from '@/app/actions/buildCv';
 
+// Lazy load Stepper and heavy UI components
+const Stepper = dynamic(() => import('@/components/ui/stepper').then(mod => mod.Stepper), {
+  loading: () => <CardLoader />,
+});
+
+const Button = dynamic(() => import('@/components/ui/button').then(mod => mod.Button));
+const Input = dynamic(() => import('@/components/ui/input').then(mod => mod.Input));
+const Textarea = dynamic(() => import('@/components/ui/textarea').then(mod => mod.Textarea));
+const Card = dynamic(() => import('@/components/ui/card').then(mod => mod.Card));
+const CardContent = dynamic(() => import('@/components/ui/card').then(mod => mod.CardContent));
+const CardHeader = dynamic(() => import('@/components/ui/card').then(mod => mod.CardHeader));
+const CardTitle = dynamic(() => import('@/components/ui/card').then(mod => mod.CardTitle));
+const CardDescription = dynamic(() => import('@/components/ui/card').then(mod => mod.CardDescription));
+const Label = dynamic(() => import('@/components/ui/label').then(mod => mod.Label));
+const Badge = dynamic(() => import('@/components/ui/badge').then(mod => mod.Badge));
+const Alert = dynamic(() => import('@/components/ui/alert').then(mod => mod.Alert));
+const AlertTitle = dynamic(() => import('@/components/ui/alert').then(mod => mod.AlertTitle));
+const AlertDescription = dynamic(() => import('@/components/ui/alert').then(mod => mod.AlertDescription));
+
+// Lazy load icons
+const AlertTriangle = dynamic(() => import('lucide-react').then(mod => mod.AlertTriangle), { ssr: false });
+const Loader2 = dynamic(() => import('lucide-react').then(mod => mod.Loader2), { ssr: false });
 
 export default function BuildCVPage() {
   const t = useTranslations('BuildCVPage');
@@ -63,7 +77,7 @@ export default function BuildCVPage() {
     };
 
     try {
-      const data = await generateCV(payload);
+      const data = await buildCV(payload);
       setResult(data);
       setCurrentStep(3);
     } catch (err: any) {
@@ -90,30 +104,38 @@ export default function BuildCVPage() {
 
   return (
     <div className="container max-w-3xl mx-auto px-4 py-16">
-      <Stepper currentStep={currentStep} steps={steps}>
-        {currentStep === 1 && (
-          <Step1 formData={formData} updateForm={updateForm} nextStep={() => setCurrentStep(2)} />
-        )}
+      <Suspense fallback={<CardLoader />}>
+        <Stepper currentStep={currentStep} steps={steps}>
+          {currentStep === 1 && (
+            <Suspense fallback={<CardLoader />}>
+              <Step1 formData={formData} updateForm={updateForm} nextStep={() => setCurrentStep(2)} />
+            </Suspense>
+          )}
 
-        {currentStep === 2 && (
-          <Step2
-            formData={formData}
-            updateForm={updateForm}
-            addCertificate={handleAddCertificate}
-            prevStep={() => setCurrentStep(1)}
-            generateCV={handleGenerateCV}
-          />
-        )}
+          {currentStep === 2 && (
+            <Suspense fallback={<CardLoader />}>
+              <Step2
+                formData={formData}
+                updateForm={updateForm}
+                addCertificate={handleAddCertificate}
+                prevStep={() => setCurrentStep(1)}
+                generateCV={handleGenerateCV}
+              />
+            </Suspense>
+          )}
 
-        {currentStep === 3 && (
-          <Step3
-            isLoading={isLoading}
-            error={error}
-            result={result}
-            restart={restart}
-          />
-        )}
-      </Stepper>
+          {currentStep === 3 && (
+            <Suspense fallback={<CardLoader />}>
+              <Step3
+                isLoading={isLoading}
+                error={error}
+                result={result}
+                restart={restart}
+              />
+            </Suspense>
+          )}
+        </Stepper>
+      </Suspense>
     </div>
   );
 }
