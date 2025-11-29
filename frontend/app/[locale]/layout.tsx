@@ -8,6 +8,7 @@ import "../globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import QueryProvider from '@/components/providers/QueryProvider';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -65,6 +66,7 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
 
+
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
@@ -85,12 +87,14 @@ export default async function RootLayout({
           disableTransitionOnChange={false}
         >
           <NextIntlClientProvider messages={messages}>
-            <QueryProvider>
-              <Navbar />
-              <main>
-                {children}
-              </main>
-            </QueryProvider>
+            <AuthProvider>
+              <QueryProvider>
+                <Navbar />
+                <main>
+                  {children}
+                </main>
+              </QueryProvider>
+            </AuthProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
