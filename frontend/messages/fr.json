@@ -34,7 +34,7 @@
         "title": "Choisissez le plan parfait pour votre carrière",
         "subtitle": "Des options flexibles pour tous les besoins, du débutant au professionnel.",
         "recommended": "Recommandé",
-        "securePayment": "Paiement sécurisé via Stripe. Annulation possible à tout moment.",
+        "securePayment": "Annulation possible à tout moment.",
         "selectPlan": "Choisir ce plan",
         "selected": "Sélectionné",
         "studentOffer": "2 mois offerts avec email école",
@@ -84,7 +84,11 @@
         "about": "À propos",
         "contact": "Contact",
         "company": "Entreprise",
-        "analyze": "Analyser CV"
+        "analyze": "Analyser CV",
+        "login": "Connexion",
+        "register": "S'inscrire",
+        "logout": "Déconnexion",
+        "profile": "Profil"
     },
     "ProcessSection": {
         "badge": "Comment ça marche",
@@ -185,6 +189,34 @@
         "cta": {
             "title": "Prêt à booster votre carrière ?",
             "button": "Commencer maintenant"
+        },
+        "stats": {
+            "success": {
+                "label": "Taux de réussite",
+                "description": "de nos utilisateurs décrochent un entretien"
+            },
+            "optimized": {
+                "label": "CV optimisés",
+                "description": "candidats nous font confiance"
+            },
+            "satisfaction": {
+                "label": "Satisfaction",
+                "description": "note moyenne de nos utilisateurs"
+            }
+        },
+        "features": {
+            "ranking": {
+                "title": "Classement intelligent automatique",
+                "description": "Tous les candidats sont automatiquement classés par ordre de pertinence grâce à notre IA."
+            },
+            "analysis": {
+                "title": "Analyse multi-critères",
+                "description": "Expérience, compétences, éducation, soft skills - tout est analysé en profondeur."
+            },
+            "reports": {
+                "title": "Rapports détaillés",
+                "description": "Obtenez des insights actionnables sur chaque candidat en un seul clic."
+            }
         }
     },
     "TrustSection": {
@@ -298,21 +330,21 @@
         "features": {
             "ranking": {
                 "title": "Classement intelligent automatique",
-                "description": "Tous les candidats sont automatiquement classés par pertinence grâce à notre IA."
+                "description": "Tous les candidats sont automatiquement classés par ordre de pertinence grâce à notre IA."
             },
             "analysis": {
                 "title": "Analyse multi-critères",
-                "description": "Expérience, compétences, formation, soft skills - tout est analysé en profondeur."
+                "description": "Expérience, compétences, éducation, soft skills - tout est analysé en profondeur."
             },
             "reports": {
                 "title": "Rapports détaillés",
-                "description": "Obtenez des insights actionnables sur chaque candidat en un clic."
+                "description": "Obtenez des insights actionnables sur chaque candidat en un seul clic."
             }
         },
         "ctaTitle": "Prêt à transformer votre recrutement ?",
         "ctaSubtitle": "Rejoignez les entreprises qui recrutent plus vite et plus intelligemment",
         "ctaButtons": {
-            "startTrial": "Démarrer l'essai gratuit",
+            "startTrial": "Commencer l'essai gratuit",
             "requestDemo": "Demander une démo"
         }
     },
@@ -341,5 +373,29 @@
             "fonts": "Choix de Police",
             "suggestions": "Suggestions d'amélioration"
         }
+    },
+    "AuthPage": {
+        "login": {
+            "title": "Bon retour",
+            "subtitle": "Connectez-vous pour accéder à votre compte et continuer à optimiser votre CV",
+            "googleButton": "Se connecter avec Google",
+            "submit": "Se connecter",
+            "or": "Ou continuer avec",
+            "noAccount": "Pas encore de compte ?",
+            "registerLink": "S'inscrire"
+        },
+        "register": {
+            "title": "Commencer",
+            "subtitle": "Créez votre compte et commencez à créer des CV professionnels avec l'IA",
+            "googleButton": "S'inscrire avec Google",
+            "submit": "Créer un compte",
+            "or": "Ou continuer avec",
+            "hasAccount": "Vous avez déjà un compte ?",
+            "loginLink": "Se connecter"
+        },
+        "email": "Adresse Email",
+        "password": "Mot de passe",
+        "logout": "Déconnexion",
+        "profile": "Profil"
     }
 }

@@ -1,14 +1,19 @@
 {
     "HomePage": {
-        "title": "Create your professional CV with AI",
-        "subtitle": "Generate optimized and professional CVs in seconds with our advanced artificial intelligence.",
-        "cta": "Create my CV",
+        "title": "Optimize your CV with AI",
+        "subtitle": "Increase your chances of getting an interview with our intelligent analysis.",
+        "cta": "Analyze my CV",
+        "features": {
+            "upload": "Easy Upload",
+            "analysis": "Instant Analysis",
+            "suggestions": "Smart Suggestions"
+        },
         "analysis": {
             "title": "Try the Full Analyzer",
             "form": {
                 "cvLabel": "1. Upload your CV (PDF)",
-                "jdLabel": "2. Paste the Job Description",
-                "jdPlaceholder": "Paste the job description here...",
+                "jdLabel": "2. Paste Job Description",
+                "jdPlaceholder": "Paste the full job description here...",
                 "visualLabel": "Also analyze Design (Template)? (Optional)",
                 "imageLabel": "Upload an image of your CV (PNG, JPG)",
                 "submitLoading": "Analyzing...",
@@ -34,7 +39,7 @@
         "title": "Choose the perfect plan for your career",
         "subtitle": "Flexible options for all needs, from beginner to professional.",
         "recommended": "Recommended",
-        "securePayment": "Secure payment via Stripe. Cancel anytime.",
+        "securePayment": "Cancel anytime.",
         "selectPlan": "Select this plan",
         "selected": "Selected",
         "studentOffer": "2 months free with school email",
@@ -80,11 +85,14 @@
     },
     "Navbar": {
         "home": "Home",
-        "pricing": "Pricing",
-        "about": "About",
-        "contact": "Contact",
         "company": "Company",
-        "analyze": "Analyze CV"
+        "pricing": "Pricing",
+        "analyze": "Analyze CV",
+        "about": "About",
+        "login": "Login",
+        "register": "Register",
+        "logout": "Logout",
+        "profile": "Profile"
     },
     "ProcessSection": {
         "badge": "How it works",
@@ -99,7 +107,7 @@
             },
             "paste": {
                 "title": "Paste Job Description",
-                "description": "Copy and paste the full job description you are targeting. Our AI will compare your CV with these requirements."
+                "description": "Copy and paste the full job description you are targeting. Our AI will compare your CV against these requirements."
             },
             "visual": {
                 "title": "Visual Analysis (Optional)",
@@ -107,20 +115,20 @@
             },
             "results": {
                 "title": "Get Your Results",
-                "description": "Receive a detailed report with your match score, strengths, areas for improvement, and concrete suggestions."
+                "description": "Receive a detailed report with your match score, strengths, areas for improvement, and actionable suggestions."
             }
         }
     },
     "CompanyPage": {
         "title": "Company Dashboard",
-        "description": "Import multiple CVs and compare them to a single job offer.",
+        "description": "Upload multiple CVs and compare them against a single job description.",
         "form": {
-            "jdLabel": "1. Paste the Job Description (JD)",
-            "jdPlaceholder": "Paste the complete job description here...",
+            "jdLabel": "1. Paste Job Description (JD)",
+            "jdPlaceholder": "Paste the full job description here...",
             "cvLabel": "2. Upload CVs (PDF)",
             "fileCount": "{count} file(s) selected",
-            "submitLoading": "Analysis in progress (this may take some time)...",
-            "submitDefault": "Start analysis of {count} CVs",
+            "submitLoading": "Analyzing (this may take a while)...",
+            "submitDefault": "Start Analysis for {count} CVs",
             "error": "Please provide a job description and at least one CV (PDF)."
         },
         "results": {
@@ -185,6 +193,34 @@
         "cta": {
             "title": "Ready to boost your career?",
             "button": "Start Now"
+        },
+        "stats": {
+            "success": {
+                "label": "Success Rate",
+                "description": "of our users land an interview"
+            },
+            "optimized": {
+                "label": "Optimized CVs",
+                "description": "candidates trust us"
+            },
+            "satisfaction": {
+                "label": "Satisfaction",
+                "description": "average rating from our users"
+            }
+        },
+        "features": {
+            "ranking": {
+                "title": "Automatic Intelligent Ranking",
+                "description": "All candidates are automatically ranked by relevance thanks to our AI."
+            },
+            "analysis": {
+                "title": "Multi-criteria Analysis",
+                "description": "Experience, skills, education, soft skills - everything is analyzed in depth."
+            },
+            "reports": {
+                "title": "Detailed Reports",
+                "description": "Get actionable insights on each candidate in a single click."
+            }
         }
     },
     "TrustSection": {
@@ -341,5 +377,29 @@
             "fonts": "Font Choice",
             "suggestions": "Improvement Suggestions"
         }
+    },
+    "AuthPage": {
+        "login": {
+            "title": "Welcome Back",
+            "subtitle": "Sign in to access your account and continue optimizing your CV",
+            "googleButton": "Sign in with Google",
+            "submit": "Sign In",
+            "or": "Or continue with",
+            "noAccount": "Don't have an account?",
+            "registerLink": "Sign Up"
+        },
+        "register": {
+            "title": "Get Started",
+            "subtitle": "Create your account and start building professional CVs with AI",
+            "googleButton": "Sign up with Google",
+            "submit": "Create Account",
+            "or": "Or continue with",
+            "hasAccount": "Already have an account?",
+            "loginLink": "Sign In"
+        },
+        "email": "Email Address",
+        "password": "Password",
+        "logout": "Logout",
+        "profile": "Profile"
     }
 }
