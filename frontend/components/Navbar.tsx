@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
-import { HiMenu, HiX, HiGlobeAlt } from 'react-icons/hi';
+import { HiMenu, HiX, HiGlobeAlt, HiLogout, HiUser } from 'react-icons/hi';
 import { Button } from '@/components/ui/button';
 import { useTranslations, useLocale } from 'next-intl';
 import {
@@ -10,37 +10,28 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from '@/components/theme-toggle';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations('Navbar');
+  const tAuth = useTranslations('AuthPage');
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
-  const isAuthenticated: boolean = true;
+  const { isAuthenticated, user, signOut } = useAuth();
 
   const mainLinks = [
     { name: t('home'), href: '/' },
     { name: t('company'), href: '/entreprise' },
     { name: t('pricing'), href: '/payment' },
     { name: t('about'), href: '/about' },
-    { name: t('contact'), href: '/contact' },
     { name: t('analyze'), href: '/CV_analyze' },
   ];
-
-  let authLinks = [
-    { name: 'Login', href: '/login' },
-    { name: 'Sign Up', href: '/signup' },
-  ];
-
-  if (isAuthenticated) {
-    authLinks = [
-      { name: 'Dashboard', href: '/dashboard' },
-    ];
-  }
 
   const handleCloseMenu = () => setIsOpen(false);
 
@@ -48,6 +39,11 @@ const Navbar = () => {
     startTransition(() => {
       router.replace(pathname, { locale: nextLocale });
     });
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/auth/login');
   };
 
   return (
@@ -88,11 +84,37 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {authLinks.map((link) => (
-              <Link key={link.name} href={link.href}>
-                <Button variant={link.href === '/signup' ? 'default' : 'ghost'}>{link.name}</Button>
-              </Link>
-            ))}
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <HiUser className="h-5 w-5" />
+                    <span className="sr-only">{tAuth('profile')}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem disabled>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{user?.email}</span>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <HiLogout className="mr-2 h-4 w-4" />
+                    {tAuth('logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link href="/auth/login">
+                  <Button variant="ghost">Login</Button>
+                </Link>
+                <Link href="/auth/register">
+                  <Button>Sign Up</Button>
+                </Link>
+              </>
+            )}
           </div>
 
 
@@ -129,14 +151,31 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-          <div className="border-t border-gray-200 pt-4 pb-3 px-4 space-y-2">
-            {authLinks.map((link) => (
-              <Link key={link.name} href={link.href} onClick={handleCloseMenu}>
-                <Button variant={link.href === '/signup' ? 'default' : 'outline'} className="w-full">
-                  {link.name}
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-4 pb-3 px-4 space-y-2">
+            {isAuthenticated ? (
+              <>
+                <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                  {user?.email}
+                </div>
+                <Button variant="outline" className="w-full" onClick={handleLogout}>
+                  <HiLogout className="mr-2 h-4 w-4" />
+                  {tAuth('logout')}
                 </Button>
-              </Link>
-            ))}
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" onClick={handleCloseMenu}>
+                  <Button variant="outline" className="w-full">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/auth/register" onClick={handleCloseMenu}>
+                  <Button className="w-full">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
