@@ -6,7 +6,6 @@ import { Plan } from '@/types/type';
 import { useTranslations } from 'next-intl';
 import { CardLoader } from '@/components/loading';
 
-// Lazy load UI components
 const Button = dynamic(() => import('@/components/ui/button').then(mod => mod.Button));
 const Card = dynamic(() => import('@/components/ui/card').then(mod => mod.Card));
 const CardContent = dynamic(() => import('@/components/ui/card').then(mod => mod.CardContent));
@@ -16,14 +15,12 @@ const CardHeader = dynamic(() => import('@/components/ui/card').then(mod => mod.
 const CardTitle = dynamic(() => import('@/components/ui/card').then(mod => mod.CardTitle));
 const Badge = dynamic(() => import('@/components/ui/badge').then(mod => mod.Badge));
 
-// Lazy load icons
 const Check = dynamic(() => import('lucide-react').then(mod => mod.Check), { ssr: false });
 
 const PaymentPage = () => {
     const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
     const t = useTranslations('PaymentPage');
 
-    // Define plans dynamically using translations
     const plans: Plan[] = [
         {
             name: t('plans.Basic.name'),
@@ -81,7 +78,6 @@ const PaymentPage = () => {
     );
 };
 
-// Extracted Plan Card Component
 function PlanCard({ plan, selectedPlan, setSelectedPlan, t }: any) {
     return (
         <Card

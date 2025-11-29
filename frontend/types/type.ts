@@ -1,3 +1,4 @@
+import { User } from "@supabase/supabase-js";
 import { LucideIcon } from "lucide-react";
 export interface AnalysisResult {
     filename: string;
@@ -107,4 +108,22 @@ export interface StepItem {
 
 export interface CompanyRankResponse {
     ranked_results: AnalysisResult[];
+}
+
+
+export interface AuthContextType {
+    user: User | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    signOut: () => Promise<void>;
+}
+
+
+export interface GoogleAuthButtonProps {
+    mode: 'login' | 'register';
+    text: string;
+}
+
+export interface EmailAuthFormProps {
+    mode: 'login' | 'register';
 }

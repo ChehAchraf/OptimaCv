@@ -23,9 +23,13 @@ services:
     container_name: optimacv_frontend
     ports:
       - "3000:3000"
+    env_file:
+      - .env
+      - frontend/.env
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - /app/.next
     command: sh -c "npm install && npm run dev"
     environment:
       - NODE_ENV=development
