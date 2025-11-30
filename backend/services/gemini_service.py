@@ -29,33 +29,7 @@ class GeminiService:
             raise ValueError(f"Failed to configure Gemini: {e}")
 
 
-
-        self.generation_config = {"response_mime_type": "application/json"}
-
-        
-
-        self.model_flash = genai.GenerativeModel(
-
-            'models/gemini-flash-latest',
-
-            generation_config=self.generation_config
-
-        )
-
-        self.model_pro = genai.GenerativeModel(
-
-            'models/gemini-pro-latest',
-
-            generation_config=self.generation_config
-
-        )
-
-        self.model_pro_vision = genai.GenerativeModel('models/gemini-pro-latest')
-
-
-
     def _clean_json_response(self, raw_text: str) -> str:
-
         """
         Kills the ```json markdown block and other unwanted chars
         """
