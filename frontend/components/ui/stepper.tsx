@@ -12,7 +12,7 @@ interface StepperProps {
 export function Stepper({ currentStep, steps, children, className }: StepperProps) {
   return (
     <div className={cn("space-y-6", className)}>
-      {}
+      { }
       <div className="flex items-center justify-between mb-8">
         {steps.map((step, index) => {
           const stepNumber = index + 1
@@ -57,9 +57,9 @@ export function Stepper({ currentStep, steps, children, className }: StepperProp
         })}
       </div>
 
-      {}
+      { }
       <div>
-        {React.Children.toArray(children)[currentStep - 1]}
+        {children}
       </div>
     </div>
   )
