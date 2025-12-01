@@ -105,25 +105,31 @@ export interface StepItem {
     iconColor: string;
     delay?: number;
 }
-
 export interface CompanyRankResponse {
     ranked_results: AnalysisResult[];
 }
-
-
 export interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     signOut: () => Promise<void>;
 }
-
-
 export interface GoogleAuthButtonProps {
     mode: 'login' | 'register';
     text: string;
 }
-
 export interface EmailAuthFormProps {
     mode: 'login' | 'register';
+}
+export interface UserPlan {
+    id: string;
+    user_id: string;
+    status: string;
+    start_date: string;
+    end_date: string;
+    plan: UserPlanResponse;
+}
+export interface UserPlanResponse {
+    name: string;
+    display_name: string;
 }
