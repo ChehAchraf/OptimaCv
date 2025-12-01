@@ -10,11 +10,13 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle2, Upload, FileText } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Upload, FileText, Lock } from 'lucide-react';
 import { AnalysisResult } from '@/types/type';
 import { useTranslations } from 'next-intl';
 import { generateCV } from '@/app/actions/generateCv';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { companyRankPayloadSchema, validateData, fileListToArray } from '@/lib/validations';
+import Link from 'next/link';
 
 export default function CompanyPage() {
   const t = useTranslations('CompanyPage');
@@ -22,17 +24,44 @@ export default function CompanyPage() {
   const [files, setFiles] = useState<FileList | null>(null);
   const [jobDescription, setJobDescription] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [isCheckingPlan, setIsCheckingPlan] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
+
+  // Check user's plan on mount
+  useEffect(() => {
+    const checkPlan = async () => {
+      try {
+        const response = await fetch('/api/user/plan');
+        const data = await response.json();
+
+        if (data.success && data.plan) {
+          // Check if user has enterprise plan
+          const isEnterprise = data.plan.plan.name === 'enterprise';
+          setHasAccess(isEnterprise);
+        } else {
+          setHasAccess(false);
+        }
+      } catch (err) {
+        console.error('Error checking plan:', err);
+        setHasAccess(false);
+      } finally {
+        setIsCheckingPlan(false);
+      }
+    };
+
+    checkPlan();
+  }, []);
 
   const { data: results = [] } = useQuery<AnalysisResult[]>({
     queryKey: ['company-results'],
     queryFn: () => [],
     staleTime: Infinity,
-    gcTime: 1000 * 60 * 30, 
-    enabled: false, 
+    gcTime: 1000 * 60 * 30,
+    enabled: false,
   });
 
   // Mutation to generate CV
-  const mutation = useMutation<AnalysisResult[], Error, { jobDescription: string; files: FileList }>({
+  const mutation = useMutation<AnalysisResult[], Error, { jobDescription: string; files: File[] }>({
     mutationFn: async (payload) => {
       const response = await generateCV(payload);
       return response.ranked_results;
@@ -60,8 +89,64 @@ export default function CompanyPage() {
       return;
     }
 
-    mutation.mutate({ jobDescription, files });
+    // Convert FileList to File array and validate
+    const filesArray = fileListToArray(files);
+    const payloadData = {
+      jobDescription,
+      files: filesArray,
+    };
+
+    // Validate payload using Zod
+    const validationResult = validateData(companyRankPayloadSchema, payloadData);
+
+    if (!validationResult.success) {
+      // Get the first error message
+      const firstError = Object.values(validationResult.errors)[0]?.[0];
+      setError(firstError || t('form.error'));
+      return;
+    }
+
+    mutation.mutate(validationResult.data);
   };
+
+  // Show loading state
+  if (isCheckingPlan) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Checking your subscription...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show access denied if no enterprise plan
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          <Card className="shadow-xl border-0 ring-1 ring-gray-200 dark:ring-gray-800">
+            <CardContent className="p-8 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/20 mb-4">
+                <Lock className="h-8 w-8 text-amber-600 dark:text-amber-500" />
+              </div>
+              <h2 className="text-2xl font-bold mb-2">Enterprise Plan Required</h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                This feature is exclusively available for Enterprise plan subscribers.
+                Upgrade your plan to access advanced company features including bulk CV analysis and ranking.
+              </p>
+              <Link href="/pricing">
+                <Button size="lg" className="text-lg px-8">
+                  View Pricing Plans
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black py-6 sm:py-12 px-3 sm:px-4 lg:px-8">
