@@ -24,6 +24,12 @@ class GeminiService:
 
             genai.configure(api_key=api_key)
 
+            # Initialize the Gemini models
+            # Using gemini-2.0-flash as it is available, stable, and multimodal
+            self.model_flash = genai.GenerativeModel("gemini-2.0-flash")
+            self.model_pro = genai.GenerativeModel("gemini-2.0-flash")
+            self.model_pro_vision = genai.GenerativeModel("gemini-2.0-flash")
+
         except Exception as e:
 
             raise ValueError(f"Failed to configure Gemini: {e}")
