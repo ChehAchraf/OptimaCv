@@ -11,15 +11,12 @@ export const createClient = () => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    console.log('🔧 Client Supabase Config:', {
-        hasUrl: !!url,
-        urlLength: url?.length,
-        hasKey: !!key,
-        keyLength: key?.length,
-    });
+    if (!url || !key) {
+        if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ Supabase credentials not configured. Authentication features will not work.');
+        }
+        throw new Error('Supabase configuration is missing. Please check your environment variables.');
+    }
 
-    return createBrowserClient(
-        url || 'https://placeholder.supabase.co',
-        key || 'placeholder-key'
-    );
+    return createBrowserClient(url, key);
 };
