@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { Plan } from '@/types/type';
 import { useTranslations } from 'next-intl';
 import { CardLoader } from '@/components/loading';
+import { useToast } from '@/hooks/use-toast';
 
 const Button = dynamic(() => import('@/components/ui/button').then(mod => mod.Button));
 const Card = dynamic(() => import('@/components/ui/card').then(mod => mod.Card));
@@ -19,6 +20,7 @@ const Check = dynamic(() => import('lucide-react').then(mod => mod.Check), { ssr
 
 const PaymentPage = () => {
     const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+    const { toast } = useToast();
     const t = useTranslations('PaymentPage');
 
     const plans: Plan[] = [
@@ -47,7 +49,7 @@ const PaymentPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50/50 flex flex-col items-center py-20 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/50 flex flex-col items-center py-20 px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
                 <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4">
                     {t('title')}
@@ -65,6 +67,7 @@ const PaymentPage = () => {
                             plan={plan}
                             selectedPlan={selectedPlan}
                             setSelectedPlan={setSelectedPlan}
+                            toast={toast}
                             t={t}
                         />
                     ))}
@@ -78,7 +81,24 @@ const PaymentPage = () => {
     );
 };
 
-function PlanCard({ plan, selectedPlan, setSelectedPlan, t }: any) {
+interface PlanCardProps {
+    plan: Plan;
+    selectedPlan: Plan | null;
+    setSelectedPlan: (plan: Plan) => void;
+    toast: any;
+    t: any;
+}
+
+function PlanCard({ plan, selectedPlan, setSelectedPlan, toast, t }: PlanCardProps) {
+    const handleSelectPlan = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setSelectedPlan(plan);
+        toast({
+            title: t('selected'),
+            description: `${plan.name} - ${plan.price}`,
+        });
+    };
+
     return (
         <Card
             className={`relative flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer ${selectedPlan?.name === plan.name
@@ -86,6 +106,15 @@ function PlanCard({ plan, selectedPlan, setSelectedPlan, t }: any) {
                 : 'border-border hover:border-primary/50'
                 } ${plan.popular ? 'shadow-md border-primary/20' : ''}`}
             onClick={() => setSelectedPlan(plan)}
+            role="button"
+            tabIndex={0}
+            aria-label={`Select ${plan.name} plan for ${plan.price}`}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedPlan(plan);
+                }
+            }}
         >
             {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -108,10 +137,10 @@ function PlanCard({ plan, selectedPlan, setSelectedPlan, t }: any) {
             </CardHeader>
 
             <CardContent className="flex-grow">
-                <ul className="space-y-3">
+                <ul className="space-y-3" role="list">
                     {plan.features.map((feature: string, i: number) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                            <Check className="h-5 w-5 text-primary shrink-0" />
+                            <Check className="h-5 w-5 text-primary shrink-0" aria-hidden="true" />
                             <span>{feature}</span>
                         </li>
                     ))}
@@ -120,7 +149,7 @@ function PlanCard({ plan, selectedPlan, setSelectedPlan, t }: any) {
 
             <CardFooter className="pt-6 flex flex-col gap-2">
                 {plan.note && (
-                    <p className="text-xs font-medium text-primary text-center w-full animate-pulse">
+                    <p className="text-xs font-medium text-primary text-center w-full animate-pulse" role="status">
                         {plan.note}
                     </p>
                 )}
@@ -131,11 +160,8 @@ function PlanCard({ plan, selectedPlan, setSelectedPlan, t }: any) {
                         : ''
                         }`}
                     size="lg"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPlan(plan);
-                        alert(`${t('selected')}: ${plan.name}`);
-                    }}
+                    onClick={handleSelectPlan}
+                    aria-pressed={selectedPlan?.name === plan.name}
                 >
                     {selectedPlan?.name === plan.name ? t('selected') : t('selectPlan')}
                 </Button>
