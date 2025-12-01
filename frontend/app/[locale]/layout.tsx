@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import QueryProvider from '@/components/providers/QueryProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -93,6 +94,7 @@ export default async function RootLayout({
                 <main>
                   {children}
                 </main>
+                <Toaster />
               </QueryProvider>
             </AuthProvider>
           </NextIntlClientProvider>
