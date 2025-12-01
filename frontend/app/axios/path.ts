@@ -20,10 +20,14 @@ function toFormData(data: Record<string, any>): FormData {
     Object.entries(data).forEach(([key, value]) => {
         if (Array.isArray(value)) {
             value.forEach((item) => {
-                formData.append(key, isFile(item) ? item : JSON.stringify(item));
+                formData.append(key, isFile(item) ? item : item);
             });
-        } else {
-            formData.append(key, isFile(value) ? value : JSON.stringify(value));
+        } else if (isFile(value)) {
+            formData.append(key, value);
+        } else if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            formData.append(key, String(value));
+        } else if (value !== null && value !== undefined) {
+            formData.append(key, JSON.stringify(value));
         }
     });
 
@@ -43,15 +47,19 @@ path.interceptors.request.use(
         }
 
         if (config.data) {
-            const hasFile = Object.values(config.data).some((v) =>
-                Array.isArray(v) ? v.some(isFile) : isFile(v)
-            );
-
-            if (hasFile) {
-                config.data = toFormData(config.data);
+            if (config.data instanceof FormData) {
                 delete (config.headers as AxiosRequestHeaders)['Content-Type'];
-            } else if (!(config.headers as AxiosRequestHeaders)['Content-Type']) {
-                config.headers['Content-Type'] = 'application/json';
+            } else {
+                const hasFile = Object.values(config.data).some((v) =>
+                    Array.isArray(v) ? v.some(isFile) : isFile(v)
+                );
+
+                if (hasFile) {
+                    config.data = toFormData(config.data);
+                    delete (config.headers as AxiosRequestHeaders)['Content-Type'];
+                } else if (!(config.headers as AxiosRequestHeaders)['Content-Type']) {
+                    config.headers['Content-Type'] = 'application/json';
+                }
             }
         }
 

@@ -89,6 +89,7 @@
         "pricing": "Pricing",
         "analyze": "Analyze CV",
         "about": "About",
+        "contact": "Contact",
         "login": "Login",
         "register": "Register",
         "logout": "Logout",
@@ -348,8 +349,8 @@
         "ctaTitle": "Ready to transform your recruitment?",
         "ctaSubtitle": "Join companies that recruit faster and smarter",
         "ctaButtons": {
-            "startTrial": "Start free trial",
-            "requestDemo": "Request a demo"
+            "startTrial": "Start Free Trial",
+            "requestDemo": "Request Demo"
         }
     },
     "CVAnalyze": {
@@ -401,5 +402,55 @@
         "password": "Password",
         "logout": "Logout",
         "profile": "Profile"
+    },
+    "ProfilePage": {
+        "loading": "Loading your profile...",
+        "error": "Failed to load profile",
+        "tryAgain": "Try Again",
+        "title": "My Profile",
+        "subtitle": "Manage your account and subscription",
+        "memberSince": "Member Since",
+        "userId": "User ID",
+        "quickActions": "Quick Actions",
+        "analyzeCv": "Analyze CV",
+        "viewPlans": "View Plans",
+        "currentPlan": "Current Plan",
+        "planDetails": "Your subscription details and benefits",
+        "price": "Price",
+        "free": "Free",
+        "perMonth": "/mo",
+        "status": "Status",
+        "active": "Active",
+        "freeTrial": "Free Trial",
+        "subscriptionPeriod": "Subscription Period",
+        "ends": "Ends:",
+        "upgradePrompt": "You're currently on a <strong>Free Trial</strong>. Upgrade to unlock more features!",
+        "upgradeNow": "Upgrade Now",
+        "usageStats": "Usage Statistics",
+        "trackUsage": "Track your CV analysis usage",
+        "analysesThisMonth": "CV Analyses This Month",
+        "analysesThisTrial": "CV Analyses This Trial",
+        "remaining": "Remaining",
+        "used": "used",
+        "warningRemaining": "⚠️ You have <strong>{count}</strong> analysis{s} remaining.",
+        "considerUpgrading": " Consider upgrading to continue using CV analysis features.",
+        "limitReached": "🚫 You've used all your CV analyses.",
+        "limitReset": " Your limit will reset at the start of your next billing cycle.",
+        "upgradeToContinue": " Upgrade to a paid plan to continue."
+    },
+    "PricingPage": {
+        "title": "Choose Your Plan",
+        "subtitle": "Unlock the full potential of your career with our premium tools.",
+        "popular": "POPULAR",
+        "free": "Free",
+        "perMonth": "/month",
+        "prioritySupport": "Priority Support",
+        "currentPlan": "Current Plan",
+        "subscribeNow": "Subscribe Now",
+        "successTitle": "Success!",
+        "successMessage": "You have successfully subscribed to the plan.",
+        "errorTitle": "Error",
+        "errorMessage": "Failed to subscribe",
+        "genericError": "Something went wrong. Please try again."
     }
 }

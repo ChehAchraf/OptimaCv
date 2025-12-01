@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { CVPersonalDetail } from '@/types/cv-builder';
+import { useFormValidation, cvPersonalDetailSchema } from '@/lib/validations';
 
 interface Props {
     data: CVPersonalDetail;
@@ -10,21 +11,30 @@ interface Props {
 }
 
 export const PersonalForm: React.FC<Props> = ({ data, updateData }) => {
+    const { getFieldError, hasError } = useFormValidation(cvPersonalDetailSchema);
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="full_name">Full Name *</Label>
+                    <Label htmlFor="full_name">
+                        Full Name <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                         id="full_name"
                         value={data.full_name}
                         onChange={(e) => updateData('full_name', e.target.value)}
                         placeholder="John Doe"
                         required
+                        className={hasError('full_name') ? 'border-red-500 focus-visible:ring-red-500' : ''}
                     />
+                    {hasError('full_name') && (
+                        <p className="text-sm text-red-500">{getFieldError('full_name')}</p>
+                    )}
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">
+                        Email <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                         id="email"
                         type="email"
@@ -32,17 +42,27 @@ export const PersonalForm: React.FC<Props> = ({ data, updateData }) => {
                         onChange={(e) => updateData('email', e.target.value)}
                         placeholder="john@example.com"
                         required
+                        className={hasError('email') ? 'border-red-500 focus-visible:ring-red-500' : ''}
                     />
+                    {hasError('email') && (
+                        <p className="text-sm text-red-500">{getFieldError('email')}</p>
+                    )}
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="phone">Phone *</Label>
+                    <Label htmlFor="phone">
+                        Phone <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                         id="phone"
                         value={data.phone}
                         onChange={(e) => updateData('phone', e.target.value)}
                         placeholder="+1 234 567 890"
                         required
+                        className={hasError('phone') ? 'border-red-500 focus-visible:ring-red-500' : ''}
                     />
+                    {hasError('phone') && (
+                        <p className="text-sm text-red-500">{getFieldError('phone')}</p>
+                    )}
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="location">Location</Label>

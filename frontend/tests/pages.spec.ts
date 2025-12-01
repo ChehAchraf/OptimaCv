@@ -27,11 +27,9 @@ test.describe('Navigation Tests', () => {
         await expect(page.getByText('Upload multiple CVs')).toBeVisible();
     });
 
-    test('Payment page loads', async ({ page }) => {
-        await page.goto('/en/payment');
-        await expect(page.getByText('Choose the perfect plan for your career')).toBeVisible();
-        await expect(page.getByText('Basic')).toBeVisible();
-        await expect(page.getByText('VIP')).toBeVisible();
+    test('Pricing page loads', async ({ page }) => {
+        await page.goto('/en/pricing');
+        await expect(page.getByText('Choose Your Plan')).toBeVisible();
     });
 
     test('Build CV page loads', async ({ page }) => {

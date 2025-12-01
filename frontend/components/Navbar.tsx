@@ -28,7 +28,7 @@ const Navbar = () => {
   const mainLinks = [
     { name: t('home'), href: '/' },
     { name: t('company'), href: '/entreprise' },
-    { name: t('pricing'), href: '/payment' },
+    { name: t('pricing'), href: '/pricing' },
     { name: t('about'), href: '/about' },
     { name: t('analyze'), href: '/CV_analyze' },
   ];
@@ -98,6 +98,10 @@ const Navbar = () => {
                       <span className="font-medium">{user?.email}</span>
                     </div>
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/profile')}>
+                    <HiUser className="mr-2 h-4 w-4" />
+                    {tAuth('profile')}
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <HiLogout className="mr-2 h-4 w-4" />
@@ -157,6 +161,12 @@ const Navbar = () => {
                 <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                   {user?.email}
                 </div>
+                <Link href="/profile" onClick={handleCloseMenu}>
+                  <Button variant="outline" className="w-full">
+                    <HiUser className="mr-2 h-4 w-4" />
+                    {tAuth('profile')}
+                  </Button>
+                </Link>
                 <Button variant="outline" className="w-full" onClick={handleLogout}>
                   <HiLogout className="mr-2 h-4 w-4" />
                   {tAuth('logout')}

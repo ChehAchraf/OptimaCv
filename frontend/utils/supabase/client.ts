@@ -1,7 +1,7 @@
 import { createBrowserClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || ''
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 if (!supabaseUrl || !supabaseKey) {
     console.error('Supabase environment variables are not configured. Authentication features will not work.')
@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseKey) {
 
 export const createClient = () => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     console.log('🔧 Client Supabase Config:', {
         hasUrl: !!url,
