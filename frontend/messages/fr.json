@@ -30,54 +30,6 @@
             }
         }
     },
-    "PaymentPage": {
-        "title": "Choisissez le plan parfait pour votre carrière",
-        "subtitle": "Des options flexibles pour tous les besoins, du débutant au professionnel.",
-        "recommended": "Recommandé",
-        "securePayment": "Annulation possible à tout moment.",
-        "selectPlan": "Choisir ce plan",
-        "selected": "Sélectionné",
-        "studentOffer": "2 mois offerts avec email école",
-        "plans": {
-            "Basic": {
-                "name": "Basique",
-                "price": "€9.99 / mois",
-                "features": [
-                    "1 CV",
-                    "Support Email",
-                    "Templates limités"
-                ]
-            },
-            "VIP": {
-                "name": "VIP",
-                "price": "€29.99 / mois",
-                "features": [
-                    "CV illimités",
-                    "Support Prioritaire",
-                    "Accès à tous les templates"
-                ]
-            },
-            "Entreprise": {
-                "name": "Entreprise",
-                "price": "€99.99 / mois",
-                "features": [
-                    "CV illimités",
-                    "Gestion équipe",
-                    "Statistiques avancées"
-                ]
-            },
-            "Students": {
-                "name": "Étudiants",
-                "price": "€4.99 / mois",
-                "features": [
-                    "1 CV",
-                    "Support Email",
-                    "Templates limités",
-                    "Prix étudiant"
-                ]
-            }
-        }
-    },
     "Navbar": {
         "home": "Accueil",
         "pricing": "Tarifs",
@@ -387,7 +339,7 @@
         "register": {
             "title": "Commencer",
             "subtitle": "Créez votre compte et commencez à créer des CV professionnels avec l'IA",
-            "googleButton": "S'inscrire avec Google",
+            "googleButton": "S'inscription avec Google",
             "submit": "Créer un compte",
             "or": "Ou continuer avec",
             "hasAccount": "Vous avez déjà un compte ?",
@@ -447,5 +399,53 @@
         "errorTitle": "Erreur",
         "errorMessage": "Échec de l'abonnement",
         "genericError": "Une erreur s'est produite. Veuillez réessayer."
+    },
+    "PaymentPage": {
+        "title": "Choisissez votre plan",
+        "subtitle": "Sélectionnez le plan parfait pour vos objectifs de carrière",
+        "plans": {
+            "Basic": {
+                "name": "Basique",
+                "price": "Gratuit",
+                "features": [
+                    "1 Analyse de CV par mois",
+                    "Suggestions de base",
+                    "Export PDF"
+                ]
+            },
+            "VIP": {
+                "name": "VIP",
+                "price": "9.99$ /mois",
+                "features": [
+                    "Analyses de CV illimitées",
+                    "Suggestions IA avancées",
+                    "Support prioritaire"
+                ]
+            },
+            "Entreprise": {
+                "name": "Entreprise",
+                "price": "Contactez-nous",
+                "features": [
+                    "Analyse en masse",
+                    "Accès API",
+                    "Gestionnaire de compte dédié"
+                ]
+            },
+            "Students": {
+                "name": "Étudiant",
+                "price": "4.99$ /mois",
+                "features": [
+                    "5 Analyses de CV par mois",
+                    "Orientation professionnelle",
+                    "Bibliothèque de modèles",
+                    "Réduction étudiante appliquée"
+                ]
+            }
+        },
+        "studentOffer": "Carte étudiante valide requise",
+        "securePayment": "Paiement sécurisé via Stripe. Annulez à tout moment.",
+        "selected": "Sélectionné",
+        "recommended": "Recommandé",
+        "selectPlan": "Sélectionner ce plan"
     }
 }
