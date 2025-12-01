@@ -1,4 +1,4 @@
-{
+﻿{
     "HomePage": {
         "title": "Optimize your CV with AI",
         "subtitle": "Increase your chances of getting an interview with our intelligent analysis.",
@@ -32,54 +32,6 @@
                 "layout": "Layout",
                 "fonts": "Font Choice",
                 "suggestions": "Improvement Suggestions"
-            }
-        }
-    },
-    "PaymentPage": {
-        "title": "Choose the perfect plan for your career",
-        "subtitle": "Flexible options for all needs, from beginner to professional.",
-        "recommended": "Recommended",
-        "securePayment": "Cancel anytime.",
-        "selectPlan": "Select this plan",
-        "selected": "Selected",
-        "studentOffer": "2 months free with school email",
-        "plans": {
-            "Basic": {
-                "name": "Basic",
-                "price": "€9.99 / month",
-                "features": [
-                    "1 CV",
-                    "Email Support",
-                    "Limited Templates"
-                ]
-            },
-            "VIP": {
-                "name": "VIP",
-                "price": "€29.99 / month",
-                "features": [
-                    "Unlimited CVs",
-                    "Priority Support",
-                    "Access to all templates"
-                ]
-            },
-            "Entreprise": {
-                "name": "Enterprise",
-                "price": "€99.99 / month",
-                "features": [
-                    "Unlimited CVs",
-                    "Team Management",
-                    "Advanced Statistics"
-                ]
-            },
-            "Students": {
-                "name": "Students",
-                "price": "€4.99 / month",
-                "features": [
-                    "1 CV",
-                    "Email Support",
-                    "Limited Templates",
-                    "Student Price"
-                ]
             }
         }
     },
@@ -452,5 +404,53 @@
         "errorTitle": "Error",
         "errorMessage": "Failed to subscribe",
         "genericError": "Something went wrong. Please try again."
+    },
+    "PaymentPage": {
+        "title": "Choose Your Plan",
+        "subtitle": "Select the perfect plan for your career goals",
+        "plans": {
+            "Basic": {
+                "name": "Basic",
+                "price": "Free",
+                "features": [
+                    "1 CV Analysis per month",
+                    "Basic suggestions",
+                    "PDF Export"
+                ]
+            },
+            "VIP": {
+                "name": "VIP",
+                "price": "$9.99 /month",
+                "features": [
+                    "Unlimited CV Analyses",
+                    "Advanced AI suggestions",
+                    "Priority Support"
+                ]
+            },
+            "Entreprise": {
+                "name": "Enterprise",
+                "price": "Contact Us",
+                "features": [
+                    "Bulk Analysis",
+                    "API Access",
+                    "Dedicated Account Manager"
+                ]
+            },
+            "Students": {
+                "name": "Student",
+                "price": "$4.99 /month",
+                "features": [
+                    "5 CV Analyses per month",
+                    "Career guidance",
+                    "Template library",
+                    "Student discount applied"
+                ]
+            }
+        },
+        "studentOffer": "Valid student ID required",
+        "securePayment": "Secure payment via Stripe. Cancel anytime.",
+        "selected": "Selected",
+        "recommended": "Recommended",
+        "selectPlan": "Select Plan"
     }
 }
