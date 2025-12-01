@@ -214,3 +214,8 @@ Desktop.ini
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+
+# Database
+/database
+
