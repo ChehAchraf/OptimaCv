@@ -2,7 +2,6 @@
 
 import { Suspense, useState } from 'react';
 import { analyzeCv } from "@/app/actions/analyzeCv";
-import { CVPayload } from "@/types/type";
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +13,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { CardLoader } from '@/components/loading';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cvPayloadSchema, validateData, formatZodErrors } from '@/lib/validations';
+import { ZodError } from 'zod';
 
 export default function CVAnalyze() {
     const t = useTranslations('CVAnalyze');
@@ -50,20 +51,32 @@ export default function CVAnalyze() {
             return;
         }
 
-        setIsLoading(true);
-        setError(null);
-        setAnalysisResult(null);
-
-        const payload: CVPayload = {
+        // Prepare payload for validation
+        const payloadData: any = {
             cv_pdf: filePDF,
             job_description: jobDescription,
         };
 
         if (analyzeVisuals && fileImage) {
-            payload.cv_image = fileImage;
+            payloadData.cv_image = fileImage;
         }
+
+        // Validate payload using Zod
+        const validationResult = validateData(cvPayloadSchema, payloadData);
+
+        if (!validationResult.success) {
+            // Get the first error message
+            const firstError = Object.values(validationResult.errors)[0]?.[0];
+            setError(firstError || t('form.errorMissing'));
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+        setAnalysisResult(null);
+
         try {
-            const response = await analyzeCv(payload);
+            const response = await analyzeCv(validationResult.data);
             console.log("API Response:", response);
             setAnalysisResult(response);
 
