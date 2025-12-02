@@ -42,6 +42,8 @@
         "analyze": "Analyze CV",
         "about": "About",
         "contact": "Contact",
+        "dashboard": "Dashboard",
+        "switchLanguage": "Switch Language",
         "login": "Login",
         "register": "Register",
         "logout": "Logout",
@@ -449,8 +451,86 @@
         },
         "studentOffer": "Valid student ID required",
         "securePayment": "Secure payment via Stripe. Cancel anytime.",
-        "selected": "Selected",
         "recommended": "Recommended",
         "selectPlan": "Select Plan"
+    },
+    "Dashboard": {
+        "welcome": "Welcome",
+        "subtitle": "Track your CVs and prepare for interviews with AI assistance",
+        "stats": {
+            "totalAnalyses": "Total Analyses",
+            "remainingAnalyses": "Remaining",
+            "averageScore": "Average Score",
+            "lastAnalysis": "Last Analysis",
+            "noAnalysis": "N/A"
+        },
+        "recentAnalyses": {
+            "title": "Recent Analyses",
+            "viewAll": "View All",
+            "empty": {
+                "title": "No analyses yet",
+                "description": "Start analyzing your CV to get personalized feedback",
+                "action": "Analyze CV"
+            }
+        },
+        "nav": {
+            "dashboard": "Dashboard",
+            "cvAnalysis": "Analyze CV",
+            "history": "History",
+            "profile": "Profile",
+            "settings": "Settings",
+            "darkMode": "Dark Mode",
+            "lightMode": "Light Mode",
+            "signOut": "Sign Out"
+        },
+        "history": {
+            "title": "CV Analysis History",
+            "subtitle": "View all your {count} CV analyses",
+            "filters": {
+                "all": "All",
+                "excellent": "Excellent (80%+)",
+                "good": "Good (65-79%)",
+                "needsImprovement": "Needs Improvement (<65%)"
+            },
+            "empty": {
+                "title": "No analyses found",
+                "description": "Try adjusting your filters or analyze a new CV",
+                "action": "Analyze New CV"
+            }
+        },
+        "profile": {
+            "title": "My Profile",
+            "subtitle": "Manage your account information",
+            "email": "Email",
+            "memberSince": "Member Since",
+            "plan": "Subscription Plan",
+            "status": "Account Status",
+            "verified": "Verified",
+            "unverified": "Unverified",
+            "usage": {
+                "title": "Usage Statistics",
+                "cvAnalyses": "CV Analyses"
+            },
+            "upgradePlan": "Upgrade Plan"
+        },
+        "settings": {
+            "title": "Settings",
+            "subtitle": "Manage your preferences",
+            "language": {
+                "title": "Language",
+                "description": "Choose your preferred language"
+            },
+            "notifications": {
+                "title": "Notifications",
+                "email": "Email Notifications",
+                "emailDescription": "Receive updates about your CV analyses"
+            },
+            "security": {
+                "title": "Security",
+                "changePassword": "Change Password",
+                "changePasswordDescription": "Update your account password"
+            },
+            "comingSoon": "Coming Soon"
+        }
     }
 }
