@@ -219,3 +219,8 @@ Desktop.ini
 # Database
 /database
 
+
+# scripts
+
+/commit.sh
+
