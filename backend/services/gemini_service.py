@@ -51,14 +51,59 @@ class GeminiService:
     async def analyze_cv_only(self, cv_text: str) -> dict:
 
         prompt = f"""
-        Analyze the following CV text and return a JSON object with this *exact* structure:
+        Analyze the following CV and return ONLY a JSON object with no explanations and no text outside the JSON.
+
+        The JSON must follow exactly this structure:
+
         {{
-            "full_name": "Full Name", "email": "email@example.com", "phone": "+123456",
-            "summary": "...", "skills": ["Skill 1"],
-            "experience": [{{  "company": "Company", "title": "Job Title", "duration": "Date - Date", "details": "..." }} ],
-            "education": [{{  "institution": "University", "degree": "Degree", "duration": "Date - Date" }} ]
+          "personal_info": {{
+            "full_name": "",
+            "email": "",
+            "phone": "",
+            "location": ""
+          }},
+          "summary": "",
+          "skills": {{
+            "technical": [],
+            "soft": []
+          }},
+          "experience": [
+            {{
+              "title": "",
+              "company": "",
+              "period": "",
+              "achievements": []
+            }}
+          ],
+          "education": [
+            {{
+              "degree": "",
+              "school": "",
+              "year": ""
+            }}
+          ],
+          "languages": [],
+          "score": {{
+            "overall": 0,
+            "skills_match": 0,
+            "clarity": 0,
+            "structure": 0
+          }},
+          "improvements": []
         }}
-        CV Text: --- {cv_text} ---
+
+        Rules:
+        - Return ONLY valid JSON.
+        - Do NOT include Markdown.
+        - Do NOT add commentary.
+        - If information is missing, leave the field empty.
+        - Arrays must never contain null values.
+        - Do not invent false details.
+        - Base everything strictly on the CV content.
+
+        CV CONTENT:
+        ---------------
+        {cv_text}
         """
 
         response = await self.model_flash.generate_content_async(prompt) 
