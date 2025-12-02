@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next';
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl = 'https://optimacv.com';
     const locales = ['en', 'fr', 'ar'];
-    const pages = ['', '/pricing', '/about', '/company', '/build-cv', '/CV_analyze'];
+    const pages = ['', '/payment', '/about', '/company', '/build-cv', '/CV_analyze'];
 
     const routes: MetadataRoute.Sitemap = [];
 
