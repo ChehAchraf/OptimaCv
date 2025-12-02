@@ -51,7 +51,6 @@ export default function CVAnalyze() {
             return;
         }
 
-        // Prepare payload for validation
         const payloadData: any = {
             cv_pdf: filePDF,
             job_description: jobDescription,
@@ -61,11 +60,9 @@ export default function CVAnalyze() {
             payloadData.cv_image = fileImage;
         }
 
-        // Validate payload using Zod
         const validationResult = validateData(cvPayloadSchema, payloadData);
 
         if (!validationResult.success) {
-            // Get the first error message
             const firstError = Object.values(validationResult.errors)[0]?.[0];
             setError(firstError || t('form.errorMissing'));
             return;
