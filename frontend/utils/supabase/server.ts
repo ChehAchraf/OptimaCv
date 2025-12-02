@@ -14,14 +14,16 @@ export async function createRouteHandlerClient(request: NextRequest) {
         },
     })
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
 
-    
+    if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Missing Supabase environment variables');
+    }
 
     const supabase = createServerClient(
-        supabaseUrl || '',
-        supabaseKey || '',
+        supabaseUrl,
+        supabaseKey,
         {
             cookies: {
                 getAll() {
@@ -40,13 +42,23 @@ export async function createRouteHandlerClient(request: NextRequest) {
     return { supabase, response }
 }
 
-
 export async function createClient() {
     const cookieStore = await cookies()
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+
+    if (!supabaseUrl || !supabaseKey) {
+        throw new Error(
+            'Missing Supabase environment variables!\n\n' +
+            'Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.\n\n' +
+            'Find these values at: https://supabase.com/dashboard/project/_/settings/api'
+        );
+    }
+
     return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+        supabaseUrl,
+        supabaseKey,
         {
             cookies: {
                 getAll() {

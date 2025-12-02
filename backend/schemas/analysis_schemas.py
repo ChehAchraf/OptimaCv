@@ -68,43 +68,46 @@ class CVvsJDResponse(BaseModel):
 
 
 
+
+
+
+
+class PersonalInfoSchema(BaseModel):
+    full_name: Optional[str] = ""
+    email: Optional[str] = ""
+    phone: Optional[str] = ""
+    location: Optional[str] = ""
+
+class SkillsSchema(BaseModel):
+    technical: List[str] = []
+    soft: List[str] = []
+
 class ExperienceSchema(BaseModel):
-
-    company: str
-
-    title: str
-
-    duration: Optional[str] = None
-
-    details: Optional[str] = None
-
-
+    title: Optional[str] = ""
+    company: Optional[str] = ""
+    period: Optional[str] = ""
+    achievements: List[str] = []
 
 class EducationSchema(BaseModel):
+    degree: Optional[str] = ""
+    school: Optional[str] = ""
+    year: Optional[str] = ""
 
-    institution: str
-
-    degree: str
-
-    duration: Optional[str] = None
-
-
+class ScoreSchema(BaseModel):
+    overall: int = 0
+    skills_match: int = 0
+    clarity: int = 0
+    structure: int = 0
 
 class CVOnlyAnalysis(BaseModel):
-
-    full_name: str
-
-    email: EmailStr
-
-    phone: str
-
-    summary: Optional[str] = None
-
-    skills: List[str]
-
+    personal_info: PersonalInfoSchema
+    summary: Optional[str] = ""
+    skills: SkillsSchema
     experience: List[ExperienceSchema]
-
     education: List[EducationSchema]
+    languages: List[str] = []
+    score: ScoreSchema
+    improvements: List[str] = []
 
 
 
