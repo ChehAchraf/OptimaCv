@@ -8,17 +8,14 @@ import { createClient } from "@/utils/supabase/server";
 export async function analyzeCv(payload: CVPayload) {
     console.log(payload, "payload");
 
-    // Check user authentication and limits
     const supabase = await createClient();
 
-    // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
         throw new Error("You must be logged in to analyze CVs");
     }
 
-    // Check for active plan
     const { data: userPlan } = await supabase
         .from("user_plans")
         .select(`
@@ -33,7 +30,6 @@ export async function analyzeCv(payload: CVPayload) {
     let canProceed = false;
 
     if (userPlan) {
-        // User has an active plan - check plan limits
         const { data: incrementResult, error: incrementError } = await supabase
             .rpc("increment_plan_usage", { p_user_id: user.id });
 
@@ -50,7 +46,6 @@ export async function analyzeCv(payload: CVPayload) {
             );
         }
     } else {
-        // No active plan - check free trial usage
         const { data: incrementResult, error: incrementError } = await supabase
             .rpc("increment_free_usage", { user_uuid: user.id });
 
@@ -71,6 +66,25 @@ export async function analyzeCv(payload: CVPayload) {
     // Proceed with analysis
     const res = await path.post("/analysis/analyze-full-cv/", payload);
     console.log(res.data, "res.data");
+
+    // Save analysis result to Supabase automatically
+    try {
+        const { error: saveError } = await supabase
+            .from("ai_cv_results")
+            .insert({
+                user_id: user.id,
+                cv_name: payload.cv_pdf.name,
+                result: res.data,
+                created_at: new Date().toISOString()
+            });
+
+        if (saveError) {
+            console.error("Failed to save CV analysis to ai_cv_results:", saveError);
+            // Don't throw error here - analysis was successful, just logging failed
+        }
+    } catch (saveErr) {
+        console.error("Exception while saving CV analysis:", saveErr);
+    }
 
     return res.data;
 }
