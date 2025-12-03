@@ -1,13 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Comprehensive form validation schemas using Zod
- * Provides type-safe validation with user-friendly error messages
- */
-
-// ============================================
-// Common Validation Rules
-// ============================================
 
 export const emailSchema = z
     .string()
@@ -45,9 +37,7 @@ export const nameSchema = z
     .regex(/^[a-zA-Z\s'-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes')
     .trim();
 
-// ============================================
-// Authentication Schemas
-// ============================================
+
 
 export const loginSchema = z.object({
     email: emailSchema,
@@ -118,9 +108,6 @@ export const changePasswordSchema = z
         path: ['newPassword'],
     });
 
-// ============================================
-// CV Builder Schemas
-// ============================================
 
 export const personalInfoSchema = z.object({
     fullName: nameSchema,
@@ -177,10 +164,6 @@ export const certificationSchema = z.object({
     credentialId: z.string().optional(),
     credentialUrl: urlSchema.optional(),
 });
-
-// ============================================
-// File Upload Schemas
-// ============================================
 
 export const fileUploadSchema = z.object({
     file: z
@@ -240,7 +223,17 @@ export const cvPayloadSchema = z.object({
         .optional(),
 });
 
-// Company CV Ranking Schema (for bulk CV analysis)
+export const cvPersonalDetailSchema = z.object({
+    full_name: nameSchema,
+    email: emailSchema,
+    phone: phoneSchema,
+    location: z.string().optional(),
+    linkedin_url: urlSchema.optional(),
+    github_url: urlSchema.optional(),
+    portfolio_url: urlSchema.optional(),
+    summary: z.string().optional(),
+});
+
 export const companyRankPayloadSchema = z.object({
     files: z
         .array(z.instanceof(File))
@@ -265,10 +258,6 @@ export const companyRankPayloadSchema = z.object({
         .trim(),
 });
 
-// ============================================
-// Payment Schemas
-// ============================================
-
 export const paymentMethodSchema = z.object({
     cardNumber: z
         .string()
@@ -282,10 +271,6 @@ export const paymentMethodSchema = z.object({
     billingAddress: z.string().min(1, 'Billing address is required').trim(),
     zipCode: z.string().min(1, 'ZIP code is required').trim(),
 });
-
-//============================================
-// Contact Form Schema
-// ============================================
 
 export const contactFormSchema = z.object({
     name: nameSchema,
@@ -301,10 +286,6 @@ export const contactFormSchema = z.object({
         .max(1000, 'Message must be less than 1000 characters')
         .trim(),
 });
-
-// ============================================
-// Search & Filter Schemas
-// ============================================
 
 export const searchQuerySchema = z.object({
     query: z.string().min(1, 'Search query is required').max(200).trim(),
@@ -323,10 +304,6 @@ export const searchQuerySchema = z.object({
         .optional(),
 });
 
-// ============================================
-// Type Exports
-// ============================================
-
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
@@ -338,6 +315,7 @@ export type SkillInput = z.infer<typeof skillSchema>;
 export type CertificationInput = z.infer<typeof certificationSchema>;
 export type CVUploadInput = z.infer<typeof cvUploadSchema>;
 export type CVPayloadInput = z.infer<typeof cvPayloadSchema>;
+export type CVPersonalDetailInput = z.infer<typeof cvPersonalDetailSchema>;
 export type CompanyRankPayloadInput = z.infer<typeof companyRankPayloadSchema>;
 export type PaymentMethodInput = z.infer<typeof paymentMethodSchema>;
 export type ContactFormInput = z.infer<typeof contactFormSchema>;
