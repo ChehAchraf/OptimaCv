@@ -1,4 +1,4 @@
-﻿{
+{
     "HomePage": {
         "title": "Optimize your CV with AI",
         "subtitle": "Increase your chances of getting an interview with our intelligent analysis.",
@@ -531,6 +531,35 @@
                 "changePasswordDescription": "Update your account password"
             },
             "comingSoon": "Coming Soon"
+        }
+    },
+    "CVBuilder": {
+        "PersonalForm": {
+            "fullName": "Full Name",
+            "email": "Email",
+            "phone": "Phone",
+            "location": "Location",
+            "linkedin": "LinkedIn URL",
+            "github": "GitHub URL",
+            "portfolio": "Portfolio URL",
+            "summary": "Professional Summary",
+            "placeholders": {
+                "fullName": "John Doe",
+                "email": "john@example.com",
+                "phone": "+1 234 567 890",
+                "location": "New York, USA",
+                "linkedin": "https://linkedin.com/in/johndoe",
+                "github": "https://github.com/johndoe",
+                "portfolio": "https://johndoe.com",
+                "summary": "Briefly describe your professional background and goals..."
+            }
+        },
+        "SkillsForm": {
+            "category": "Category",
+            "categoryPlaceholder": "e.g., Frontend, Backend, Soft Skills",
+            "skillsLabel": "Skills (Press Enter to add)",
+            "skillPlaceholder": "Add a skill...",
+            "addCategory": "+ Add Skill Category"
         }
     }
 }
