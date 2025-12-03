@@ -6,20 +6,11 @@ import { useRouter, useParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { RecentAnalysisCard } from '@/components/dashboard/RecentAnalysisCard';
 import { useTranslations } from 'next-intl';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { FileText, Filter } from 'lucide-react';
 
-interface CVAnalysis {
-    id: string;
-    created_at: string;
-    job_title: string;
-    company_name?: string;
-    result?: string;
-    overall_score: number;
-    status: 'completed' | 'pending' | 'failed';
-    top_strengths: string[];
-    top_improvements: string[];
-}
+import { CVAnalysis } from '@/types/dashboard';
+
 
 export default function HistoryPage() {
     const { user, isAuthenticated, isLoading } = useAuth();
@@ -62,6 +53,7 @@ export default function HistoryPage() {
                         created_at: a.created_at,
                         job_title: result.job_title || a.cv_name || 'Untitled CV',
                         company_name: result.company_name,
+                        result: result,
                         overall_score: result.overall_score || 0,
                         status: 'completed' as const,
                         top_strengths: result.strengths?.slice(0, 3) || [],
