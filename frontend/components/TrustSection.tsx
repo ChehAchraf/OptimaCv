@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { ArrowRight, CheckCircle2, TrendingUp, Users, Award, Star, Zap, Target } from 'lucide-react';
+import { ArrowRight, CheckCircle2,Award} from 'lucide-react';
 import { features, stats } from '@/config/company';
 
 
@@ -19,7 +19,6 @@ const TrustSection = () => {
 
   return (
     <section className="relative py-24 lg:py-32 bg-linear-to-b from-white via-gray-50/50 to-white dark:from-gray-950 dark:via-black dark:to-gray-950 overflow-hidden">
-      {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-gray-200 dark:bg-gray-900 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-200 dark:bg-gray-900 rounded-full blur-3xl opacity-20" />
@@ -27,7 +26,6 @@ const TrustSection = () => {
 
       <div className="container max-w-7xl mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -35,7 +33,6 @@ const TrustSection = () => {
             transition={{ duration: 0.8, ease: [0.21, 1.11, 0.81, 0.99] }}
             className="space-y-10"
           >
-            {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -51,7 +48,6 @@ const TrustSection = () => {
               </Badge>
             </motion.div>
 
-            {/* Title */}
             <motion.h2
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -75,7 +71,6 @@ const TrustSection = () => {
               })}
             </motion.h2>
 
-            {/* Description */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -88,7 +83,6 @@ const TrustSection = () => {
 
             <Separator className="my-8" />
 
-            {/* Stats */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -140,7 +134,6 @@ const TrustSection = () => {
               })}
             </motion.div>
 
-            {/* Features */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -179,7 +172,6 @@ const TrustSection = () => {
               })}
             </motion.div>
 
-            {/* CTA */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -206,7 +198,6 @@ const TrustSection = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right Image */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -227,10 +218,8 @@ const TrustSection = () => {
                 priority
                 quality={90}
               />
-              {/* Overlay */}
               <div className="absolute inset-0 bg-linear-to-t from-gray-900/20 via-transparent to-transparent" />
 
-              {/* Floating Card */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
