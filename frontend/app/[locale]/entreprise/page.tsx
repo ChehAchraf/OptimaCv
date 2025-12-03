@@ -121,7 +121,6 @@ export default function CompanyPage() {
     );
   }
 
-  // Show access denied if no enterprise plan
   if (!hasAccess) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4">

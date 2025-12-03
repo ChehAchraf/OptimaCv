@@ -223,10 +223,7 @@ function BulletList({ items, color }: { items: string[]; color: keyof typeof col
     );
 }
 
-
-
-
-
+export const dynamic = 'force-dynamic';
 
 const getReportHTML = (result: AnalysisResult, score: number, config: { label: string; color: string }, date: string) => {
     return `
@@ -339,13 +336,16 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
             config,
             new Date().toLocaleDateString(locale, { dateStyle: 'long' })
         );
+const container = document.createElement('div');
+container.innerHTML = htmlContent;
 
-        const container = document.createElement('div');
-        container.innerHTML = htmlContent;
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.top = '0';
-        document.body.appendChild(container);
+// Remove all classNames to prevent Tailwind -> lab() conversion
+container.querySelectorAll('*').forEach(el => el.removeAttribute('class'));
+
+container.style.position = 'absolute';
+container.style.left = '-9999px';
+container.style.top = '0';
+document.body.appendChild(container);
 
         try {
             const canvas = await html2canvas(container.firstElementChild as HTMLElement, {
@@ -577,86 +577,6 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
                                 </p>
                             </div>
                         </SectionCard>
-                    </div>
-                </div>
-                {/* HIDDEN SIMPLE PDF CONTENT */}
-                <div id="simple-pdf-content" style={{
-                    position: 'absolute',
-                    left: '-9999px',
-                    top: 0,
-                    width: '210mm',
-                    padding: '20mm',
-                    backgroundColor: '#ffffff',
-                    color: '#000000',
-                    fontFamily: 'Arial, sans-serif'
-                }}>
-                    <div style={{ borderBottom: '2px solid #333', paddingBottom: '10px', marginBottom: '20px' }}>
-                        <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>OptimaCV Analysis Report</h1>
-                        <p style={{ fontSize: '14px', color: '#666', marginTop: '5px' }}>
-                            Generated on {new Date().toLocaleDateString()}
-                        </p>
-                    </div>
-
-                    <div style={{ marginBottom: '30px' }}>
-                        <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#333' }}>Analysis Details</h2>
-                        <table style={{ width: '100%', marginTop: '10px', borderCollapse: 'collapse' }}>
-                            <tbody>
-                                <tr>
-                                    <td style={{ padding: '8px 0', fontWeight: 'bold', width: '150px' }}>Job Title:</td>
-                                    <td>{result.job_title || analysis.cv_name}</td>
-                                </tr>
-                                <tr>
-                                    <td style={{ padding: '8px 0', fontWeight: 'bold' }}>Company:</td>
-                                    <td>{result.company_name || 'N/A'}</td>
-                                </tr>
-                                <tr>
-                                    <td style={{ padding: '8px 0', fontWeight: 'bold' }}>Match Score:</td>
-                                    <td>
-                                        <span style={{
-                                            display: 'inline-block',
-                                            padding: '4px 8px',
-                                            borderRadius: '4px',
-                                            backgroundColor: score >= 70 ? '#d1fae5' : score >= 60 ? '#fef3c7' : '#ffe4e6',
-                                            color: score >= 70 ? '#065f46' : score >= 60 ? '#92400e' : '#9f1239',
-                                            fontWeight: 'bold'
-                                        }}>
-                                            {score}/100 - {config.label}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {result.analysis_vs_jd?.summary && (
-                        <div style={{ marginBottom: '30px' }}>
-                            <h3 style={{ fontSize: '16px', fontWeight: 'bold', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>Executive Summary</h3>
-                            <p style={{ marginTop: '10px', lineHeight: '1.6', fontSize: '14px' }}>
-                                {result.analysis_vs_jd.summary}
-                            </p>
-                        </div>
-                    )}
-
-                    <div style={{ marginBottom: '30px' }}>
-                        <h3 style={{ fontSize: '16px', fontWeight: 'bold', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>Key Strengths</h3>
-                        <ul style={{ marginTop: '10px', paddingLeft: '20px' }}>
-                            {(result.strengths || result.analysis_vs_jd?.strengths || []).slice(0, 5).map((item, i) => (
-                                <li key={i} style={{ marginBottom: '8px', fontSize: '14px' }}>{item}</li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div style={{ marginBottom: '30px' }}>
-                        <h3 style={{ fontSize: '16px', fontWeight: 'bold', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>Areas for Improvement</h3>
-                        <ul style={{ marginTop: '10px', paddingLeft: '20px' }}>
-                            {(result.improvements || result.analysis_vs_jd?.improvements || []).slice(0, 5).map((item, i) => (
-                                <li key={i} style={{ marginBottom: '8px', fontSize: '14px' }}>{item}</li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div style={{ marginTop: '50px', fontSize: '12px', color: '#999', textAlign: 'center', borderTop: '1px solid #eee', paddingTop: '10px' }}>
-                        Powered by OptimaCV
                     </div>
                 </div>
             </div>

@@ -11,6 +11,7 @@ import { FileText, Filter } from 'lucide-react';
 
 import { CVAnalysis } from '@/types/dashboard';
 
+export const dynamic = 'force-dynamic';
 
 export default function HistoryPage() {
     const { user, isAuthenticated, isLoading } = useAuth();
