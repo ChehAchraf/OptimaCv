@@ -2,10 +2,6 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 
-/**
- * Creates a Supabase client for use in Route Handlers
- * This version properly handles cookie setting in API routes
- */
 export async function createRouteHandlerClient(request: NextRequest) {
     const cookieStore = await cookies()
     let response = NextResponse.next({

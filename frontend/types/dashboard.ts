@@ -5,12 +5,14 @@ export interface AnalysisResult {
     job_title: string;
     company_name?: string;
     analysis_vs_jd: {
+        weaknesses: string[];
         match_score: number;
         summary: string;
         strengths: string[];
         improvements: string[];
     };
     strengths: string[];
+    weaknesses: string[];
     improvements: string[];
 }
 

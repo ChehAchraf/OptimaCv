@@ -28,6 +28,11 @@
                 "fonts": "Choix de Police (Fonts)",
                 "suggestions": "Suggestions d'amélioration"
             }
+        },
+        "features": {
+            "analysis": "Analyse instantanée",
+            "suggestions": "Suggestions intelligentes",
+            "upload": "Téléchargement facile"
         }
     },
     "Navbar": {
@@ -381,7 +386,7 @@
         "analysesThisTrial": "Analyses de CV (Essai)",
         "remaining": "Restant",
         "used": "utilisé",
-        "warningRemaining": "⚠️ Il vous reste <strong>{count}</strong> analyse{s}.",
+        "warningRemaining": "âš ï¸ Il vous reste <strong>{count}</strong> analyse{s}.",
         "considerUpgrading": " Envisagez de mettre à niveau pour continuer à utiliser les fonctionnalités d'analyse.",
         "limitReached": "🚫 Vous avez utilisé toutes vos analyses de CV.",
         "limitReset": " Votre limite sera réinitialisée au début de votre prochain cycle de facturation.",
@@ -449,5 +454,113 @@
         "selected": "Sélectionné",
         "recommended": "Recommandé",
         "selectPlan": "Sélectionner ce plan"
+    },
+    "Dashboard": {
+        "subtitle": "Suivez vos CV et préparez vos entretiens avec l'assistance de l'IA",
+        "profile": {
+            "usage": {
+                "cvAnalyses": "Analyses de CV",
+                "title": "Statistiques d'utilisation"
+            },
+            "upgradePlan": "Mettre à niveau",
+            "subtitle": "Gérez les informations de votre compte",
+            "plan": "Abonnement",
+            "unverified": "Non vérifié",
+            "memberSince": "Membre depuis",
+            "status": "Statut du compte",
+            "verified": "Vérifié",
+            "title": "Mon profil",
+            "email": "Email"
+        },
+        "welcome": "Bienvenue",
+        "recentAnalyses": {
+            "title": "Analyses récentes",
+            "viewAll": "Tout voir",
+            "empty": {
+                "title": "Aucune analyse pour le moment",
+                "description": "Commencez à analyser votre CV pour obtenir des commentaires personnalisés",
+                "action": "Analyser le CV"
+            }
+        },
+        "stats": {
+            "averageScore": "Score moyen",
+            "totalAnalyses": "Analyses totales",
+            "remainingAnalyses": "Restantes",
+            "noAnalysis": "N/A",
+            "lastAnalysis": "Dernière analyse"
+        },
+        "history": {
+            "empty": {
+                "title": "Aucune analyse trouvée",
+                "description": "Essayez d'ajuster vos filtres ou d'analyser un nouveau CV",
+                "action": "Analyser un nouveau CV"
+            },
+            "subtitle": "Voir toutes vos {count} analyses de CV",
+            "title": "Historique des analyses de CV",
+            "filters": {
+                "excellent": "Excellent (80%+)",
+                "needsImprovement": "À améliorer (<65%)",
+                "all": "Tous",
+                "good": "Bon (65-79%)"
+            }
+        },
+        "nav": {
+            "lightMode": "Mode clair",
+            "profile": "Profil",
+            "darkMode": "Mode sombre",
+            "cvAnalysis": "Analyser le CV",
+            "signOut": "Se déconnecter",
+            "settings": "Paramètres",
+            "history": "Historique",
+            "dashboard": "Tableau de bord"
+        },
+        "settings": {
+            "subtitle": "Gérez vos préférences",
+            "security": {
+                "changePassword": "Changer le mot de passe",
+                "title": "Sécurité",
+                "changePasswordDescription": "Mettre à jour le mot de passe de votre compte"
+            },
+            "language": {
+                "description": "Choisissez votre langue préférée",
+                "title": "Langue"
+            },
+            "notifications": {
+                "email": "Notifications par email",
+                "title": "Notifications",
+                "emailDescription": "Recevoir des mises à jour sur vos analyses de CV"
+            },
+            "title": "Paramètres",
+            "comingSoon": "Bientôt disponible"
+        }
+    },
+    "CVBuilder": {
+        "PersonalForm": {
+            "fullName": "Nom complet",
+            "email": "Email",
+            "phone": "Téléphone",
+            "location": "Localisation",
+            "linkedin": "URL LinkedIn",
+            "github": "URL GitHub",
+            "portfolio": "URL Portfolio",
+            "summary": "Résumé professionnel",
+            "placeholders": {
+                "fullName": "Jean Dupont",
+                "email": "jean@exemple.fr",
+                "phone": "+33 6 12 34 56 78",
+                "location": "Paris, France",
+                "linkedin": "https://linkedin.com/in/jeandupont",
+                "github": "https://github.com/jeandupont",
+                "portfolio": "https://jeandupont.fr",
+                "summary": "Décrivez brièvement votre parcours professionnel et vos objectifs..."
+            }
+        },
+        "SkillsForm": {
+            "category": "Catégorie",
+            "categoryPlaceholder": "ex., Frontend, Backend, Compétences interpersonnelles",
+            "skillsLabel": "Compétences (Appuyez sur Entrée pour ajouter)",
+            "skillPlaceholder": "Ajouter une compétence...",
+            "addCategory": "+ Ajouter une catégorie de compétences"
+        }
     }
 }

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FcGoogle } from 'react-icons/fc';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { GoogleAuthButtonProps } from '@/types/type';
 import { useParams } from 'next/navigation';

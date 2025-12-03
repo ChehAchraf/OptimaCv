@@ -18,7 +18,7 @@ import {
     Crown,
     Zap
 } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ProfileData } from '@/types/user';

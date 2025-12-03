@@ -1,13 +1,11 @@
 "use server";
 
-import path from "@/app/axios/path";
 import { CVPayload } from "@/types/type";
-import { createClient } from "@/utils/supabase/server";
-
+import { createClient } from "@/lib/supabase/server";
+import { logger, logServerAction } from "@/lib/logger";
+import { revalidateTag } from "next/cache";
 
 export async function analyzeCv(payload: CVPayload) {
-    console.log(payload, "payload");
-
     const supabase = await createClient();
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -15,6 +13,8 @@ export async function analyzeCv(payload: CVPayload) {
     if (authError || !user) {
         throw new Error("You must be logged in to analyze CVs");
     }
+
+    logServerAction('analyzeCv', user.id, { fileName: payload.cv_pdf.name });
 
     const { data: userPlan } = await supabase
         .from("user_plans")
@@ -34,7 +34,7 @@ export async function analyzeCv(payload: CVPayload) {
             .rpc("increment_plan_usage", { p_user_id: user.id });
 
         if (incrementError) {
-            console.error("Error incrementing plan usage:", incrementError);
+            logger.error("Error incrementing plan usage", incrementError, { userId: user.id });
             throw new Error("Failed to update usage count");
         }
 
@@ -50,7 +50,7 @@ export async function analyzeCv(payload: CVPayload) {
             .rpc("increment_free_usage", { user_uuid: user.id });
 
         if (incrementError) {
-            console.error("Error incrementing free usage:", incrementError);
+            logger.error("Error incrementing free usage", incrementError, { userId: user.id });
             throw new Error("Failed to update usage count");
         }
 
@@ -63,30 +63,56 @@ export async function analyzeCv(payload: CVPayload) {
         }
     }
 
-    // Proceed with analysis
-    const res = await path.post("/analysis/analyze-full-cv/", payload);
-    console.log(res.data, "res.data");
+    const formData = new FormData();
+    formData.append('cv_pdf', payload.cv_pdf);
+    formData.append('job_description', payload.job_description);
+    if (payload.cv_image) {
+        formData.append('cv_image', payload.cv_image);
+    }
 
-    // Save analysis result to Supabase automatically
+    const baseURL = process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_APP_BASE_URL;
+
+    if (!baseURL) {
+        throw new Error("API Base URL is not configured");
+    }
+
+    const response = await fetch(`${baseURL}/analysis/analyze-full-cv/`, {
+        method: 'POST',
+        body: formData,
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        logger.error("Analysis API failed", new Error(errorText), { status: response.status });
+        throw new Error(`Analysis failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
     try {
         const { error: saveError } = await supabase
             .from("ai_cv_results")
             .insert({
                 user_id: user.id,
                 cv_name: payload.cv_pdf.name,
-                result: res.data,
+                result: data,
                 created_at: new Date().toISOString()
             });
 
         if (saveError) {
-            console.error("Failed to save CV analysis to ai_cv_results:", saveError);
-            // Don't throw error here - analysis was successful, just logging failed
+            logger.error("Failed to save CV analysis to ai_cv_results", saveError, { userId: user.id, fileName: payload.cv_pdf.name });
+        } else {
+            const nextCache = await import('next/cache');
+            nextCache.revalidateTag(`user-${user.id}`, {});
+            nextCache.revalidateTag('cv-history', {});
+
+            logger.info("CV analysis saved successfully", { userId: user.id, fileName: payload.cv_pdf.name });
         }
     } catch (saveErr) {
-        console.error("Exception while saving CV analysis:", saveErr);
+        logger.error("Exception while saving CV analysis", saveErr as Error, { userId: user.id });
     }
 
-    return res.data;
+    return data;
 }
 
 export async function getUserUsage() {
@@ -97,31 +123,26 @@ export async function getUserUsage() {
         return null;
     }
 
-    // Check for active plan
     const { data: userPlan } = await supabase
         .from("user_plans")
         .select(`
             cv_analyses_used,
-            plan:plans(max_cv_analyses)
+            plan:plans!inner(max_cv_analyses)
         `)
         .eq("user_id", user.id)
         .eq("status", "active")
         .gt("end_date", new Date().toISOString())
         .single();
 
-    if (userPlan) {
-        // userPlan.plan is an array or object depending on query, but .single() on user_plans makes userPlan an object.
-        // The join plan:plans(*) usually returns an object if it's a foreign key relation and we use single() or if it's a many-to-one.
-        // Assuming one plan per user_plan.
-        const plan = userPlan.plan as any;
+    if (userPlan && userPlan.plan) {
         return {
             usage: userPlan.cv_analyses_used,
-            limit: plan?.max_cv_analyses ?? null, // null means unlimited
+            limit: (userPlan.plan as any).max_cv_analyses ?? null,
             isPlan: true
         };
     }
 
-    // Check free usage
+
     const { data: userUsage } = await supabase
         .from("user_usage")
         .select("lifetime_analyses_used")

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,7 +17,7 @@ interface Props {
 export const ExperienceForm: React.FC<Props> = ({ data, updateData }) => {
     const [optimizingIndex, setOptimizingIndex] = useState<number | null>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (data.length === 0) {
             addExperience();
         }
@@ -58,7 +58,6 @@ export const ExperienceForm: React.FC<Props> = ({ data, updateData }) => {
             updateExperience(index, 'description', result.optimized_text);
         } catch (error) {
             console.error(error);
-            // Handle error (toast, etc.)
         } finally {
             setOptimizingIndex(null);
         }

@@ -8,8 +8,10 @@ import { StatsCard } from '@/components/dashboard/StatsCard';
 import { RecentAnalysisCard } from '@/components/dashboard/RecentAnalysisCard';
 import { useTranslations } from 'next-intl';
 import { FileText, TrendingUp, Award, CalendarDays } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { CVAnalysis, UserStats } from '@/types/dashboard';
+import { Link } from '@/i18n/routing';
+
 
 
 
@@ -155,15 +157,16 @@ export default function DashboardPage() {
 
                 <div>
                     <div className="flex items-center justify-between mb-6">
+
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                             {t('recentAnalyses.title')}
                         </h2>
-                        <a
-                            href={`/${locale}/dashboard/history`}
+                        <Link
+                            href="/dashboard/history"
                             className="text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-gray-300 font-medium underline decoration-gray-300 underline-offset-4"
                         >
                             {t('recentAnalyses.viewAll')}
-                        </a>
+                        </Link>
                     </div>
 
                     {loadingData ? (

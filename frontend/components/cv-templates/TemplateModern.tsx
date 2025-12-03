@@ -12,7 +12,6 @@ export const TemplateModern: React.FC<TemplateProps> = ({ data }) => {
 
     return (
         <div className="w-full h-full bg-white text-gray-800 p-8 font-sans" id="cv-template">
-            {/* Header */}
             <header className="border-b-2 border-blue-600 pb-6 mb-6">
                 <h1 className="text-4xl font-bold text-gray-900 uppercase tracking-wider">{personal_details.full_name}</h1>
                 <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
@@ -59,7 +58,6 @@ export const TemplateModern: React.FC<TemplateProps> = ({ data }) => {
             </header>
 
             <div className="grid grid-cols-3 gap-8">
-                {/* Left Column (Skills & Education) */}
                 <div className="col-span-1 space-y-8">
                     {skills.length > 0 && (
                         <section>
