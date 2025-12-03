@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-import { CheckCircle, AlertCircle, TrendingUp } from 'lucide-react';
+import { Link } from '@/i18n/routing';
+import { CheckCircle, TrendingUp } from 'lucide-react';
 import { RecentAnalysisCardProps } from '@/types/dashboard';
 
 
@@ -38,7 +38,7 @@ export function RecentAnalysisCard({ analysis, locale }: RecentAnalysisCardProps
     });
 
     return (
-        <Link href={`/${locale}/dashboard/history/${analysis.id}`}>
+        <Link href={`/dashboard/history/${analysis.id}`}>
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-300 h-full cursor-pointer group">
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
