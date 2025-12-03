@@ -10,7 +10,6 @@ export const TemplateClassic: React.FC<TemplateProps> = ({ data }) => {
 
     return (
         <div className="w-full h-full bg-white text-gray-900 p-10 font-serif" id="cv-template">
-            {/* Header */}
             <div className="text-center border-b-2 border-gray-800 pb-6 mb-8">
                 <h1 className="text-3xl font-bold uppercase tracking-widest mb-2">{personal_details.full_name}</h1>
                 <div className="text-sm flex justify-center gap-4 flex-wrap text-gray-700">
@@ -21,7 +20,6 @@ export const TemplateClassic: React.FC<TemplateProps> = ({ data }) => {
                 </div>
             </div>
 
-            {/* Summary */}
             {personal_details.summary && (
                 <section className="mb-6">
                     <h2 className="text-lg font-bold uppercase border-b border-gray-300 mb-3">Professional Summary</h2>
@@ -29,7 +27,6 @@ export const TemplateClassic: React.FC<TemplateProps> = ({ data }) => {
                 </section>
             )}
 
-            {/* Experience */}
             {experience.length > 0 && (
                 <section className="mb-6">
                     <h2 className="text-lg font-bold uppercase border-b border-gray-300 mb-4">Experience</h2>
@@ -48,7 +45,6 @@ export const TemplateClassic: React.FC<TemplateProps> = ({ data }) => {
                 </section>
             )}
 
-            {/* Education */}
             {education.length > 0 && (
                 <section className="mb-6">
                     <h2 className="text-lg font-bold uppercase border-b border-gray-300 mb-4">Education</h2>
@@ -66,7 +62,6 @@ export const TemplateClassic: React.FC<TemplateProps> = ({ data }) => {
                 </section>
             )}
 
-            {/* Projects */}
             {projects.length > 0 && (
                 <section className="mb-6">
                     <h2 className="text-lg font-bold uppercase border-b border-gray-300 mb-4">Projects</h2>
@@ -82,7 +77,6 @@ export const TemplateClassic: React.FC<TemplateProps> = ({ data }) => {
                 </section>
             )}
 
-            {/* Skills */}
             {skills.length > 0 && (
                 <section>
                     <h2 className="text-lg font-bold uppercase border-b border-gray-300 mb-4">Skills</h2>
