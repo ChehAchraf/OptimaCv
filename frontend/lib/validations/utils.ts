@@ -1,8 +1,5 @@
 import { ZodError, ZodSchema } from 'zod';
 
-/**
- * Validates data against a Zod schema and returns formatted errors
- */
 export function validateData<T>(
     schema: ZodSchema<T>,
     data: unknown
@@ -11,7 +8,7 @@ export function validateData<T>(
         const validatedData = schema.parse(data);
         return { success: true, data: validatedData };
     } catch (error) {
-        if (error instanceof ZodError) {
+        if (error instanceof ZodError) {    
             const formattedErrors: Record<string, string[]> = {};
 
             error.issues.forEach((err) => {
@@ -32,61 +29,39 @@ export function validateData<T>(
     }
 }
 
-/**
- * Validates data and throws an error if validation fails
- */
 export function validateOrThrow<T>(schema: ZodSchema<T>, data: unknown): T {
     return schema.parse(data);
 }
 
-/**
- * Safely validates data and returns null if validation fails
- */
 export function validateSafe<T>(schema: ZodSchema<T>, data: unknown): T | null {
     const result = schema.safeParse(data);
     return result.success ? result.data : null;
 }
 
-/**
- * Formats Zod errors into a user-friendly string
- */
+
 export function formatZodErrors(error: ZodError): string {
     return error.issues.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ');
 }
 
-/**
- * Gets the first error message from validation errors
- */
 export function getFirstError(errors: Record<string, string[]>): string | null {
     const firstKey = Object.keys(errors)[0];
     return firstKey ? errors[firstKey][0] : null;
 }
 
-/**
- * Converts FileList to File array for validation
- */
 export function fileListToArray(fileList: FileList | null): File[] {
     if (!fileList) return [];
     return Array.from(fileList);
 }
 
-/**
- * Validates file type
- */
 export function validateFileType(file: File, allowedTypes: string[]): boolean {
     return allowedTypes.includes(file.type);
 }
 
-/**
- * Validates file size (size in bytes)
- */
 export function validateFileSize(file: File, maxSize: number): boolean {
     return file.size <= maxSize;
 }
 
-/**
- * Format file size for display
- */
+
 export function formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
 
