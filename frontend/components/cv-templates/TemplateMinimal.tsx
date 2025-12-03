@@ -10,7 +10,6 @@ export const TemplateMinimal: React.FC<TemplateProps> = ({ data }) => {
 
     return (
         <div className="w-full h-full bg-white text-gray-800 p-12 font-mono text-sm" id="cv-template">
-            {/* Header */}
             <header className="mb-12">
                 <h1 className="text-2xl font-bold mb-2">{personal_details.full_name}</h1>
                 <div className="text-gray-500 space-y-1">
@@ -22,7 +21,6 @@ export const TemplateMinimal: React.FC<TemplateProps> = ({ data }) => {
             </header>
 
             <div className="grid grid-cols-12 gap-8">
-                {/* Left Column */}
                 <div className="col-span-4 space-y-10">
                     {skills.length > 0 && (
                         <section>
@@ -54,7 +52,6 @@ export const TemplateMinimal: React.FC<TemplateProps> = ({ data }) => {
                     )}
                 </div>
 
-                {/* Right Column */}
                 <div className="col-span-8 space-y-10">
                     {personal_details.summary && (
                         <section>
