@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { DashboardLayoutProps } from '@/types/dashboard';
 
 
@@ -72,13 +72,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"
+                    className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
             >
                 <div className="flex flex-col h-full">
@@ -93,7 +93,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                         </Link>
                         <button
                             onClick={() => setSidebarOpen(false)}
-                            className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                         >
                             <X className="h-6 w-6" />
                         </button>
@@ -163,12 +163,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
             </aside>
 
-            <div className="lg:pl-64">
+            <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:pl-64' : ''}`}>
                 <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
                     <div className="flex items-center justify-between h-16 px-6">
                         <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                         >
                             <Menu className="h-6 w-6" />
                         </button>
