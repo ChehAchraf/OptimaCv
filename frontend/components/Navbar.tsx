@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useMemo } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
-import { HiMenu, HiX, HiGlobeAlt, HiLogout, HiUser, HiChartBar } from 'react-icons/hi';
+import { Menu, X, Globe, LogOut, User, BarChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslations, useLocale } from 'next-intl';
 import {
@@ -35,7 +35,7 @@ const Navbar = () => {
 
     const authenticatedLinks = [
       { name: t('analyze'), href: '/CV_analyze', showAlways: false },
-       { name: t('company'), href: '/entreprise', showAlways: true },
+      { name: t('company'), href: '/entreprise', showAlways: true },
     ];
 
     if (isAuthenticated) {
@@ -69,7 +69,6 @@ const Navbar = () => {
     <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo and Desktop Navigation */}
           <div className="flex items-center space-x-6">
             <Link href="/" className="flex items-center space-x-2 group">
               <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -77,7 +76,6 @@ const Navbar = () => {
               </span>
             </Link>
 
-            {/* Desktop Navigation Links */}
             <div className="hidden lg:flex lg:items-center lg:space-x-1">
               {navigationLinks.map((link) => (
                 <Link key={link.name} href={link.href}>
@@ -95,15 +93,13 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Desktop Right Side Actions */}
           <div className="hidden md:flex items-center space-x-2">
             <ThemeToggle />
 
-            {/* Language Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
-                  <HiGlobeAlt className="h-5 w-5" />
+                  <Globe className="h-5 w-5" />
                   <span className="sr-only">{t('switchLanguage') || 'Switch language'}</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -132,12 +128,11 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User Menu or Auth Buttons */}
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
-                    <HiUser className="h-5 w-5" />
+                    <User className="h-5 w-5" />
                     <span className="sr-only">{tAuth('profile')}</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -154,12 +149,12 @@ const Navbar = () => {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => router.push(`/dashboard`)}>
-                    <HiChartBar className="mr-2 h-4 w-4" />
+                    <BarChart className="mr-2 h-4 w-4" />
                     {t('dashboard')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
-                    <HiLogout className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-2 h-4 w-4" />
                     {tAuth('logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -183,7 +178,7 @@ const Navbar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
-                  <HiGlobeAlt className="h-5 w-5" />
+                  <Globe className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -195,13 +190,12 @@ const Navbar = () => {
 
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)}>
               <span className="sr-only">{isOpen ? 'Close menu' : 'Open menu'}</span>
-              {isOpen ? <HiX className="h-6 w-6" /> : <HiMenu className="h-6 w-6" />}
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu Panel */}
       {isOpen && (
         <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 animate-in slide-in-from-top-2 duration-200">
           <div className="px-2 pt-2 pb-3 space-y-1">
@@ -242,7 +236,7 @@ const Navbar = () => {
                 </div>
                 <Link href="/profile" onClick={handleCloseMenu}>
                   <Button variant="outline" className="w-full justify-start">
-                    <HiUser className="mr-2 h-4 w-4" />
+                    <User className="mr-2 h-4 w-4" />
                     {tAuth('profile')}
                   </Button>
                 </Link>
@@ -251,7 +245,7 @@ const Navbar = () => {
                   className="w-full justify-start text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950"
                   onClick={handleLogout}
                 >
-                  <HiLogout className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-2 h-4 w-4" />
                   {tAuth('logout')}
                 </Button>
               </>
