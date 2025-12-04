@@ -7,13 +7,19 @@ import AudioVisualizer from "./AudioVisualizer";
 import { Mic, Square, Play, Loader2, Send, CheckCircle } from "lucide-react";
 import axios from "axios";
 
+import { InterviewQuestion } from "./InterviewSetup";
+
 interface AnalysisResult {
     feedback: string;
     score: number;
     next_question_suggestion: string;
 }
 
-export default function WebcamProcessor() {
+interface WebcamProcessorProps {
+    questions?: InterviewQuestion[];
+}
+
+export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const workerRef = useRef<Worker | null>(null);
     const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -270,8 +276,8 @@ export default function WebcamProcessor() {
                             <p className="text-gray-400">Here is how you performed</p>
                         </div>
                         <div className={`flex items-center justify-center w-16 h-16 rounded-full border-4 text-2xl font-bold ${analysisResult.score >= 8 ? 'border-green-500 text-green-400' :
-                                analysisResult.score >= 5 ? 'border-yellow-500 text-yellow-400' :
-                                    'border-red-500 text-red-400'
+                            analysisResult.score >= 5 ? 'border-yellow-500 text-yellow-400' :
+                                'border-red-500 text-red-400'
                             }`}>
                             {analysisResult.score}
                         </div>

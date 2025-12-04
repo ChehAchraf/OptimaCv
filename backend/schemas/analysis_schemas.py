@@ -238,3 +238,14 @@ class CVBuildResponse(BaseModel):
     generated_cv: GeneratedCVData
 
     analysis: GeneratedCVStrengths
+
+
+class InterviewQuestion(BaseModel):
+    id: int
+    question: str
+    context: str
+    topic: str
+
+class InterviewPrepResponse(BaseModel):
+    questions: List[InterviewQuestion]
+
