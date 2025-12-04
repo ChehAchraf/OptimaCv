@@ -10,6 +10,7 @@ export async function GET(
         const { locale } = await context.params;
         const requestUrl = new URL(request.url);
         const code = requestUrl.searchParams.get('code');
+        const next = requestUrl.searchParams.get('next');
         const origin = requestUrl.origin;
 
 
@@ -19,7 +20,7 @@ export async function GET(
 
         const cookieStore = await cookies();
 
-        const redirectUrl = `/${locale}`;
+        const redirectUrl = next ? `/${locale}${next}` : `/${locale}`;
         const forwardedHost = request.headers.get('x-forwarded-host');
         const isLocalEnv = process.env.NODE_ENV === 'development';
 
