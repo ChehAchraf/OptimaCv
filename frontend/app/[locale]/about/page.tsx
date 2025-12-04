@@ -99,7 +99,6 @@ export default function AboutPage() {
     );
 }
 
-// Value card component
 function ValueCard({ icon, title, iconColor }: { icon: string; title: string; iconColor: string }) {
     const colorClasses = {
         blue: 'bg-blue-100 text-blue-600',

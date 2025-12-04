@@ -234,6 +234,47 @@ export const cvPersonalDetailSchema = z.object({
     summary: z.string().optional(),
 });
 
+// CV Builder specific schemas
+export const cvExperienceSchema = z.object({
+    company: z.string().min(1, 'Company name is required').trim(),
+    position: z.string().min(1, 'Position is required').trim(),
+    location: z.string().optional(),
+    start_date: z.string().min(1, 'Start date is required'),
+    end_date: z.string().optional(),
+    current: z.boolean(),
+    description: z
+        .string()
+        .min(20, 'Description should be at least 20 characters')
+        .max(1000, 'Description must be less than 1000 characters')
+        .trim(),
+});
+
+export const cvEducationSchema = z.object({
+    institution: z.string().min(1, 'Institution name is required').trim(),
+    degree: z.string().min(1, 'Degree is required').trim(),
+    field_of_study: z.string().min(1, 'Field of study is required').trim(),
+    start_date: z.string().min(1, 'Start date is required'),
+    end_date: z.string().optional(),
+    current: z.boolean(),
+    description: z.string().optional(),
+});
+
+export const cvProjectSchema = z.object({
+    name: z.string().min(1, 'Project name is required').trim(),
+    description: z
+        .string()
+        .min(20, 'Description should be at least 20 characters')
+        .max(500, 'Description must be less than 500 characters')
+        .trim(),
+    technologies: z.array(z.string()).min(1, 'At least one technology is required'),
+    link: urlSchema.optional(),
+});
+
+export const cvSkillSchema = z.object({
+    category: z.string().min(1, 'Category is required').trim(),
+    skills: z.array(z.string()).min(1, 'At least one skill is required'),
+});
+
 export const companyRankPayloadSchema = z.object({
     files: z
         .array(z.instanceof(File))
@@ -316,6 +357,10 @@ export type CertificationInput = z.infer<typeof certificationSchema>;
 export type CVUploadInput = z.infer<typeof cvUploadSchema>;
 export type CVPayloadInput = z.infer<typeof cvPayloadSchema>;
 export type CVPersonalDetailInput = z.infer<typeof cvPersonalDetailSchema>;
+export type CVExperienceInput = z.infer<typeof cvExperienceSchema>;
+export type CVEducationInput = z.infer<typeof cvEducationSchema>;
+export type CVProjectInput = z.infer<typeof cvProjectSchema>;
+export type CVSkillInput = z.infer<typeof cvSkillSchema>;
 export type CompanyRankPayloadInput = z.infer<typeof companyRankPayloadSchema>;
 export type PaymentMethodInput = z.infer<typeof paymentMethodSchema>;
 export type ContactFormInput = z.infer<typeof contactFormSchema>;

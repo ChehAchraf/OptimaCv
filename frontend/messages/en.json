@@ -40,6 +40,7 @@
         "company": "Company",
         "pricing": "Pricing",
         "analyze": "Analyze CV",
+        "build": "Build CV",
         "about": "About",
         "contact": "Contact",
         "dashboard": "Dashboard",
@@ -99,35 +100,22 @@
     },
     "BuildCVPage": {
         "steps": {
-            "info": "Personal Info",
-            "profile": "Profile",
-            "generation": "Generation"
+            "personalInfo": "Personal Info",
+            "experience": "Experience",
+            "education": "Education",
+            "projects": "Projects",
+            "skills": "Skills",
+            "preview": "Preview & Download"
         },
-        "step1": {
-            "title": "Step 1: Basic Information",
-            "name": "Full Name",
-            "email": "Email",
-            "phone": "Phone",
+        "navigation": {
+            "previous": "Previous",
             "next": "Next"
         },
-        "step2": {
-            "title": "Step 2: Your Profile",
-            "description": "Describe yourself and list your certificates. AI handles the rest.",
-            "descLabel": "Describe yourself (or your goals)",
-            "descPlaceholder": "Ex: 'Cloud developer, just finished an internship...' or 'Cloud, DevOps, Java...'",
-            "certLabel": "Your Certificates (Optional)",
-            "certPlaceholder": "Ex: 'AWS Certified Cloud Practitioner'",
-            "add": "Add",
-            "prev": "Previous",
-            "generate": "Generate my CV"
-        },
-        "step3": {
-            "title": "Step 3: Generation...",
-            "loading": "AI is writing your CV...",
-            "resultTitle": "Your new profile (Title): {title}",
-            "keyPoints": "Key points of this CV:",
-            "content": "CV Content (JSON):",
-            "restart": "Restart"
+        "validation": {
+            "error": "Validation Error",
+            "fillRequired": "Please fill in all required fields correctly",
+            "addEducation": "Please add at least one education entry",
+            "addSkills": "Please add at least one skill category"
         }
     },
     "AboutPage": {
@@ -355,7 +343,22 @@
         "email": "Email Address",
         "password": "Password",
         "logout": "Logout",
-        "profile": "Profile"
+        "profile": "Profile",
+        "forgotPassword": {
+            "title": "Forgot Password",
+            "subtitle": "Enter your email to reset your password",
+            "submit": "Send Reset Link",
+            "backToLogin": "Back to Login",
+            "successMessage": "Check your email for the reset link."
+        },
+        "resetPassword": {
+            "title": "Reset Password",
+            "subtitle": "Enter your new password",
+            "submit": "Update Password",
+            "successMessage": "Password updated successfully. Redirecting...",
+            "newPassword": "New Password",
+            "confirmPassword": "Confirm Password"
+        }
     },
     "ProfilePage": {
         "loading": "Loading your profile...",
@@ -533,6 +536,47 @@
             "comingSoon": "Coming Soon"
         }
     },
+    "ContactPage": {
+        "title": "Contact Us",
+        "subtitle": "Get in touch with our team",
+        "description": "Have a question or need assistance? We're here to help! Fill out the form below and our team will get back to you as soon as possible.",
+        "form": {
+            "name": "Full Name",
+            "namePlaceholder": "John Doe",
+            "email": "Email Address",
+            "emailPlaceholder": "john@example.com",
+            "subject": "Subject",
+            "subjectPlaceholder": "How can we help you?",
+            "message": "Message",
+            "messagePlaceholder": "Tell us more about your inquiry...",
+            "submit": "Send Message",
+            "submitting": "Sending..."
+        },
+        "info": {
+            "email": {
+                "title": "Email",
+                "value": "support@optimacv.com"
+            },
+            "phone": {
+                "title": "Phone",
+                "value": "+1 (555) 123-4567"
+            },
+            "address": {
+                "title": "Address",
+                "value": "123 Business St, Suite 100, New York, NY 10001"
+            },
+            "hours": {
+                "title": "Business Hours",
+                "value": "Monday - Friday: 9:00 AM - 6:00 PM EST"
+            },
+            "social": {
+                "title": "Follow Us",
+                "description": "Stay connected on social media"
+            }
+        },
+        "successMessage": "Thank you for contacting us! We'll get back to you soon.",
+        "errorMessage": "Something went wrong. Please try again."
+    },
     "CVBuilder": {
         "PersonalForm": {
             "fullName": "Full Name",
@@ -546,7 +590,7 @@
             "placeholders": {
                 "fullName": "John Doe",
                 "email": "john@example.com",
-                "phone": "+1 234 567 890",
+                "phone": "+1 (555) 123-4567",
                 "location": "New York, USA",
                 "linkedin": "https://linkedin.com/in/johndoe",
                 "github": "https://github.com/johndoe",
@@ -556,7 +600,7 @@
         },
         "SkillsForm": {
             "category": "Category",
-            "categoryPlaceholder": "e.g., Frontend, Backend, Soft Skills",
+            "categoryPlaceholder": "e.g. Frontend, Backend, Soft Skills",
             "skillsLabel": "Skills (Press Enter to add)",
             "skillPlaceholder": "Add a skill...",
             "addCategory": "+ Add Skill Category"
