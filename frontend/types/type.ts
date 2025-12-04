@@ -135,10 +135,6 @@ export interface EmailAuthFormProps {
     mode: 'login' | 'register';
 }
 
-export interface Plan {
-    name: string;
-    price: string;
-    features: string[];
-    popular?: boolean;
-    note?: string;
-}
+// Plan types are now defined in @/types/plan.ts
+// Re-export for backwards compatibility
+export type { PaymentPlan as Plan } from './plan';

@@ -2,6 +2,16 @@ import { NextResponse, NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+/**
+ * Auth callback handler
+ * 
+ * This route handles the OAuth callback after a user authenticates.
+ * It also assigns the Free plan to new users who don't have any plan yet.
+ * 
+ * Database tables used:
+ * - plans: to get the Free plan ID and duration_days
+ * - user_plans: to check if user has a plan and insert new plan assignment
+ */
 export async function GET(
     request: NextRequest,
     context: { params: Promise<{ locale: string }> }
@@ -10,6 +20,7 @@ export async function GET(
         const { locale } = await context.params;
         const requestUrl = new URL(request.url);
         const code = requestUrl.searchParams.get('code');
+        const next = requestUrl.searchParams.get('next');
         const origin = requestUrl.origin;
 
 
@@ -19,7 +30,7 @@ export async function GET(
 
         const cookieStore = await cookies();
 
-        const redirectUrl = `/${locale}`;
+        const redirectUrl = next ? `/${locale}${next}` : `/${locale}`;
         const forwardedHost = request.headers.get('x-forwarded-host');
         const isLocalEnv = process.env.NODE_ENV === 'development';
 
@@ -68,6 +79,11 @@ export async function GET(
                 `${origin}/${locale}/auth/login?error=NoSession`
             );
         }
+
+        // Assign Free plan to new users who don't have any plan yet
+        const userId = data.session.user.id;
+        await assignFreePlanIfNeeded(supabase, userId);
+
         return response;
     } catch (err: any) {
         const requestUrl = new URL(request.url);
@@ -75,5 +91,72 @@ export async function GET(
         return NextResponse.redirect(
             `${origin}/en/auth/login?error=${encodeURIComponent(err.message || 'UnexpectedError')}`
         );
+    }
+}
+
+/**
+ * Assigns the Free plan to a user if they don't have any plan yet.
+ * 
+ * This function:
+ * 1. Checks if the user already has a plan in user_plans
+ * 2. If not, finds the Free plan from the plans table
+ * 3. Creates a new user_plans entry with the Free plan
+ * 
+ * @param supabase - Supabase client
+ * @param userId - The user's ID
+ */
+async function assignFreePlanIfNeeded(supabase: any, userId: string) {
+    try {
+        // Check if user already has any plan (active or not)
+        const { data: existingPlan } = await supabase
+            .from('user_plans')
+            .select('id')
+            .eq('user_id', userId)
+            .limit(1)
+            .single();
+
+        // If user already has a plan, don't assign a new one
+        if (existingPlan) {
+            return;
+        }
+
+        // Get the Free plan
+        const { data: freePlan, error: planError } = await supabase
+            .from('plans')
+            .select('id, duration_days')
+            .ilike('name', 'free')
+            .limit(1)
+            .single();
+
+        if (planError || !freePlan) {
+            console.error('Error finding Free plan:', planError?.message || 'Free plan not found');
+            return;
+        }
+
+        // Calculate end date based on plan duration
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + (freePlan.duration_days || 30));
+
+        // Insert the user_plans record
+        const { error: insertError } = await supabase
+            .from('user_plans')
+            .insert({
+                user_id: userId,
+                plan_id: freePlan.id,
+                status: 'active',
+                start_date: startDate.toISOString(),
+                end_date: endDate.toISOString(),
+                cv_builds_used: 0,
+                cv_analyses_used: 0
+            });
+
+        if (insertError) {
+            console.error('Error assigning Free plan to user:', insertError.message);
+        } else {
+            console.log(`✅ Free plan assigned to new user: ${userId}`);
+        }
+    } catch (err) {
+        console.error('Error in assignFreePlanIfNeeded:', err);
     }
 }

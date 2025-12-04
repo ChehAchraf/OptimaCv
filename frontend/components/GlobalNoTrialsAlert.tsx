@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getUserUsage } from '@/app/actions/analyzeCv';
+import { getUserUsage } from '@/app/[locale]/profile/actions/analyzeCv';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { HiXCircle } from 'react-icons/hi';
 import { useAuth } from '@/components/providers/AuthProvider';

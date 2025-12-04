@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CVExperience } from '@/types/cv-builder';
-import { optimizeText } from '@/app/actions/optimize';
+import { optimizeText } from '@/app/[locale]/profile/actions/optimize';
 import { HiSparkles, HiTrash } from 'react-icons/hi';
 import { Loader2 } from 'lucide-react';
 
