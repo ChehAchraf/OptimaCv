@@ -38,6 +38,7 @@ const Navbar = () => {
       { name: t('analyze'), href: '/CV_analyze', showAlways: false },
       { name: t('company'), href: '/entreprise', showAlways: true },
       { name: t('build'), href: '/build-cv', showAlways: true },
+      { name: t('interview'), href: '/interview', showAlways: true },
     ];
 
     if (isAuthenticated) {
