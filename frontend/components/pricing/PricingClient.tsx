@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,10 +11,26 @@ import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { Plan, UserPlan } from "@/types/plan";
 
-
-
+/**
+ * PricingClient Component
+ * 
+ * Fetches plans dynamically from Supabase via /api/plans endpoint.
+ * 
+ * Database fields used from `plans` table:
+ * - id (uuid): Unique identifier for the plan
+ * - name (text): Internal plan name (e.g., 'free', 'vip', 'enterprise', 'students')
+ * - price (numeric): Plan price
+ * - duration_days (integer): Subscription duration in days
+ * - max_cv_builds (integer): Maximum CV builds allowed
+ * - max_cv_analyses (integer): Maximum CV analyses allowed
+ * - features (jsonb): Multilingual features { en: string[], fr: string[], ar: string[] }
+ * - created_at (timestamp): When the plan was created
+ */
 export default function PricingClient() {
     const t = useTranslations('PricingPage');
+    const params = useParams();
+    const locale = (params.locale as string) || 'en';
+
     const [plans, setPlans] = useState<Plan[]>([]);
     const [userPlan, setUserPlan] = useState<UserPlan | null>(null);
     const [loading, setLoading] = useState(true);
@@ -24,12 +40,12 @@ export default function PricingClient() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [locale]);
 
     const fetchData = async () => {
         try {
             const [plansRes, userPlanRes] = await Promise.all([
-                fetch("/api/plans"),
+                fetch(`/api/plans?locale=${locale}`),
                 fetch("/api/user/plan")
             ]);
 

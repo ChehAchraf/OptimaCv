@@ -5,11 +5,11 @@ import { updateSession } from '@/lib/supabase/middleware';
 
 const intlMiddleware = createMiddleware(routing);
 
-export async function middleware(request: NextRequest) {
-    // 1. Update Supabase session (handles auth token refresh)
+export async function proxy(request: NextRequest) {
+    // Update Supabase session (handles auth token refresh)
     const { response: supabaseResponse, user } = await updateSession(request);
 
-    // 2. Protect routes
+    // Protect routes
     const protectedPaths = ['/entreprise', '/build-cv', '/CV_analyze'];
     const isProtected = protectedPaths.some(path => request.nextUrl.pathname.includes(path));
 
@@ -19,10 +19,10 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(`/${validLocale}/auth/login`, request.url));
     }
 
-    // 3. Run i18n Middleware (handles locale routing)
+    // Run i18n Middleware (handles locale routing)
     const intlResponse = intlMiddleware(request);
 
-    // 4. Merge cookies from Supabase response to Intl response
+    // Merge cookies from Supabase response to Intl response
     // This ensures that if Supabase refreshed the token, we pass that back to the client
     // along with any locale cookies set by next-intl.
     supabaseResponse.cookies.getAll().forEach((cookie) => {
@@ -44,7 +44,7 @@ export const config = {
         // - /_next (Next.js internals)
         // - /_vercel (Vercel internals)
         // - /images (Static images)
-        // - /.*\\..* (Static files with extensions, e.g. .css, .js, .png, .jpg)
+        // - /.*\..* (Static files with extensions, e.g. .css, .js, .png, .jpg)
         '/((?!api|_next|_vercel|images|.*\\..*).*)'
     ]
 };
