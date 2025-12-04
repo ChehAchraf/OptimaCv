@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, CheckCircle2, Upload, FileText, Lock } from 'lucide-react';
 import { AnalysisResult } from '@/types/type';
 import { useTranslations } from 'next-intl';
-import { generateCV } from '@/app/actions/generateCv';
+import { generateCV } from '@/app/[locale]/profile/actions/generateCv';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { companyRankPayloadSchema, validateData, fileListToArray } from '@/lib/validations';
 import Link from 'next/link';
@@ -27,7 +27,6 @@ export default function CompanyPage() {
   const [isCheckingPlan, setIsCheckingPlan] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
 
-  // Check user's plan on mount
   useEffect(() => {
     const checkPlan = async () => {
       try {
@@ -35,7 +34,6 @@ export default function CompanyPage() {
         const data = await response.json();
 
         if (data.success && data.plan) {
-          // Check if user has enterprise plan
           const isEnterprise = data.plan.plan.name === 'enterprise';
           setHasAccess(isEnterprise);
         } else {
@@ -60,7 +58,6 @@ export default function CompanyPage() {
     enabled: false,
   });
 
-  // Mutation to generate CV
   const mutation = useMutation<AnalysisResult[], Error, { jobDescription: string; files: File[] }>({
     mutationFn: async (payload) => {
       const response = await generateCV(payload);
@@ -89,18 +86,15 @@ export default function CompanyPage() {
       return;
     }
 
-    // Convert FileList to File array and validate
     const filesArray = fileListToArray(files);
     const payloadData = {
       jobDescription,
       files: filesArray,
     };
 
-    // Validate payload using Zod
     const validationResult = validateData(companyRankPayloadSchema, payloadData);
 
     if (!validationResult.success) {
-      // Get the first error message
       const firstError = Object.values(validationResult.errors)[0]?.[0];
       setError(firstError || t('form.error'));
       return;
@@ -109,7 +103,6 @@ export default function CompanyPage() {
     mutation.mutate(validationResult.data);
   };
 
-  // Show loading state
   if (isCheckingPlan) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4 flex items-center justify-center">
