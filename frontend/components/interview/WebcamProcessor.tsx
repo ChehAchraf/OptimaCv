@@ -6,6 +6,7 @@ import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import AudioVisualizer from "./AudioVisualizer";
 import { Mic, Square, Play, Loader2, Send, CheckCircle } from "lucide-react";
 import axios from "axios";
+import { saveInterviewAnalysis } from "@/app/[locale]/profile/actions/interviewActions";
 
 interface AnalysisResult {
     feedback: string;
@@ -138,8 +139,9 @@ export default function WebcamProcessor() {
         try {
             const formData = new FormData();
             formData.append("audio_file", audioBlob, "answer.webm");
+            const questionContext = "Tell me about a time you faced a challenge."; // Hardcoded for now
             formData.append("video_analysis", JSON.stringify(accumulatedStats));
-            formData.append("question_context", "Tell me about a time you faced a challenge."); // Hardcoded for now
+            formData.append("question_context", questionContext);
 
             const response = await axios.post("http://localhost:8000/api/v1/interview/analyze-answer", formData, {
                 headers: {
@@ -148,6 +150,21 @@ export default function WebcamProcessor() {
             });
 
             setAnalysisResult(response.data);
+
+            // Save to database
+            try {
+                await saveInterviewAnalysis({
+                    video_analysis: accumulatedStats,
+                    question_context: questionContext,
+                    feedback: response.data.feedback,
+                    score: response.data.score,
+                    next_question_suggestion: response.data.next_question_suggestion
+                });
+                console.log("Interview analysis saved to database");
+            } catch (dbError) {
+                console.error("Failed to save to database:", dbError);
+                // Don't block the UI if database save fails
+            }
         } catch (error) {
             console.error("Error analyzing answer:", error);
             alert("Failed to analyze answer. Please try again.");
@@ -274,8 +291,8 @@ export default function WebcamProcessor() {
                             <p className="text-gray-400">Here is how you performed</p>
                         </div>
                         <div className={`flex items-center justify-center w-16 h-16 rounded-full border-4 text-2xl font-bold ${analysisResult.score >= 8 ? 'border-green-500 text-green-400' :
-                                analysisResult.score >= 5 ? 'border-yellow-500 text-yellow-400' :
-                                    'border-red-500 text-red-400'
+                            analysisResult.score >= 5 ? 'border-yellow-500 text-yellow-400' :
+                                'border-red-500 text-red-400'
                             }`}>
                             {analysisResult.score}
                         </div>
