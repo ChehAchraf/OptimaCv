@@ -48,7 +48,8 @@
         "login": "Login",
         "register": "Register",
         "logout": "Logout",
-        "profile": "Profile"
+        "profile": "Profile",
+        "interview": "Interview"
     },
     "ProcessSection": {
         "badge": "How it works",
@@ -484,7 +485,8 @@
             "settings": "Settings",
             "darkMode": "Dark Mode",
             "lightMode": "Light Mode",
-            "signOut": "Sign Out"
+            "signOut": "Sign Out",
+            "interview": "Interview"
         },
         "history": {
             "title": "CV Analysis History",
@@ -534,6 +536,15 @@
                 "changePasswordDescription": "Update your account password"
             },
             "comingSoon": "Coming Soon"
+        },
+        "recentInterviews": {
+            "title": "Recent Interviews",
+            "viewAll": "View All",
+            "empty": {
+                "title": "No interviews yet",
+                "description": "Start practicing with AI mock interviews",
+                "action": "Start Interview"
+            }
         }
     },
     "ContactPage": {
@@ -604,6 +615,20 @@
             "skillsLabel": "Skills (Press Enter to add)",
             "skillPlaceholder": "Add a skill...",
             "addCategory": "+ Add Skill Category"
+        }
+    },
+    "InterviewPage": {
+        "pageTitle": "AI Mock Interview",
+        "viewHistory": "View History",
+        "history": {
+            "title": "Interview History",
+            "subtitle": "Review your past mock interview sessions",
+            "empty": "No interview history yet",
+            "startFirst": "Start Your First Interview",
+            "score": "Score",
+            "feedback": "Feedback",
+            "suggestedFollowup": "Suggested Follow-up",
+            "question": "Question"
         }
     }
 }
