@@ -7,7 +7,7 @@ export interface AudioRecorderState {
     mediaStream: MediaStream | null;
 }
 
-export const useAudioRecorder = () => {
+export const useAudioRecorder = (onStop?: (blob: Blob) => void) => {
     const [isRecording, setIsRecording] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -44,6 +44,9 @@ export const useAudioRecorder = () => {
             recorder.onstop = () => {
                 const blob = new Blob(chunksRef.current, { type: mimeType || "audio/webm" });
                 setAudioBlob(blob);
+                if (onStop) {
+                    onStop(blob);
+                }
 
                 // Stop all tracks to release microphone
                 stream.getTracks().forEach(track => track.stop());
@@ -63,7 +66,7 @@ export const useAudioRecorder = () => {
             console.error("Error starting recording:", error);
             alert("Could not access microphone. Please allow permissions.");
         }
-    }, []);
+    }, [onStop]);
 
     const stopRecording = useCallback(() => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {

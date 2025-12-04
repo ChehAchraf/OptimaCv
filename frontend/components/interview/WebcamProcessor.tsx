@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { FaceLandmarkerResult } from "@mediapipe/tasks-vision";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import AudioVisualizer from "./AudioVisualizer";
@@ -24,17 +24,44 @@ export default function WebcamProcessor() {
     // Analysis State
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-    const [accumulatedStats, setAccumulatedStats] = useState<any[]>([]);
 
-    // Audio Recorder Hook
+    // Use Ref for stats to avoid re-renders and stale closures
+    const accumulatedStatsRef = useRef<any[]>([]);
+
+    const submitAnswer = async (blob: Blob, stats: any[]) => {
+        setIsAnalyzing(true);
+        try {
+            const formData = new FormData();
+            formData.append("audio_file", blob, "answer.webm");
+            formData.append("video_analysis", JSON.stringify(stats));
+            formData.append("question_context", "Tell me about a time you faced a challenge."); // Hardcoded for now
+
+            const response = await axios.post("http://localhost:8000/api/v1/interview/analyze-answer", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            setAnalysisResult(response.data);
+        } catch (error) {
+            console.error("Error analyzing answer:", error);
+            alert("Failed to analyze answer. Please try again.");
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    // Audio Recorder Hook with onStop callback
     const {
         startRecording,
         stopRecording,
         isRecording,
         recordingTime,
-        audioBlob,
         mediaStream
-    } = useAudioRecorder();
+    } = useAudioRecorder((blob) => {
+        // Automatic submission when recording stops
+        submitAnswer(blob, accumulatedStatsRef.current);
+    });
 
     useEffect(() => {
         // Initialize the Web Worker
@@ -50,16 +77,14 @@ export default function WebcamProcessor() {
                 const faceData = results as FaceLandmarkerResult;
 
                 // If recording, accumulate stats
-                if (isRecording) {
-                    // We only save a simplified version to save memory
-                    // For example, just blendshapes or specific landmarks
-                    // Here we save the whole object but throttle it in the worker logic or here
-                    // For this demo, we'll just save it every 10th frame roughly
+                // We check the ref directly, no dependency needed
+                if (accumulatedStatsRef.current) {
+                    // Throttle saving to save memory (approx 10% of frames)
                     if (Math.random() < 0.1) {
-                        setAccumulatedStats(prev => [...prev, {
+                        accumulatedStatsRef.current.push({
                             timestamp: performance.now(),
                             faceBlendshapes: faceData.faceBlendshapes
-                        }]);
+                        });
                     }
                 }
             } else if (type === "ERROR") {
@@ -71,7 +96,7 @@ export default function WebcamProcessor() {
             workerRef.current?.terminate();
             cancelAnimationFrame(requestRef.current);
         };
-    }, [isRecording]); // Re-bind listener when isRecording changes if needed, but ref is stable
+    }, []);
 
     const startWebcam = async () => {
         try {
@@ -97,23 +122,30 @@ export default function WebcamProcessor() {
     };
 
     const processVideo = () => {
+        // Safety Check
         if (
-            videoRef.current &&
-            workerRef.current &&
-            videoRef.current.readyState >= 2 &&
-            isModelLoaded
+            !videoRef.current ||
+            videoRef.current.paused ||
+            videoRef.current.ended ||
+            videoRef.current.readyState < 2 ||
+            !workerRef.current ||
+            !isModelLoaded
         ) {
-            if (videoRef.current.currentTime !== lastVideoTimeRef.current) {
-                lastVideoTimeRef.current = videoRef.current.currentTime;
-
-                createImageBitmap(videoRef.current).then((bitmap) => {
-                    workerRef.current?.postMessage({
-                        frame: bitmap,
-                        timestamp: performance.now()
-                    }, [bitmap]);
-                }).catch(err => console.error("Frame capture error:", err));
-            }
+            requestRef.current = requestAnimationFrame(processVideo);
+            return;
         }
+
+        if (videoRef.current.currentTime !== lastVideoTimeRef.current) {
+            lastVideoTimeRef.current = videoRef.current.currentTime;
+
+            createImageBitmap(videoRef.current).then((bitmap) => {
+                workerRef.current?.postMessage({
+                    frame: bitmap,
+                    timestamp: performance.now()
+                }, [bitmap]);
+            }).catch(err => console.error("Frame capture error:", err));
+        }
+
         requestRef.current = requestAnimationFrame(processVideo);
     };
 
@@ -126,34 +158,9 @@ export default function WebcamProcessor() {
 
     // Reset stats when starting recording
     const handleStartRecording = () => {
-        setAccumulatedStats([]);
+        accumulatedStatsRef.current = []; // Reset ref
         setAnalysisResult(null);
         startRecording();
-    };
-
-    const handleSubmitAnswer = async () => {
-        if (!audioBlob) return;
-
-        setIsAnalyzing(true);
-        try {
-            const formData = new FormData();
-            formData.append("audio_file", audioBlob, "answer.webm");
-            formData.append("video_analysis", JSON.stringify(accumulatedStats));
-            formData.append("question_context", "Tell me about a time you faced a challenge."); // Hardcoded for now
-
-            const response = await axios.post("http://localhost:8000/api/v1/interview/analyze-answer", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-
-            setAnalysisResult(response.data);
-        } catch (error) {
-            console.error("Error analyzing answer:", error);
-            alert("Failed to analyze answer. Please try again.");
-        } finally {
-            setIsAnalyzing(false);
-        }
     };
 
     const formatTime = (seconds: number) => {
@@ -240,7 +247,7 @@ export default function WebcamProcessor() {
                             className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-red-500/25 disabled:opacity-50"
                         >
                             <Mic className="w-5 h-5" />
-                            {audioBlob ? "Record Again" : "Start Answer"}
+                            Start Answer
                         </button>
                     ) : (
                         <button
@@ -249,17 +256,6 @@ export default function WebcamProcessor() {
                         >
                             <Square className="w-5 h-5 fill-current" />
                             Finish Answer
-                        </button>
-                    )}
-
-                    {audioBlob && !isRecording && (
-                        <button
-                            onClick={handleSubmitAnswer}
-                            disabled={isAnalyzing}
-                            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-blue-500/25 disabled:opacity-50"
-                        >
-                            <Send className="w-5 h-5" />
-                            Submit for Analysis
                         </button>
                     )}
                 </div>
@@ -298,8 +294,7 @@ export default function WebcamProcessor() {
                         <button
                             onClick={() => {
                                 setAnalysisResult(null);
-                                setAccumulatedStats([]);
-                                // Ideally reset audio blob here too via hook reset if available
+                                accumulatedStatsRef.current = [];
                             }}
                             className="w-full py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-xl font-semibold transition-all"
                         >
