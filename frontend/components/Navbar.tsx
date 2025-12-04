@@ -31,11 +31,13 @@ const Navbar = () => {
       { name: t('home'), href: '/', showAlways: true },
       { name: t('pricing'), href: '/payment', showAlways: true },
       { name: t('about'), href: '/about', showAlways: true },
+      { name: t('contact'), href: '/contact', showAlways: true },
     ];
 
     const authenticatedLinks = [
       { name: t('analyze'), href: '/CV_analyze', showAlways: false },
       { name: t('company'), href: '/entreprise', showAlways: true },
+      { name: t('build'), href: '/build-cv', showAlways: true },
     ];
 
     if (isAuthenticated) {
