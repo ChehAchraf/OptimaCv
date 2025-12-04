@@ -35,10 +35,14 @@ services:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=1000
+      - NEXT_TELEMETRY_DISABLED=1
       - INTERNAL_API_BASE_URL=http://backend:8000/api/v1
       - NEXT_PUBLIC_APP_BASE_URL=http://localhost:8000/api/v1
     depends_on:
       - backend
+    stdin_open: true
+    tty: true
 
 volumes:
   frontend_node_modules:
