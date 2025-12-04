@@ -15,6 +15,7 @@ import {
     LogOut,
     Moon,
     Sun,
+    Mic,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -42,6 +43,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             name: t('nav.cvAnalysis'),
             href: `/${locale}/CV_analyze`,
             icon: FileText,
+        },
+        {
+            name: t('nav.interview'),
+            href: `/${locale}/interview`,
+            icon: Mic,
         },
         {
             name: t('nav.history'),
