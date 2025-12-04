@@ -65,14 +65,14 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/50">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-300">
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b">
+            <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b dark:border-gray-800">
                 <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+                    <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl sm:tracking-tight lg:text-6xl">
                         {t('title')}
                     </h1>
-                    <p className="mt-5 max-w-xl mx-auto text-xl text-gray-600">
+                    <p className="mt-5 max-w-xl mx-auto text-xl text-gray-600 dark:text-gray-400">
                         {t('subtitle')}
                     </p>
                 </div>
@@ -81,7 +81,7 @@ export default function ContactPage() {
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 {/* Description */}
                 <div className="text-center mb-12">
-                    <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+                    <p className="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
                         {t('description')}
                     </p>
                 </div>
@@ -90,17 +90,17 @@ export default function ContactPage() {
                     {/* Contact Form - Takes 2 columns */}
                     <div className="lg:col-span-2">
                         <Suspense fallback={<CardLoader />}>
-                            <Card className="shadow-xl border-none bg-white">
+                            <Card className="shadow-xl border-none bg-white dark:bg-gray-900">
                                 <CardHeader>
-                                    <CardTitle className="text-2xl">{t('form.name')}</CardTitle>
-                                    <CardDescription>{t('description')}</CardDescription>
+                                    <CardTitle className="text-2xl text-gray-900 dark:text-white">{t('form.name')}</CardTitle>
+                                    <CardDescription className="text-gray-500 dark:text-gray-400">{t('description')}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             {/* Name Field */}
                                             <div className="space-y-2">
-                                                <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                                                <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                     {t('form.name')}
                                                 </Label>
                                                 <Input
@@ -111,13 +111,13 @@ export default function ContactPage() {
                                                     value={formData.name}
                                                     onChange={handleChange}
                                                     placeholder={t('form.namePlaceholder')}
-                                                    className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                                                    className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
                                                 />
                                             </div>
 
                                             {/* Email Field */}
                                             <div className="space-y-2">
-                                                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                                                <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                     {t('form.email')}
                                                 </Label>
                                                 <Input
@@ -128,14 +128,14 @@ export default function ContactPage() {
                                                     value={formData.email}
                                                     onChange={handleChange}
                                                     placeholder={t('form.emailPlaceholder')}
-                                                    className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                                                    className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
                                                 />
                                             </div>
                                         </div>
 
                                         {/* Subject Field */}
                                         <div className="space-y-2">
-                                            <Label htmlFor="subject" className="text-sm font-medium text-gray-700">
+                                            <Label htmlFor="subject" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                 {t('form.subject')}
                                             </Label>
                                             <Input
@@ -146,13 +146,13 @@ export default function ContactPage() {
                                                 value={formData.subject}
                                                 onChange={handleChange}
                                                 placeholder={t('form.subjectPlaceholder')}
-                                                className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                                                className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
                                             />
                                         </div>
 
                                         {/* Message Field */}
                                         <div className="space-y-2">
-                                            <Label htmlFor="message" className="text-sm font-medium text-gray-700">
+                                            <Label htmlFor="message" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                 {t('form.message')}
                                             </Label>
                                             <Textarea
@@ -163,7 +163,7 @@ export default function ContactPage() {
                                                 onChange={handleChange}
                                                 placeholder={t('form.messagePlaceholder')}
                                                 rows={6}
-                                                className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 resize-none"
+                                                className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 resize-none dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
                                             />
                                         </div>
 
@@ -190,14 +190,14 @@ export default function ContactPage() {
 
                                         {/* Success/Error Messages */}
                                         {submitStatus === 'success' && (
-                                            <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 animate-in fade-in slide-in-from-top-2">
+                                            <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300 animate-in fade-in slide-in-from-top-2">
                                                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                                                 <p>{t('successMessage')}</p>
                                             </div>
                                         )}
 
                                         {submitStatus === 'error' && (
-                                            <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 animate-in fade-in slide-in-from-top-2">
+                                            <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 animate-in fade-in slide-in-from-top-2">
                                                 <span className="text-xl flex-shrink-0">⚠️</span>
                                                 <p>{t('errorMessage')}</p>
                                             </div>
@@ -216,8 +216,8 @@ export default function ContactPage() {
                                 icon={<Mail className="w-6 h-6" />}
                                 title={t('info.email.title')}
                                 value={t('info.email.value')}
-                                bgColor="bg-blue-50"
-                                iconColor="text-blue-600"
+                                bgColor="bg-blue-50 dark:bg-blue-900/20"
+                                iconColor="text-blue-600 dark:text-blue-400"
                             />
 
                             {/* Phone Card */}
@@ -225,8 +225,8 @@ export default function ContactPage() {
                                 icon={<Phone className="w-6 h-6" />}
                                 title={t('info.phone.title')}
                                 value={t('info.phone.value')}
-                                bgColor="bg-green-50"
-                                iconColor="text-green-600"
+                                bgColor="bg-green-50 dark:bg-green-900/20"
+                                iconColor="text-green-600 dark:text-green-400"
                             />
 
                             {/* Address Card */}
@@ -234,8 +234,8 @@ export default function ContactPage() {
                                 icon={<MapPin className="w-6 h-6" />}
                                 title={t('info.address.title')}
                                 value={t('info.address.value')}
-                                bgColor="bg-purple-50"
-                                iconColor="text-purple-600"
+                                bgColor="bg-purple-50 dark:bg-purple-900/20"
+                                iconColor="text-purple-600 dark:text-purple-400"
                             />
 
                             {/* Business Hours Card */}
@@ -243,38 +243,38 @@ export default function ContactPage() {
                                 icon={<Clock className="w-6 h-6" />}
                                 title={t('info.hours.title')}
                                 value={t('info.hours.value')}
-                                bgColor="bg-orange-50"
-                                iconColor="text-orange-600"
+                                bgColor="bg-orange-50 dark:bg-orange-900/20"
+                                iconColor="text-orange-600 dark:text-orange-400"
                             />
 
                             {/* Social Media Card */}
-                            <Card className="hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 border-none bg-white">
+                            <Card className="hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 border-none bg-white dark:bg-gray-900">
                                 <CardContent className="pt-6">
                                     <div className="flex flex-col gap-4">
                                         <div>
-                                            <h3 className="font-semibold text-gray-900 mb-1">{t('info.social.title')}</h3>
-                                            <p className="text-sm text-gray-600">{t('info.social.description')}</p>
+                                            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('info.social.title')}</h3>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">{t('info.social.description')}</p>
                                         </div>
                                         <div className="flex gap-4">
                                             <SocialButton
                                                 icon={<Instagram className="w-5 h-5" />}
                                                 href="https://instagram.com"
-                                                color="text-pink-600 bg-pink-50 hover:bg-pink-100"
+                                                color="text-pink-600 bg-pink-50 hover:bg-pink-100 dark:bg-pink-900/20 dark:hover:bg-pink-900/30 dark:text-pink-400"
                                             />
                                             <SocialButton
                                                 icon={<Linkedin className="w-5 h-5" />}
                                                 href="https://linkedin.com"
-                                                color="text-blue-700 bg-blue-50 hover:bg-blue-100"
+                                                color="text-blue-700 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 dark:text-blue-400"
                                             />
                                             <SocialButton
                                                 icon={<Facebook className="w-5 h-5" />}
                                                 href="https://facebook.com"
-                                                color="text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                                color="text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 dark:text-blue-400"
                                             />
                                             <SocialButton
                                                 icon={<Twitter className="w-5 h-5" />}
                                                 href="https://twitter.com"
-                                                color="text-sky-500 bg-sky-50 hover:bg-sky-100"
+                                                color="text-sky-500 bg-sky-50 hover:bg-sky-100 dark:bg-sky-900/20 dark:hover:bg-sky-900/30 dark:text-sky-400"
                                             />
                                         </div>
                                     </div>
@@ -303,15 +303,15 @@ function ContactInfoCard({
     iconColor: string;
 }) {
     return (
-        <Card className="hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 border-none bg-white">
+        <Card className="hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 border-none bg-white dark:bg-gray-900">
             <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
                     <div className={`p-3 ${bgColor} ${iconColor} rounded-xl flex-shrink-0`}>
                         {icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 mb-1">{title}</h3>
-                        <p className="text-sm text-gray-600 break-words">{value}</p>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 break-words">{value}</p>
                     </div>
                 </div>
             </CardContent>
