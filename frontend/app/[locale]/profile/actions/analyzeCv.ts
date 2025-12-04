@@ -4,22 +4,20 @@ import { CVPayload } from "@/types/type";
 import { createClient } from "@/lib/supabase/server";
 import { logger, logServerAction } from "@/lib/logger";
 import { revalidateTag } from "next/cache";
+import { checkUserAccess } from "@/lib/auth-check";
 
 export async function analyzeCv(payload: CVPayload) {
     const supabase = await createClient();
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-        throw new Error("You must be logged in to analyze CVs");
-    }
+    // Check authentication and ban status
+    const user = await checkUserAccess();
 
     logServerAction('analyzeCv', user.id, { fileName: payload.cv_pdf.name });
 
     const { data: userPlan } = await supabase
         .from("user_plans")
         .select(`
-            *,
+           *,
             plan:plans(*)
         `)
         .eq("user_id", user.id)
