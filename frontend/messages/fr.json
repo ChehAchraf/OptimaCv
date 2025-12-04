@@ -42,6 +42,7 @@
         "contact": "Contact",
         "company": "Entreprise",
         "analyze": "Analyser CV",
+        "build": "Créer CV",
         "dashboard": "Tableau de bord",
         "switchLanguage": "Changer de langue",
         "login": "Connexion",
@@ -80,66 +81,6 @@
         "form": {
             "jdLabel": "1. Collez la description de poste (JD)",
             "jdPlaceholder": "Collez la description de poste complète ici...",
-            "cvLabel": "2. Téléchargez les CVs (PDF)",
-            "fileCount": "{count} fichier(s) sélectionné(s)",
-            "submitLoading": "Analyse en cours (cela peut prendre du temps)...",
-            "submitDefault": "Lancer l'analyse de {count} CVs",
-            "error": "Veuillez fournir une description de poste et au moins un CV (PDF)."
-        },
-        "results": {
-            "title": "Résultats: {count} Candidats Classés",
-            "rank": "Rang #{rank}",
-            "matchScore": "Score de correspondance",
-            "nameNotFound": "Nom non trouvé",
-            "emailNotFound": "Email non trouvé",
-            "noSummary": "Pas de résumé.",
-            "strengths": "Points forts identifiés :",
-            "noStrengths": "Aucun point fort majeur détecté."
-        }
-    },
-    "BuildCVPage": {
-        "steps": {
-            "info": "Infos Perso",
-            "profile": "Profil",
-            "generation": "Génération"
-        },
-        "step1": {
-            "title": "Étape 1: Informations de base",
-            "name": "Nom complet",
-            "email": "Email",
-            "phone": "Téléphone",
-            "next": "Suivant"
-        },
-        "step2": {
-            "title": "Étape 2: Votre Profil",
-            "description": "Décrivez-vous et listez vos certificats. L'IA s'occupe du reste.",
-            "descLabel": "Décrivez-vous (ou vos objectifs)",
-            "descPlaceholder": "Ex: 'Développeur passionné par le cloud, je viens de terminer un stage...' ou 'Cloud, DevOps, Java...'",
-            "certLabel": "Vos Certificats (Optionnel)",
-            "certPlaceholder": "Ex: 'AWS Certified Cloud Practitioner'",
-            "add": "Ajouter",
-            "prev": "Précédent",
-            "generate": "Générer mon CV"
-        },
-        "step3": {
-            "title": "Étape 3: Génération...",
-            "loading": "L'IA rédige votre CV...",
-            "resultTitle": "Votre nouveau profil (Titre): {title}",
-            "keyPoints": "Points forts de ce CV :",
-            "content": "Contenu du CV (JSON) :",
-            "restart": "Recommencer"
-        }
-    },
-    "AboutPage": {
-        "hero": {
-            "title": "Notre Mission",
-            "subtitle": "Révolutionner la recherche d'emploi grâce à l'intelligence artificielle."
-        },
-        "story": {
-            "title": "Notre Histoire",
-            "description": "Né de la frustration de voir des talents ignorés à cause de CV mal formatés, OptimaCv a été créé pour donner à chacun une chance équitable. Nous combinons expertise RH et technologie de pointe."
-        },
-        "values": {
             "title": "Nos Valeurs",
             "innovation": "Innovation constante",
             "accessibility": "Accessibilité pour tous",
@@ -355,7 +296,22 @@
         "email": "Adresse e-mail",
         "password": "Mot de passe",
         "logout": "Se déconnecter",
-        "profile": "Profil"
+        "profile": "Profil",
+        "forgotPassword": {
+            "title": "Mot de passe oublié",
+            "subtitle": "Entrez votre email pour réinitialiser votre mot de passe",
+            "submit": "Envoyer le lien",
+            "backToLogin": "Retour à la connexion",
+            "successMessage": "Vérifiez votre email pour le lien de réinitialisation."
+        },
+        "resetPassword": {
+            "title": "Réinitialiser le mot de passe",
+            "subtitle": "Entrez votre nouveau mot de passe",
+            "submit": "Mettre à jour",
+            "successMessage": "Mot de passe mis à jour avec succès. Redirection...",
+            "newPassword": "Nouveau mot de passe",
+            "confirmPassword": "Confirmer le mot de passe"
+        }
     },
     "ProfilePage": {
         "loading": "Chargement de votre profil...",
@@ -386,7 +342,7 @@
         "analysesThisTrial": "Analyses de CV (Essai)",
         "remaining": "Restant",
         "used": "utilisé",
-        "warningRemaining": "âš ï¸ Il vous reste <strong>{count}</strong> analyse{s}.",
+        "warningRemaining": "⚠️ Il vous reste <strong>{count}</strong> analyse{s}.",
         "considerUpgrading": " Envisagez de mettre à niveau pour continuer à utiliser les fonctionnalités d'analyse.",
         "limitReached": "🚫 Vous avez utilisé toutes vos analyses de CV.",
         "limitReset": " Votre limite sera réinitialisée au début de votre prochain cycle de facturation.",
@@ -533,6 +489,47 @@
             "title": "Paramètres",
             "comingSoon": "Bientôt disponible"
         }
+    },
+    "ContactPage": {
+        "title": "Contactez-nous",
+        "subtitle": "Entrez en contact avec notre équipe",
+        "description": "Vous avez une question ou besoin d'aide ? Nous sommes là pour vous aider ! Remplissez le formulaire ci-dessous et notre équipe vous répondra dans les plus brefs délais.",
+        "form": {
+            "name": "Nom complet",
+            "namePlaceholder": "Jean Dupont",
+            "email": "Adresse e-mail",
+            "emailPlaceholder": "jean@exemple.fr",
+            "subject": "Sujet",
+            "subjectPlaceholder": "Comment pouvons-nous vous aider ?",
+            "message": "Message",
+            "messagePlaceholder": "Parlez-nous de votre demande...",
+            "submit": "Envoyer le message",
+            "submitting": "Envoi en cours..."
+        },
+        "info": {
+            "email": {
+                "title": "E-mail",
+                "value": "support@optimacv.com"
+            },
+            "phone": {
+                "title": "Téléphone",
+                "value": "+33 1 23 45 67 89"
+            },
+            "address": {
+                "title": "Adresse",
+                "value": "123 Rue des Affaires, Bureau 100, Paris, 75001"
+            },
+            "hours": {
+                "title": "Horaires d'ouverture",
+                "value": "Lundi - Vendredi : 9h00 - 18h00 CET"
+            },
+            "social": {
+                "title": "Suivez-nous",
+                "description": "Restez connecté sur les réseaux sociaux"
+            }
+        },
+        "successMessage": "Merci de nous avoir contactés ! Nous vous répondrons bientôt.",
+        "errorMessage": "Une erreur s'est produite. Veuillez réessayer."
     },
     "CVBuilder": {
         "PersonalForm": {
