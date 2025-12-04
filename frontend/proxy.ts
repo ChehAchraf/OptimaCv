@@ -10,7 +10,7 @@ export async function proxy(request: NextRequest) {
     const { response: supabaseResponse, user } = await updateSession(request);
 
     // Protect routes
-    const protectedPaths = ['/entreprise', '/build-cv', '/CV_analyze'];
+    const protectedPaths = ['/entreprise', '/build-cv', '/CV_analyze', '/interview',];
     const isProtected = protectedPaths.some(path => request.nextUrl.pathname.includes(path));
 
     if (isProtected && !user) {
@@ -21,10 +21,6 @@ export async function proxy(request: NextRequest) {
 
     // Run i18n Middleware (handles locale routing)
     const intlResponse = intlMiddleware(request);
-
-    // Merge cookies from Supabase response to Intl response
-    // This ensures that if Supabase refreshed the token, we pass that back to the client
-    // along with any locale cookies set by next-intl.
     supabaseResponse.cookies.getAll().forEach((cookie) => {
         intlResponse.cookies.set(cookie.name, cookie.value, cookie);
     });
