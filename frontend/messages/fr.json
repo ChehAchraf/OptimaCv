@@ -48,7 +48,8 @@
         "login": "Connexion",
         "register": "S'inscrire",
         "logout": "Déconnexion",
-        "profile": "Profil"
+        "profile": "Profil",
+        "interview": "Entretien"
     },
     "ProcessSection": {
         "badge": "Comment ça marche",
@@ -468,7 +469,8 @@
             "signOut": "Se déconnecter",
             "settings": "Paramètres",
             "history": "Historique",
-            "dashboard": "Tableau de bord"
+            "dashboard": "Tableau de bord",
+            "interview": "Entretien"
         },
         "settings": {
             "subtitle": "Gérez vos préférences",
@@ -488,6 +490,15 @@
             },
             "title": "Paramètres",
             "comingSoon": "Bientôt disponible"
+        },
+        "recentInterviews": {
+            "title": "Entretiens Récents",
+            "viewAll": "Tout Voir",
+            "empty": {
+                "title": "Aucun entretien",
+                "description": "Commencez à vous entraîner avec des entretiens IA",
+                "action": "Commencer un Entretien"
+            }
         }
     },
     "ContactPage": {
@@ -558,6 +569,20 @@
             "skillsLabel": "Compétences (Appuyez sur Entrée pour ajouter)",
             "skillPlaceholder": "Ajouter une compétence...",
             "addCategory": "+ Ajouter une catégorie de compétences"
+        }
+    },
+    "InterviewPage": {
+        "pageTitle": "Entretien IA",
+        "viewHistory": "Voir l'historique",
+        "history": {
+            "title": "Historique des Entretiens",
+            "subtitle": "Consultez vos sessions d'entretien passées",
+            "empty": "Aucun historique d'entretien",
+            "startFirst": "Commencer Votre Premier Entretien",
+            "score": "Score",
+            "feedback": "Retour",
+            "suggestedFollowup": "Question de Suivi Suggérée",
+            "question": "Question"
         }
     }
 }
