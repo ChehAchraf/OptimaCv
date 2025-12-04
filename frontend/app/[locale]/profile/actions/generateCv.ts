@@ -2,8 +2,12 @@
 
 import { CompanyRankPayload, CompanyRankResponse } from "@/types/type";
 import path from "@/app/axios/path";
+import { checkUserAccess } from "@/lib/auth-check";
 
 export async function generateCV(payload: CompanyRankPayload): Promise<CompanyRankResponse> {
+    // Check authentication and ban status
+    await checkUserAccess();
+
     try {
         const { jobDescription, files } = payload;
 
