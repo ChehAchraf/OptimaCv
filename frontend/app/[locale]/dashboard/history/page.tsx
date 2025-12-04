@@ -54,11 +54,11 @@ export default function HistoryPage() {
                         created_at: a.created_at,
                         job_title: result.job_title || a.cv_name || 'Untitled CV',
                         company_name: result.company_name,
-                        result: result,
-                        overall_score: result.overall_score || 0,
+                        overall_score: result.analysis_vs_jd?.match_score || 0,
                         status: 'completed' as const,
                         top_strengths: result.strengths?.slice(0, 3) || [],
                         top_improvements: result.improvements?.slice(0, 3) || [],
+                        
                     };
                 })
             );
@@ -91,7 +91,6 @@ export default function HistoryPage() {
     return (
         <DashboardLayout>
             <div className="p-6 space-y-6">
-                {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -103,7 +102,6 @@ export default function HistoryPage() {
                     </div>
                 </div>
 
-                {/* Filters */}
                 <div className="flex items-center gap-3 overflow-x-auto pb-2">
                     <Filter className="h-5 w-5 text-gray-400 flex-shrink-0" />
                     {[
