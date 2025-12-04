@@ -8,11 +8,13 @@ import { createClient } from '@/lib/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { EmailAuthFormProps } from '@/types/type';
 
 
 
 export function EmailAuthForm({ mode }: EmailAuthFormProps) {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +37,9 @@ export function EmailAuthForm({ mode }: EmailAuthFormProps) {
                     password,
                     options: {
                         emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`,
+                        data: {
+                            full_name: name,
+                        }
                     },
                 });
                 if (error) throw error;
@@ -64,6 +69,20 @@ export function EmailAuthForm({ mode }: EmailAuthFormProps) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === 'register' && (
+                <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input
+                        id="name"
+                        type="text"
+                        placeholder="John Doe"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        disabled={isLoading}
+                    />
+                </div>
+            )}
             <div className="space-y-2">
                 <Label htmlFor="email">{t('email')}</Label>
                 <Input
@@ -77,7 +96,17 @@ export function EmailAuthForm({ mode }: EmailAuthFormProps) {
                 />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="password">{t('password')}</Label>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="password">{t('password')}</Label>
+                    {mode === 'login' && (
+                        <Link
+                            href={`/${locale}/auth/forgot-password`}
+                            className="text-sm text-blue-600 hover:underline"
+                        >
+                            {t('forgotPassword.title')}
+                        </Link>
+                    )}
+                </div>
                 <Input
                     id="password"
                     type="password"
