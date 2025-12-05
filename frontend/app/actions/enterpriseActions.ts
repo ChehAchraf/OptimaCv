@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { checkUserAccess } from "@/lib/auth-check";
+import { checkUserAccess, checkEnterpriseAccess } from "@/lib/auth-check";
 import {
     EnterpriseCV,
     EnterpriseAnalysis,
@@ -19,7 +19,7 @@ export async function getEnterpriseCVs(
     limit: number = 50,
     offset: number = 0
 ): Promise<{ data: EnterpriseCV[]; total: number }> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     let query = supabase
@@ -57,7 +57,7 @@ export async function getEnterpriseCVs(
  * Upload and save a new CV
  */
 export async function createEnterpriseCV(payload: CreateEnterpriseCVPayload): Promise<EnterpriseCV> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -91,7 +91,7 @@ export async function createEnterpriseCV(payload: CreateEnterpriseCVPayload): Pr
 export async function createMultipleEnterpriseCVs(
     files: Array<{ file_name: string; file_path: string; file_size: number }>
 ): Promise<EnterpriseCV[]> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const cvs = files.map(file => ({
@@ -121,7 +121,7 @@ export async function createMultipleEnterpriseCVs(
  * Upload CVs to Supabase Storage and save metadata
  */
 export async function uploadEnterpriseCVs(formData: FormData): Promise<EnterpriseCV[]> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const files = formData.getAll("files") as File[];
@@ -192,7 +192,7 @@ export async function uploadEnterpriseCVs(formData: FormData): Promise<Enterpris
  * Get CV files from storage for analysis
  */
 export async function getEnterpriseCVFiles(cvIds: string[]): Promise<File[]> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     // Get CV metadata
@@ -236,7 +236,7 @@ export async function updateEnterpriseCV(
     cvId: string,
     updates: Partial<Pick<EnterpriseCV, 'candidate_name' | 'candidate_email' | 'tags' | 'status'>>
 ): Promise<EnterpriseCV> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -260,7 +260,7 @@ export async function updateEnterpriseCV(
  * Soft delete a CV
  */
 export async function deleteEnterpriseCV(cvId: string): Promise<boolean> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { error } = await supabase
@@ -282,7 +282,7 @@ export async function deleteEnterpriseCV(cvId: string): Promise<boolean> {
  * Delete multiple CVs
  */
 export async function deleteMultipleEnterpriseCVs(cvIds: string[]): Promise<boolean> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { error } = await supabase
@@ -304,7 +304,7 @@ export async function deleteMultipleEnterpriseCVs(cvIds: string[]): Promise<bool
  * Get CVs by IDs
  */
 export async function getEnterpriseCVsByIds(cvIds: string[]): Promise<EnterpriseCV[]> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -328,7 +328,7 @@ export async function getEnterpriseCVsByIds(cvIds: string[]): Promise<Enterprise
 export async function createEnterpriseAnalysis(
     payload: CreateEnterpriseAnalysisPayload
 ): Promise<EnterpriseAnalysis> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -360,7 +360,7 @@ export async function getEnterpriseAnalyses(
     limit: number = 20,
     offset: number = 0
 ): Promise<{ data: EnterpriseAnalysis[]; total: number }> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { data, error, count } = await supabase
@@ -384,7 +384,7 @@ export async function getEnterpriseAnalyses(
 export async function getEnterpriseAnalysisById(
     analysisId: string
 ): Promise<EnterpriseAnalysis | null> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -406,7 +406,7 @@ export async function getEnterpriseAnalysisById(
  * Get analysis results for an analysis
  */
 export async function getEnterpriseAnalysisResults(analysisId: string) {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -441,7 +441,7 @@ export async function saveEnterpriseAnalysisResults(
         rank: number;
     }>
 ): Promise<boolean> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { error: resultsError } = await supabase
@@ -501,7 +501,7 @@ export async function saveDirectAnalysisResults(payload: {
     job_description: string;
     results: any[];
 }): Promise<string> {
-    const user = await checkUserAccess();
+    const user = await checkEnterpriseAccess();
     const supabase = await createClient();
 
     const { data: analysis, error } = await supabase
@@ -510,12 +510,12 @@ export async function saveDirectAnalysisResults(payload: {
             user_id: user.id,
             job_description: payload.job_description,
             job_title: payload.job_title,
-            cv_ids: [], 
+            cv_ids: [],
             total_cvs: payload.results.length,
             status: "completed",
             analyzed_count: payload.results.length,
             completed_at: new Date().toISOString(),
-            results: payload.results 
+            results: payload.results
         })
         .select()
         .single();
