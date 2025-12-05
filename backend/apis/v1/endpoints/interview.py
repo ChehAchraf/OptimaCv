@@ -35,48 +35,12 @@ async def analyze_interview_answer(
             # Gemini 1.5 Flash supports audio files directly
             uploaded_file = genai.upload_file(tmp_path, mime_type=audio_file.content_type or "audio/webm")
             
-            # 3. Prepare the prompt
-            # We parse the video analysis JSON to make it readable for the LLM
-            try:
-                video_stats = json.loads(video_analysis)
-                video_context = json.dumps(video_stats, indent=2)
-            except:
-                video_context = video_analysis
-
-            prompt = f"""
-            You are an expert Interview Coach.
-            
-            **Context:**
-            The candidate was asked: "{question_context}"
-            
-            **Input:**
-            1. An audio recording of their answer.
-            2. Body Language Analysis (from computer vision):
-            {video_context}
-            
-            **Task:**
-            Analyze the candidate's performance.
-            - Listen to the audio for content quality, clarity, and confidence.
-            - Cross-reference with the body language stats. For example, if 'eye_contact_score' is low, mention that they should look at the camera more. If they seem nervous based on the audio or video stats, give advice on that.
-            
-            **Output:**
-            Return a JSON object with this exact schema:
-            {{
-                "feedback": "A concise paragraph (3-4 sentences) giving specific, actionable advice.",
-                "score": <integer 0-10>,
-                "next_question_suggestion": "A relevant follow-up interview question."
-            }}
-            """
-
-            # 4. Generate Content
-            model = genai.GenerativeModel('gemini-2.0-flash')
-            response = model.generate_content(
-                [prompt, uploaded_file],
-                generation_config={"response_mime_type": "application/json"}
+            # 3. Call Service (with Retry Logic)
+            result = await gemini_service.analyze_interview_answer(
+                audio_file=uploaded_file,
+                video_analysis=video_analysis,
+                question_context=question_context
             )
-            
-            # 5. Parse Response
-            result = json.loads(response.text)
             
             return InterviewAnalysisResponse(
                 feedback=result.get("feedback", "No feedback generated."),
@@ -93,4 +57,43 @@ async def analyze_interview_answer(
 
     except Exception as e:
         print(f"Error processing interview answer: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+from backend.services.pdf_service import pdf_service
+from backend.services.gemini_service import gemini_service
+from backend.schemas.analysis_schemas import InterviewPrepResponse
+
+@router.post("/init-session", response_model=InterviewPrepResponse)
+async def init_interview_session(
+    resume: UploadFile = File(...),
+    job_description: str = Form(...)
+):
+    """
+    Initializes an interview session by analyzing the resume vs job description
+    and generating relevant questions.
+    """
+    try:
+        # 1. Read and Parse PDF
+        if resume.content_type != "application/pdf":
+             raise HTTPException(status_code=400, detail="Only PDF files are supported for resumes.")
+        
+        content = await resume.read()
+        try:
+            cv_text = pdf_service.parse_text(content)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+        # 2. Generate Questions via Gemini
+        result = await gemini_service.generate_interview_questions(cv_text, job_description)
+        
+        if not result or "questions" not in result:
+             raise HTTPException(status_code=500, detail="Failed to generate interview questions.")
+
+        return InterviewPrepResponse(questions=result["questions"])
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error initializing interview session: {e}")
         raise HTTPException(status_code=500, detail=str(e))

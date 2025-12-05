@@ -1,16 +1,11 @@
 import google.generativeai as genai
-
 from backend.core.config import settings
-
 import json
-
 import PIL.Image
-
 import io
-
 import asyncio
-
-
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type, RetryError
+from google.api_core.exceptions import ResourceExhausted, ServiceUnavailable
 
 class GeminiService:
 
@@ -25,10 +20,13 @@ class GeminiService:
             genai.configure(api_key=api_key)
 
             # Initialize the Gemini models
-            # Using gemini-2.0-flash as it is available, stable, and multimodal
-            self.model_flash = genai.GenerativeModel("gemini-2.0-flash")
-            self.model_pro = genai.GenerativeModel("gemini-2.0-flash")
-            self.model_pro_vision = genai.GenerativeModel("gemini-2.0-flash")
+            # Primary: gemini-2.0-flash
+            self.model_flash = genai.GenerativeModel("models/gemini-2.0-flash")
+            self.model_pro = genai.GenerativeModel("models/gemini-2.0-flash")
+            self.model_pro_vision = genai.GenerativeModel("models/gemini-2.0-flash")
+            
+            # Fallback: gemini-2.0-flash-lite-preview-02-05
+            self.model_fallback = genai.GenerativeModel("models/gemini-2.0-flash-lite-preview-02-05")
 
         except Exception as e:
 
@@ -44,8 +42,18 @@ class GeminiService:
 
         return cleaned.strip()
 
-
-
+    @retry(
+        retry=retry_if_exception_type((ResourceExhausted, ServiceUnavailable)),
+        wait=wait_exponential(multiplier=2, min=2, max=10),
+        stop=stop_after_attempt(3) # Reduced to 3 to failover faster
+    )
+    async def _generate_content_with_retry(self, model, contents, generation_config=None):
+        """
+        Helper method to generate content with retry logic.
+        """
+        if generation_config:
+            return await model.generate_content_async(contents, generation_config=generation_config)
+        return await model.generate_content_async(contents)
 
 
     async def analyze_cv_only(self, cv_text: str) -> dict:
@@ -106,7 +114,11 @@ class GeminiService:
         {cv_text}
         """
 
-        response = await self.model_flash.generate_content_async(prompt) 
+        try:
+            response = await self._generate_content_with_retry(self.model_flash, prompt)
+        except RetryError:
+            print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (CV Only) ⚠️ ---")
+            response = await self._generate_content_with_retry(self.model_fallback, prompt)
 
         print("--- 💡 RAW GEMINI (CV Only) RESPONSE 💡 ---")
 
@@ -121,7 +133,6 @@ class GeminiService:
             print(f"--- 🔴 ERROR: Failed to parse cleaned CV-ONLY JSON: {cleaned_text} 🔴 ---")
 
             return {}
-
 
 
     async def analyze_cv_vs_jd(self, cv_text: str, jd_text: str) -> dict:
@@ -175,8 +186,11 @@ class GeminiService:
         """
 
         
-
-        response = await self.model_pro.generate_content_async(prompt_in_english)
+        try:
+            response = await self._generate_content_with_retry(self.model_pro, prompt_in_english)
+        except RetryError:
+            print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (CV vs JD) ⚠️ ---")
+            response = await self._generate_content_with_retry(self.model_fallback, prompt_in_english)
 
         
 
@@ -207,9 +221,6 @@ class GeminiService:
             print("--- 🔴 ERROR: Gemini did not return valid JSON! 🔴 ---")
 
             return {}
-
-
-
 
 
     async def analyze_cv_visuals(self, image_bytes: bytes) -> dict:
@@ -243,7 +254,11 @@ class GeminiService:
 
         try:
 
-            response = await self.model_pro_vision.generate_content_async([prompt, img])
+            try:
+                response = await self._generate_content_with_retry(self.model_pro_vision, [prompt, img])
+            except RetryError:
+                print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (Visual) ⚠️ ---")
+                response = await self._generate_content_with_retry(self.model_fallback, [prompt, img])
 
             
 
@@ -282,7 +297,6 @@ class GeminiService:
             print(f"Gemini content generation error: {e}")
 
             return None
-
 
 
     async def generate_cv_from_data(self, user_data: dict) -> dict:
@@ -338,8 +352,11 @@ class GeminiService:
         
 
                                                    
-
-        response = await self.model_pro.generate_content_async(prompt)
+        try:
+            response = await self._generate_content_with_retry(self.model_pro, prompt)
+        except RetryError:
+            print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (CV Builder) ⚠️ ---")
+            response = await self._generate_content_with_retry(self.model_fallback, prompt)
 
         
 
@@ -357,6 +374,115 @@ class GeminiService:
 
             print(f"--- 🔴 ERROR: Failed to parse CV Builder JSON: {cleaned_text} 🔴 ---")
 
-            return {}                        
+            return {}
+
+
+    async def generate_interview_questions(self, cv_text: str, jd_text: str) -> dict:
+        """
+        Generates 5 interview questions based on CV and JD.
+        """
+        prompt = f"""
+        You are an Expert Technical Recruiter and Hiring Manager.
+        
+        **Task:**
+        Generate 5 distinct interview questions to assess a candidate based on their CV and the Job Description.
+        
+        **Inputs:**
+        1. **Candidate CV:**
+        {cv_text[:10000]} (truncated if too long)
+        
+        2. **Job Description:**
+        {jd_text[:5000]} (truncated if too long)
+        
+        **Requirements:**
+        - Create a mix of **Technical** (hard skills) and **Behavioral** (soft skills/culture fit) questions.
+        - For each question, provide a brief 'context' explaining WHY you are asking it (e.g., "To verify their experience with React hooks mentioned in the CV").
+        - Assign a 'topic' (e.g., "Frontend Architecture", "Conflict Resolution").
+        
+        **Output Format:**
+        Return a JSON object with this EXACT structure:
+        {{
+            "questions": [
+                {{
+                    "id": 1,
+                    "question": "The actual question text...",
+                    "context": "Reasoning for asking...",
+                    "topic": "Category"
+                }},
+                ...
+            ]
+        }}
+        """
+
+        try:
+            try:
+                response = await self._generate_content_with_retry(self.model_flash, prompt)
+            except RetryError:
+                print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (Questions) ⚠️ ---")
+                response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            
+            cleaned_text = self._clean_json_response(response.text)
+            return json.loads(cleaned_text)
+        except Exception as e:
+            print(f"Error generating interview questions: {e}")
+            # Return a fallback or empty structure to avoid crashing
+            return {"questions": []}
+
+
+    async def analyze_interview_answer(self, audio_file, video_analysis: str, question_context: str) -> dict:
+        """
+        Analyzes an interview answer (audio + video stats).
+        """
+        
+        # We parse the video analysis JSON to make it readable for the LLM
+        try:
+            video_stats = json.loads(video_analysis)
+            video_context = json.dumps(video_stats, indent=2)
+        except:
+            video_context = video_analysis
+
+        prompt = f"""
+        You are an expert Interview Coach.
+        
+        **Context:**
+        The candidate was asked: "{question_context}"
+        
+        **Input:**
+        1. An audio recording of their answer.
+        2. Body Language Analysis (from computer vision):
+        {video_context}
+        
+        **Task:**
+        Analyze the candidate's performance.
+        - Listen to the audio for content quality, clarity, and confidence.
+        - Cross-reference with the body language stats. For example, if 'eye_contact_score' is low, mention that they should look at the camera more. If they seem nervous based on the audio or video stats, give advice on that.
+        
+        **Output:**
+        Return a JSON object with this exact schema:
+        {{
+            "feedback": "A concise paragraph (3-4 sentences) giving specific, actionable advice.",
+            "score": <integer 0-10>,
+            "next_question_suggestion": "A relevant follow-up interview question."
+        }}
+        """
+
+        # Generate Content
+        try:
+            response = await self._generate_content_with_retry(
+                self.model_flash, 
+                [prompt, audio_file],
+                generation_config={"response_mime_type": "application/json"}
+            )
+        except RetryError:
+             print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (Answer Analysis) ⚠️ ---")
+             response = await self._generate_content_with_retry(
+                self.model_fallback, 
+                [prompt, audio_file],
+                generation_config={"response_mime_type": "application/json"}
+            )
+        
+        # Parse Response
+        return json.loads(response.text)
+
 
 gemini_service = GeminiService(api_key=settings.GOOGLE_API_KEY)
