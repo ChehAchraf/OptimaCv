@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import UAParser from "ua-parser-js";
+import { UAParser } from "ua-parser-js";
 import { updateUserOS } from "@/app/actions/updateUserOS";
 
 export function useAnalytics() {

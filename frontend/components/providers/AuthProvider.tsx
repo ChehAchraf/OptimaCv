@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { AuthContextType } from '@/types/type';
+import { createUserProfile } from '@/app/actions/createUserProfile';
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
@@ -39,8 +40,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 if (error) {
                     setUser(null);
                 } else {
-                    
+
                     setUser(data.session?.user ?? null);
+                    if (data.session?.user) {
+                        createUserProfile();
+                    }
                 }
             } catch (error) {
                 if (mounted) setUser(null);
@@ -58,6 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } = supabase.auth.onAuthStateChange((_event, session) => {
             if (mounted) {
                 setUser(session?.user ?? null);
+                if (session?.user) {
+                    createUserProfile();
+                }
                 setIsLoading(false);
             }
         });
