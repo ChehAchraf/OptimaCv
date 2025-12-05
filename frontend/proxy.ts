@@ -6,8 +6,11 @@ import { updateSession } from '@/lib/supabase/middleware';
 const intlMiddleware = createMiddleware(routing);
 
 export async function proxy(request: NextRequest) {
+    console.log(`Proxy Middleware: Processing ${request.nextUrl.pathname}`);
+
     // Update Supabase session (handles auth token refresh)
     const { response: supabaseResponse, user } = await updateSession(request);
+    console.log(`Proxy Middleware: User authenticated: ${!!user}`);
 
     // Protect routes
     const protectedPaths = ['/entreprise', '/build-cv', '/CV_analyze', '/interview',];
