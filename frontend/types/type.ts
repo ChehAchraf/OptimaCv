@@ -135,6 +135,26 @@ export interface EmailAuthFormProps {
     mode: 'login' | 'register';
 }
 
-// Plan types are now defined in @/types/plan.ts
-// Re-export for backwards compatibility
-export type { PaymentPlan as Plan } from './plan';
+export interface InterviewAnalysis {
+    id: string;
+    user_id: string;
+    audio_file_path?: string;
+    video_analysis?: any;
+    question_context: string;
+    feedback: string;
+    score: number;
+    next_question_suggestion?: string;
+    is_deleted: boolean;
+    created_at: string;
+    updated_at?: string;
+}
+
+export interface CreateInterviewAnalysisPayload {
+    audio_file_path?: string;
+    video_analysis?: any;
+    question_context: string;
+    feedback: string;
+    score: number;
+    next_question_suggestion?: string;
+}
+

@@ -1,284 +1,394 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle2, Upload, FileText, Lock } from 'lucide-react';
-import { AnalysisResult } from '@/types/type';
-import { useTranslations } from 'next-intl';
-import { generateCV } from '@/app/[locale]/profile/actions/generateCv';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { companyRankPayloadSchema, validateData, fileListToArray } from '@/lib/validations';
-import Link from 'next/link';
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Plus,
+  Search,
+  Filter,
+  FileBarChart,
+  Trash2,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  Users,
+  FileText,
+  TrendingUp
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CVUploadZone, CVTable } from "@/components/enterprise";
+import {
+  getEnterpriseCVs,
+  deleteMultipleEnterpriseCVs,
+  getEnterpriseAnalyses
+} from "@/app/actions/enterpriseActions";
+import { EnterpriseCV, EnterpriseAnalysis } from "@/types/enterprise";
+import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
-export default function CompanyPage() {
-  const t = useTranslations('CompanyPage');
-  const queryClient = useQueryClient();
-  const [files, setFiles] = useState<FileList | null>(null);
-  const [jobDescription, setJobDescription] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
-  const [isCheckingPlan, setIsCheckingPlan] = useState(true);
-  const [hasAccess, setHasAccess] = useState(false);
+const ITEMS_PER_PAGE = 10;
 
-  useEffect(() => {
-    const checkPlan = async () => {
-      try {
-        const response = await fetch('/api/user/plan');
-        const data = await response.json();
+export default function EnterpriseDashboardPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const t = useTranslations("EnterpriseDashboard");
 
-        if (data.success && data.plan) {
-          const isEnterprise = data.plan.plan.name === 'enterprise';
-          setHasAccess(isEnterprise);
-        } else {
-          setHasAccess(false);
-        }
-      } catch (err) {
-        console.error('Error checking plan:', err);
-        setHasAccess(false);
-      } finally {
-        setIsCheckingPlan(false);
-      }
-    };
+  // State
+  const [cvs, setCVs] = useState<EnterpriseCV[]>([]);
+  const [analyses, setAnalyses] = useState<EnterpriseAnalysis[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [totalCVs, setTotalCVs] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
-    checkPlan();
+  // Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  // Fetch CVs
+  const fetchCVs = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+      const filters = {
+        search: searchQuery || undefined,
+        status: statusFilter !== "all" ? statusFilter as any : undefined,
+      };
+
+      const { data, total } = await getEnterpriseCVs(filters, ITEMS_PER_PAGE, offset);
+      setCVs(data);
+      setTotalCVs(total);
+    } catch (error) {
+      toast({ title: "Failed to fetch CVs", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, searchQuery, statusFilter, toast]);
+
+  // Fetch analyses
+  const fetchAnalyses = useCallback(async () => {
+    try {
+      const { data } = await getEnterpriseAnalyses(5, 0);
+      setAnalyses(data);
+    } catch (error) {
+      console.error("Failed to fetch analyses:", error);
+    }
   }, []);
 
-  const { data: results = [] } = useQuery<AnalysisResult[]>({
-    queryKey: ['company-results'],
-    queryFn: () => [],
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 30,
-    enabled: false,
-  });
+  useEffect(() => {
+    fetchCVs();
+    fetchAnalyses();
+  }, [fetchCVs, fetchAnalyses]);
 
-  const mutation = useMutation<AnalysisResult[], Error, { jobDescription: string; files: File[] }>({
-    mutationFn: async (payload) => {
-      const response = await generateCV(payload);
-      return response.ranked_results;
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(['company-results'], data);
-      setError(null);
-    },
-    onError: (err: any) => {
-      setError(err.response?.data?.detail || err.message || 'Une erreur est survenue.');
-    },
-  });
+  // Handle bulk delete
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles(e.target.files);
+    try {
+      await deleteMultipleEnterpriseCVs(selectedIds);
+      toast({ title: `${selectedIds.length} CV(s) deleted` });
+      setSelectedIds([]);
+      fetchCVs();
+    } catch (error) {
+      toast({ title: "Failed to delete CVs", variant: "destructive" });
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!files || files.length === 0 || !jobDescription) {
-      setError(t('form.error'));
-      return;
-    }
-
-    const filesArray = fileListToArray(files);
-    const payloadData = {
-      jobDescription,
-      files: filesArray,
-    };
-
-    const validationResult = validateData(companyRankPayloadSchema, payloadData);
-
-    if (!validationResult.success) {
-      const firstError = Object.values(validationResult.errors)[0]?.[0];
-      setError(firstError || t('form.error'));
-      return;
-    }
-
-    mutation.mutate(validationResult.data);
+  // Handle analyze - now just redirects to analyze page
+  const handleAnalyze = () => {
+    router.push("/entreprise/analyze");
   };
 
-  if (isCheckingPlan) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4 flex items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Checking your subscription...</p>
-        </div>
-      </div>
-    );
-  }
+  const totalPages = Math.ceil(totalCVs / ITEMS_PER_PAGE);
+  const pendingCount = cvs.filter(cv => cv.status === "pending").length;
+  const analyzedCount = cvs.filter(cv => cv.status === "analyzed").length;
 
-  if (!hasAccess) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-black py-12 px-4">
-        <div className="max-w-2xl mx-auto">
-          <Card className="shadow-xl border-0 ring-1 ring-gray-200 dark:ring-gray-800">
-            <CardContent className="p-8 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/20 mb-4">
-                <Lock className="h-8 w-8 text-amber-600 dark:text-amber-500" />
-              </div>
-              <h2 className="text-2xl font-bold mb-2">Enterprise Plan Required</h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                This feature is exclusively available for Enterprise plan subscribers.
-                Upgrade your plan to access advanced company features including bulk CV analysis and ranking.
-              </p>
-              <Link href="/pricing">
-                <Button size="lg" className="text-lg px-8">
-                  View Pricing Plans
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-8 px-4">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Enterprise Dashboard
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
+              Manage your CV pool and run bulk analyses
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              size="lg"
+              onClick={handleAnalyze}
+              className="gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              <FileBarChart className="w-5 h-5" />
+              Analyze CVs
+            </Button>
+
+            <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+              <DialogTrigger asChild>
+                <Button size="lg" className="gap-2">
+                  <Plus className="w-5 h-5" />
+                  Upload CVs
                 </Button>
-              </Link>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Upload CVs</DialogTitle>
+                </DialogHeader>
+                <CVUploadZone
+                  onUploadComplete={() => {
+                    setIsUploadOpen(false);
+                    fetchCVs();
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                  <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {totalCVs}
+                  </p>
+                  <p className="text-sm text-gray-500">Total CVs</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl">
+                  <Users className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {pendingCount}
+                  </p>
+                  <p className="text-sm text-gray-500">Pending</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
+                  <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {analyzedCount}
+                  </p>
+                  <p className="text-sm text-gray-500">Analyzed</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+                  <FileBarChart className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {analyses.length}
+                  </p>
+                  <p className="text-sm text-gray-500">Analyses</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
-      </div>
-    );
-  }
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black py-6 sm:py-12 px-3 sm:px-4 lg:px-8">
-      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 relative z-10">
-        <div className="text-center space-y-3 sm:space-y-4">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-            {t('title')}
-          </h1>
-          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-2">
-            {t('description')}
-          </p>
-        </div>
+        {/* CV Management Section */}
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <CardTitle>CV Pool</CardTitle>
 
-        <Card className="shadow-xl border-0 ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-gray-900">
-          <CardContent className="p-4 sm:p-6 lg:p-8">
-            <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-              {error && (
-                <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  <AlertTitle>Erreur</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-                <div className="space-y-4">
-                  <div className="bg-blue-50 dark:bg-blue-900/10 p-3 sm:p-4 rounded-xl border border-blue-100 dark:border-blue-900/20">
-                    <Label htmlFor="cv-files" className="font-semibold text-base sm:text-lg flex items-center gap-2 mb-2">
-                      <Upload className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
-                      {t('form.cvLabel')} <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="cv-files"
-                      type="file"
-                      accept="application/pdf"
-                      onChange={handleFileChange}
-                      required
-                      multiple
-                      className="bg-white dark:bg-black/50 text-sm"
-                    />
-                    {files && <p className="text-sm text-muted-foreground mt-2">{t('form.fileCount', { count: files.length })}</p>}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="jd-company" className="font-semibold text-base sm:text-lg flex items-center gap-2">
-                    <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
-                    {t('form.jdLabel')} <span className="text-red-500">*</span>
-                  </Label>
-                  <Textarea
-                    id="jd-company"
-                    className="min-h-[200px] sm:min-h-[280px] resize-none bg-gray-50 dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 text-sm"
-                    value={jobDescription}
-                    onChange={(e) => setJobDescription(e.target.value)}
-                    placeholder={t('form.jdPlaceholder')}
-                    required
+              {/* Filters & Search */}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="Search CVs..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 w-64"
                   />
                 </div>
-              </div>
 
-              <Button
-                type="submit"
-                disabled={mutation.isPending}
-                className="w-full h-11 sm:h-12 text-base sm:text-lg font-semibold transition-all duration-300 shadow-lg"
-              >
-                {mutation.isPending ? (
-                  <div className="flex items-center gap-2">
-                    <div className="h-4 w-4 sm:h-5 sm:w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span className="text-sm sm:text-base">{t('form.submitLoading')}</span>
-                  </div>
-                ) : (
-                  t('form.submitDefault', { count: files?.length || 0 })
-                )}
-              </Button>
-            </form>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-40">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="analyzed">Analyzed</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={fetchCVs}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            {/* Action Bar */}
+            {selectedIds.length > 0 && (
+              <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-between">
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  {selectedIds.length} CV(s) selected
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleBulkDelete}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleAnalyze}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <FileBarChart className="w-4 h-4 mr-2" />
+                    Analyze Selected
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Table */}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <RefreshCw className="w-8 h-8 animate-spin text-gray-400" />
+              </div>
+            ) : (
+              <CVTable
+                cvs={cvs}
+                selectedIds={selectedIds}
+                onSelectionChange={setSelectedIds}
+                onRefresh={fetchCVs}
+              />
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                <p className="text-sm text-gray-500">
+                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
+                  {Math.min(currentPage * ITEMS_PER_PAGE, totalCVs)} of {totalCVs}
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {results.length > 0 && (
-          <div className="mt-12 border-t pt-8">
-            <h3 className="text-2xl font-bold mb-6">
-              {t('results.title', { count: results.length })}
-            </h3>
-            <div className="space-y-4">
-              {results.map((item, index) => (
-                <Card key={item.filename} className="flex flex-col md:flex-row items-start shadow-md hover:shadow-lg transition-shadow duration-200">
-                  <div className="p-4 md:w-1/4 md:border-r text-center bg-gray-50 dark:bg-gray-800 rounded-t-lg md:rounded-l-lg md:rounded-t-none h-full flex flex-col justify-center">
-                    <div className="text-lg font-semibold text-muted-foreground">{t('results.rank', { rank: index + 1 })}</div>
-                    <div className="text-5xl font-bold text-blue-600 my-2">
-                      {item.analysis.match_score ?? 0}%
-                    </div>
-                    <Progress value={item.analysis.match_score ?? 0} className="h-2 w-full" />
-                    <p className="text-xs text-muted-foreground mt-2">{t('results.matchScore')}</p>
-                  </div>
-
-                  <div className="p-4 md:w-3/4 w-full">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <Avatar className="h-12 w-12">
-                        <AvatarFallback className="bg-blue-100 text-blue-700 font-bold">
-                          {item.analysis.contact_info?.name?.substring(0, 2).toUpperCase() || 'NA'}
-                        </AvatarFallback>
-                      </Avatar>
+        {/* Recent Analyses */}
+        {analyses.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Analyses</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {analyses.map((analysis) => (
+                  <div
+                    key={analysis.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    onClick={() => router.push(`/entreprise/analysis/${analysis.id}`)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                        <FileBarChart className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                      </div>
                       <div>
-                        <CardTitle className="text-xl">
-                          {item.analysis.contact_info?.name || t('results.nameNotFound')}
-                        </CardTitle>
-                        <CardDescription>
-                          {item.analysis.contact_info?.email || t('results.emailNotFound')}
-                        </CardDescription>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {analysis.job_title || "Job Analysis"}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {analysis.total_cvs} CVs analyzed
+                        </p>
                       </div>
                     </div>
-
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">
-                      {item.analysis.summary || t('results.noSummary')}
-                    </p>
-
-                    <h5 className="font-semibold text-sm mb-2 flex items-center gap-1">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      {t('results.strengths')}
-                    </h5>
-                    <div className="flex flex-wrap gap-2">
-                      {item.analysis.strengths.length > 0 ? (
-                        item.analysis.strengths.slice(0, 3).map((strength, i) => (
-                          <Badge
-                            key={i}
-                            variant="secondary"
-                            className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50"
-                          >
-                            {strength}
-                          </Badge>
-                        ))
-                      ) : (
-                        <p className="text-sm text-muted-foreground">{t('results.noStrengths')}</p>
-                      )}
+                    <div className="text-right">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${analysis.status === "completed"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                        : analysis.status === "processing"
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                          : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
+                        }`}>
+                        {analysis.status}
+                      </span>
                     </div>
                   </div>
-                </Card>
-              ))}
-            </div>
-          </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

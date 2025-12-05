@@ -19,7 +19,6 @@ const Label = dynamic(() => import('@/components/ui/label').then(mod => mod.Labe
 
 const Mail = dynamic(() => import('lucide-react').then(mod => mod.Mail), { ssr: false });
 const Phone = dynamic(() => import('lucide-react').then(mod => mod.Phone), { ssr: false });
-const MapPin = dynamic(() => import('lucide-react').then(mod => mod.MapPin), { ssr: false });
 const Clock = dynamic(() => import('lucide-react').then(mod => mod.Clock), { ssr: false });
 const Send = dynamic(() => import('lucide-react').then(mod => mod.Send), { ssr: false });
 const CheckCircle2 = dynamic(() => import('lucide-react').then(mod => mod.CheckCircle2), { ssr: false });
@@ -43,7 +42,6 @@ export default function ContactPage() {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Simulate API call
         try {
             await new Promise(resolve => setTimeout(resolve, 2000));
             setSubmitStatus('success');
@@ -52,7 +50,6 @@ export default function ContactPage() {
             setSubmitStatus('error');
         } finally {
             setIsSubmitting(false);
-            // Reset status after 5 seconds
             setTimeout(() => setSubmitStatus('idle'), 5000);
         }
     };
@@ -66,7 +63,6 @@ export default function ContactPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 transition-colors duration-300">
-            {/* Hero Section */}
             <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b dark:border-gray-800">
                 <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 text-center">
                     <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl sm:tracking-tight lg:text-6xl">
@@ -79,7 +75,6 @@ export default function ContactPage() {
             </div>
 
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                {/* Description */}
                 <div className="text-center mb-12">
                     <p className="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
                         {t('description')}
@@ -87,7 +82,6 @@ export default function ContactPage() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Contact Form - Takes 2 columns */}
                     <div className="lg:col-span-2">
                         <Suspense fallback={<CardLoader />}>
                             <Card className="shadow-xl border-none bg-white dark:bg-gray-900">
@@ -98,7 +92,6 @@ export default function ContactPage() {
                                 <CardContent>
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            {/* Name Field */}
                                             <div className="space-y-2">
                                                 <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                     {t('form.name')}
@@ -115,7 +108,6 @@ export default function ContactPage() {
                                                 />
                                             </div>
 
-                                            {/* Email Field */}
                                             <div className="space-y-2">
                                                 <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                     {t('form.email')}
@@ -133,7 +125,6 @@ export default function ContactPage() {
                                             </div>
                                         </div>
 
-                                        {/* Subject Field */}
                                         <div className="space-y-2">
                                             <Label htmlFor="subject" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                 {t('form.subject')}
@@ -150,7 +141,6 @@ export default function ContactPage() {
                                             />
                                         </div>
 
-                                        {/* Message Field */}
                                         <div className="space-y-2">
                                             <Label htmlFor="message" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                 {t('form.message')}
@@ -167,7 +157,6 @@ export default function ContactPage() {
                                             />
                                         </div>
 
-                                        {/* Submit Button */}
                                         <div className="pt-4">
                                             <Button
                                                 type="submit"
@@ -188,7 +177,6 @@ export default function ContactPage() {
                                             </Button>
                                         </div>
 
-                                        {/* Success/Error Messages */}
                                         {submitStatus === 'success' && (
                                             <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300 animate-in fade-in slide-in-from-top-2">
                                                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
@@ -208,10 +196,8 @@ export default function ContactPage() {
                         </Suspense>
                     </div>
 
-                    {/* Contact Information - Takes 1 column */}
                     <div className="space-y-6">
                         <Suspense fallback={<CardLoader />}>
-                            {/* Email Card */}
                             <ContactInfoCard
                                 icon={<Mail className="w-6 h-6" />}
                                 title={t('info.email.title')}
@@ -220,7 +206,6 @@ export default function ContactPage() {
                                 iconColor="text-blue-600 dark:text-blue-400"
                             />
 
-                            {/* Phone Card */}
                             <ContactInfoCard
                                 icon={<Phone className="w-6 h-6" />}
                                 title={t('info.phone.title')}
@@ -229,16 +214,6 @@ export default function ContactPage() {
                                 iconColor="text-green-600 dark:text-green-400"
                             />
 
-                            {/* Address Card */}
-                            <ContactInfoCard
-                                icon={<MapPin className="w-6 h-6" />}
-                                title={t('info.address.title')}
-                                value={t('info.address.value')}
-                                bgColor="bg-purple-50 dark:bg-purple-900/20"
-                                iconColor="text-purple-600 dark:text-purple-400"
-                            />
-
-                            {/* Business Hours Card */}
                             <ContactInfoCard
                                 icon={<Clock className="w-6 h-6" />}
                                 title={t('info.hours.title')}
@@ -247,7 +222,6 @@ export default function ContactPage() {
                                 iconColor="text-orange-600 dark:text-orange-400"
                             />
 
-                            {/* Social Media Card */}
                             <Card className="hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1 border-none bg-white dark:bg-gray-900">
                                 <CardContent className="pt-6">
                                     <div className="flex flex-col gap-4">

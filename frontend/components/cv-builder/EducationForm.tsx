@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { CVEducation } from '@/types/cv-builder';
 import { HiTrash } from 'react-icons/hi';
 
-interface Props {
+export interface Props {
     data: CVEducation[];
     updateData: (data: CVEducation[]) => void;
 }

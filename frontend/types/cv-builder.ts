@@ -54,3 +54,10 @@ export interface OptimizationResponse {
     optimized_text: string;
     improvements: string[];
 }
+
+
+
+export interface Props {
+    data: CVExperience[];
+    updateData: (data: CVExperience[]) => void;
+}

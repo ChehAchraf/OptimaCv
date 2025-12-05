@@ -15,6 +15,7 @@ import {
     LogOut,
     Moon,
     Sun,
+    Mic,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -44,9 +45,19 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             icon: FileText,
         },
         {
+            name: t('nav.interview'),
+            href: `/${locale}/interview`,
+            icon: Mic,
+        },
+        {
+            name: t('nav.interviewHistory'),
+            href: `/${locale}/dashboard/interview-history`,
+            icon: History,
+        },
+        {
             name: t('nav.history'),
             href: `/${locale}/dashboard/history`,
-            icon: History,
+            icon: FileText,
         },
         {
             name: t('nav.profile'),

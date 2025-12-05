@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { PaymentPlan } from '@/types/plan';
+import { PaymentPlan, PlanCardProps } from '@/types/plan';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { CardLoader } from '@/components/loading';
@@ -46,7 +46,6 @@ const PaymentPage = () => {
     const params = useParams();
     const locale = params.locale as string || 'en';
 
-    // Fetch plans from Supabase on mount
     useEffect(() => {
         const fetchPlans = async () => {
             try {
@@ -62,7 +61,6 @@ const PaymentPage = () => {
                 const data = await response.json();
 
                 if (data.plans && Array.isArray(data.plans)) {
-                    // Transform plans to PaymentPlan format
                     const transformedPlans: PaymentPlan[] = data.plans.map((plan: any) => ({
                         id: plan.id,
                         name: plan.display_name || plan.name,
@@ -85,7 +83,6 @@ const PaymentPage = () => {
         fetchPlans();
     }, [locale, t]);
 
-    // Format price based on locale and currency
     const formatPrice = (price: number, currency: string, locale: string): string => {
         if (price === 0) {
             return t('plans.Basic.price') || 'Free';
@@ -99,7 +96,6 @@ const PaymentPage = () => {
 
         const formattedPrice = formatter.format(price);
 
-        // Add "/month" suffix based on locale
         const monthSuffix = locale === 'fr' ? '/mois' : locale === 'ar' ? '/شهر' : '/month';
         return `${formattedPrice} ${monthSuffix}`;
     };
@@ -165,13 +161,7 @@ const PaymentPage = () => {
     );
 };
 
-interface PlanCardProps {
-    plan: PaymentPlan;
-    selectedPlan: PaymentPlan | null;
-    setSelectedPlan: (plan: PaymentPlan) => void;
-    toast: any;
-    t: any;
-}
+
 
 function PlanCard({ plan, selectedPlan, setSelectedPlan, toast, t }: PlanCardProps) {
     const handleSelectPlan = (e: React.MouseEvent) => {

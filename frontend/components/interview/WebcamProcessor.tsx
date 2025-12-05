@@ -4,16 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { FaceLandmarkerResult } from "@mediapipe/tasks-vision";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import AudioVisualizer from "./AudioVisualizer";
-import { Mic, Square, Play, Loader2, CheckCircle, Circle, Clock, ArrowRight } from "lucide-react";
-import axios from "axios";
+import { Mic, Square, Play, Loader2, CheckCircle, Circle, Clock, ArrowRight, Save } from "lucide-react";
+import { analyzeInterviewAnswer } from "@/app/actions/analyzeInterview";
+import { InterviewAnalysisResult, InterviewQuestion } from "@/types/interview";
 
-import { InterviewQuestion } from "./InterviewSetup";
 
-interface AnalysisResult {
-    feedback: string;
-    score: number;
-    next_question_suggestion: string;
-}
+
 
 interface WebcamProcessorProps {
     questions?: InterviewQuestion[];
@@ -27,33 +23,30 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
     const requestRef = useRef<number>(0);
     const lastVideoTimeRef = useRef(-1);
 
-    // Question State
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const currentQuestion = questions[currentQuestionIndex];
 
-    // Analysis State
     const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+    const [analysisResult, setAnalysisResult] = useState<InterviewAnalysisResult | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [savedSuccessfully, setSavedSuccessfully] = useState(false);
 
-    // Use Ref for stats to avoid re-renders and stale closures
     const accumulatedStatsRef = useRef<any[]>([]);
 
     const submitAnswer = async (blob: Blob, stats: any[]) => {
         setIsAnalyzing(true);
+        setSavedSuccessfully(false);
         try {
-            const formData = new FormData();
-            formData.append("audio_file", blob, "answer.webm");
-            formData.append("video_analysis", JSON.stringify(stats));
-            // Use the actual current question context
-            formData.append("question_context", currentQuestion?.question || "General Interview Question");
+            const questionContext = currentQuestion?.question || "General Interview Question";
 
-            const response = await axios.post("http://localhost:8000/api/v1/interview/analyze-answer", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
+            const response = await analyzeInterviewAnswer({
+                audioBlob: blob,
+                videoAnalysis: stats,
+                questionContext,
             });
 
-            setAnalysisResult(response.data);
+            setAnalysisResult(response.analysisResult);
+            setSavedSuccessfully(response.savedSuccessfully);
         } catch (error) {
             console.error("Error analyzing answer:", error);
             alert("Failed to analyze answer. Please try again.");
@@ -62,7 +55,6 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
         }
     };
 
-    // Audio Recorder Hook with onStop callback
     const {
         startRecording,
         stopRecording,
@@ -70,12 +62,10 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
         recordingTime,
         mediaStream
     } = useAudioRecorder((blob) => {
-        // Automatic submission when recording stops
         submitAnswer(blob, accumulatedStatsRef.current);
     });
 
     useEffect(() => {
-        // Initialize the Web Worker
         workerRef.current = new Worker(new URL("../../workers/face-mesh-worker.ts", import.meta.url));
 
         workerRef.current.onmessage = (event) => {
@@ -87,9 +77,7 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
             } else if (type === "RESULT") {
                 const faceData = results as FaceLandmarkerResult;
 
-                // If recording, accumulate stats
                 if (accumulatedStatsRef.current) {
-                    // Throttle saving to save memory (approx 10% of frames)
                     if (Math.random() < 0.1) {
                         accumulatedStatsRef.current.push({
                             timestamp: performance.now(),
@@ -132,7 +120,6 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
     };
 
     const processVideo = () => {
-        // Safety Check
         if (
             !videoRef.current ||
             videoRef.current.paused ||
@@ -166,9 +153,8 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
         return () => cancelAnimationFrame(requestRef.current);
     }, [isModelLoaded, cameraActive]);
 
-    // Reset stats when starting recording
     const handleStartRecording = () => {
-        accumulatedStatsRef.current = []; // Reset ref
+        accumulatedStatsRef.current = [];
         setAnalysisResult(null);
         startRecording();
     };
@@ -180,7 +166,6 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
             setCurrentQuestionIndex(prev => prev + 1);
         } else {
             alert("Interview Completed!");
-            // Handle completion logic here (e.g., redirect or show summary)
         }
     };
 
@@ -194,11 +179,10 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
         <div className="w-full max-w-7xl mx-auto p-4 lg:p-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                {/* Left Sidebar: Questions List */}
                 <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-gray-900/50 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl">
-                        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                            <Clock className="w-5 h-5 text-blue-400" />
+                    <div className="bg-white/80 dark:bg-gray-900/50 backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-white/10 p-6 shadow-xl">
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <Clock className="w-5 h-5 text-blue-500 dark:text-blue-400" />
                             Interview Progress
                         </h2>
                         <div className="space-y-3">
@@ -211,29 +195,29 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
                                     <div
                                         key={q.id}
                                         className={`p-4 rounded-xl border transition-all ${isActive
-                                                ? 'bg-blue-600/20 border-blue-500/50 shadow-lg shadow-blue-500/10'
-                                                : isCompleted
-                                                    ? 'bg-green-500/10 border-green-500/20 opacity-75'
-                                                    : 'bg-white/5 border-white/5 opacity-50'
+                                            ? 'bg-blue-50 dark:bg-blue-600/20 border-blue-200 dark:border-blue-500/50 shadow-lg shadow-blue-500/10'
+                                            : isCompleted
+                                                ? 'bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 opacity-75'
+                                                : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/5 opacity-50'
                                             }`}
                                     >
                                         <div className="flex items-start gap-3">
                                             <div className="mt-1">
                                                 {isCompleted ? (
-                                                    <CheckCircle className="w-5 h-5 text-green-400" />
+                                                    <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />
                                                 ) : isActive ? (
-                                                    <div className="w-5 h-5 rounded-full border-2 border-blue-400 flex items-center justify-center">
-                                                        <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                                                    <div className="w-5 h-5 rounded-full border-2 border-blue-500 dark:border-blue-400 flex items-center justify-center">
+                                                        <div className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse" />
                                                     </div>
                                                 ) : (
-                                                    <Circle className="w-5 h-5 text-gray-500" />
+                                                    <Circle className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                 )}
                                             </div>
                                             <div>
-                                                <p className={`text-sm font-medium ${isActive ? 'text-white' : 'text-gray-300'}`}>
+                                                <p className={`text-sm font-medium ${isActive ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
                                                     Question {idx + 1}
                                                 </p>
-                                                <p className="text-xs text-gray-400 mt-1 line-clamp-2">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                                                     {q.question}
                                                 </p>
                                             </div>
@@ -245,26 +229,23 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
                     </div>
                 </div>
 
-                {/* Main Area: Video & Controls */}
                 <div className="lg:col-span-2 space-y-6">
 
-                    {/* Active Question Card */}
                     {currentQuestion && (
-                        <div className="bg-gradient-to-r from-blue-900/40 to-purple-900/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 shadow-2xl">
-                            <span className="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold mb-3 border border-blue-500/30">
+                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/40 dark:to-purple-900/40 backdrop-blur-md rounded-2xl border border-blue-100 dark:border-white/10 p-6 shadow-xl dark:shadow-2xl">
+                            <span className="inline-block px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 text-xs font-bold mb-3 border border-blue-200 dark:border-blue-500/30">
                                 {currentQuestion.topic}
                             </span>
-                            <h3 className="text-2xl font-bold text-white leading-relaxed">
+                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white leading-relaxed">
                                 {currentQuestion.question}
                             </h3>
-                            <p className="text-gray-400 text-sm mt-2 italic border-l-2 border-gray-600 pl-3">
+                            <p className="text-gray-600 dark:text-gray-400 text-sm mt-2 italic border-l-2 border-gray-300 dark:border-gray-600 pl-3">
                                 Context: {currentQuestion.context}
                             </p>
                         </div>
                     )}
 
-                    {/* Video Container */}
-                    <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800 ring-1 ring-white/10">
+                    <div className="relative w-full aspect-video bg-gray-100 dark:bg-black rounded-2xl overflow-hidden shadow-xl dark:shadow-2xl border border-gray-200 dark:border-gray-800 ring-1 ring-gray-200 dark:ring-white/10">
                         <video
                             ref={videoRef}
                             autoPlay
@@ -273,22 +254,22 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
                             className="w-full h-full object-cover transform scale-x-[-1]"
                         />
 
-                        {/* Status Badges */}
                         <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-                            <div className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md border ${isModelLoaded ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400'}`}>
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md border ${isModelLoaded
+                                ? 'bg-green-100 dark:bg-green-500/10 border-green-300 dark:border-green-500/20 text-green-700 dark:text-green-400'
+                                : 'bg-yellow-100 dark:bg-yellow-500/10 border-yellow-300 dark:border-yellow-500/20 text-yellow-700 dark:text-yellow-400'}`}>
                                 AI Model: {isModelLoaded ? "Ready" : "Loading..."}
                             </div>
                             {isRecording && (
-                                <div className="px-3 py-1 rounded-full text-xs font-medium bg-red-500/10 border border-red-500/20 text-red-400 animate-pulse flex items-center gap-2">
+                                <div className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/10 border border-red-300 dark:border-red-500/20 text-red-600 dark:text-red-400 animate-pulse flex items-center gap-2">
                                     <div className="w-2 h-2 rounded-full bg-red-500"></div>
                                     Recording {formatTime(recordingTime)}
                                 </div>
                             )}
                         </div>
 
-                        {/* Start Camera Overlay */}
                         {!cameraActive && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-20">
+                            <div className="absolute inset-0 flex items-center justify-center bg-gray-200/90 dark:bg-black/80 backdrop-blur-sm z-20">
                                 <button
                                     onClick={startWebcam}
                                     disabled={!isModelLoaded}
@@ -309,28 +290,25 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
                             </div>
                         )}
 
-                        {/* Audio Visualizer Overlay */}
                         {isRecording && (
-                            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/90 to-transparent flex items-end justify-center pb-4 px-4">
+                            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-900/90 dark:from-black/90 to-transparent flex items-end justify-center pb-4 px-4">
                                 <div className="w-full max-w-md h-16">
                                     <AudioVisualizer stream={mediaStream} height={64} barColor="#60a5fa" />
                                 </div>
                             </div>
                         )}
 
-                        {/* Analysis Loading Overlay */}
                         {isAnalyzing && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm z-30">
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-200/90 dark:bg-black/80 backdrop-blur-sm z-30">
                                 <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-                                <p className="text-white font-medium text-lg animate-pulse">Analyzing your answer...</p>
-                                <p className="text-gray-400 text-sm mt-2">Checking body language & vocal confidence</p>
+                                <p className="text-gray-900 dark:text-white font-medium text-lg animate-pulse">Analyzing your answer...</p>
+                                <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">Checking body language & vocal confidence</p>
                             </div>
                         )}
                     </div>
 
-                    {/* Controls */}
                     {cameraActive && !analysisResult && (
-                        <div className="flex items-center justify-center gap-4 p-6 bg-gray-900/50 backdrop-blur-md rounded-2xl border border-white/10">
+                        <div className="flex items-center justify-center gap-4 p-6 bg-white/80 dark:bg-gray-900/50 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-white/10 shadow-lg">
                             {!isRecording ? (
                                 <button
                                     onClick={handleStartRecording}
@@ -343,7 +321,7 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
                             ) : (
                                 <button
                                     onClick={stopRecording}
-                                    className="flex items-center gap-3 px-8 py-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl font-bold text-lg transition-all border border-white/10 transform hover:scale-105"
+                                    className="flex items-center gap-3 px-8 py-4 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-xl font-bold text-lg transition-all border border-gray-300 dark:border-white/10 transform hover:scale-105"
                                 >
                                     <Square className="w-6 h-6 fill-current" />
                                     Finish Answer
@@ -352,34 +330,33 @@ export default function WebcamProcessor({ questions = [] }: WebcamProcessorProps
                         </div>
                     )}
 
-                    {/* Results Display */}
                     {analysisResult && (
-                        <div className="w-full bg-gray-900/80 backdrop-blur-md rounded-2xl border border-white/10 p-8 animate-in fade-in slide-in-from-bottom-4 shadow-2xl">
+                        <div className="w-full bg-white/90 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-white/10 p-8 animate-in fade-in slide-in-from-bottom-4 shadow-xl dark:shadow-2xl">
                             <div className="flex items-start justify-between mb-8">
                                 <div>
-                                    <h3 className="text-3xl font-bold text-white mb-2">Analysis Result</h3>
-                                    <p className="text-gray-400">Feedback for Question {currentQuestionIndex + 1}</p>
+                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Analysis Result</h3>
+                                    <p className="text-gray-600 dark:text-gray-400">Feedback for Question {currentQuestionIndex + 1}</p>
                                 </div>
-                                <div className={`flex items-center justify-center w-20 h-20 rounded-full border-4 text-3xl font-bold ${analysisResult.score >= 8 ? 'border-green-500 text-green-400' :
-                                    analysisResult.score >= 5 ? 'border-yellow-500 text-yellow-400' :
-                                        'border-red-500 text-red-400'
+                                <div className={`flex items-center justify-center w-20 h-20 rounded-full border-4 text-3xl font-bold ${analysisResult.score >= 8 ? 'border-green-500 text-green-500 dark:text-green-400' :
+                                    analysisResult.score >= 5 ? 'border-yellow-500 text-yellow-500 dark:text-yellow-400' :
+                                        'border-red-500 text-red-500 dark:text-red-400'
                                     }`}>
                                     {analysisResult.score}
                                 </div>
                             </div>
 
                             <div className="space-y-6">
-                                <div className="bg-white/5 rounded-xl p-6 border border-white/5">
-                                    <h4 className="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Feedback</h4>
-                                    <p className="text-gray-200 leading-relaxed text-lg">{analysisResult.feedback}</p>
+                                <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-6 border border-gray-200 dark:border-white/5">
+                                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">Feedback</h4>
+                                    <p className="text-gray-800 dark:text-gray-200 leading-relaxed text-lg">{analysisResult.feedback}</p>
                                 </div>
 
-                                <div className="bg-blue-500/10 rounded-xl p-6 border border-blue-500/20">
-                                    <h4 className="text-sm font-semibold text-blue-300 mb-3 uppercase tracking-wider flex items-center gap-2">
+                                <div className="bg-blue-50 dark:bg-blue-500/10 rounded-xl p-6 border border-blue-200 dark:border-blue-500/20">
+                                    <h4 className="text-sm font-semibold text-blue-600 dark:text-blue-300 mb-3 uppercase tracking-wider flex items-center gap-2">
                                         <CheckCircle className="w-5 h-5" />
                                         Suggested Follow-up
                                     </h4>
-                                    <p className="text-blue-100 font-medium text-lg">"{analysisResult.next_question_suggestion}"</p>
+                                    <p className="text-blue-700 dark:text-blue-100 font-medium text-lg">"{analysisResult.next_question_suggestion}"</p>
                                 </div>
 
                                 <button

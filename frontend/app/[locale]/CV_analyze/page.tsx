@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import { analyzeCv } from "@/app/[locale]/profile/actions/analyzeCv";
+import { analyzeCv } from "@/app/actions/analyzeCv";
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,7 +74,6 @@ export default function CVAnalyze() {
 
         try {
             const response = await analyzeCv(validationResult.data);
-            console.log("API Response:", response);
             setAnalysisResult(response);
 
         } catch (err: any) {

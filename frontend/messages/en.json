@@ -48,7 +48,8 @@
         "login": "Login",
         "register": "Register",
         "logout": "Logout",
-        "profile": "Profile"
+        "profile": "Profile",
+        "interview": "Interview"
     },
     "ProcessSection": {
         "badge": "How it works",
@@ -484,7 +485,9 @@
             "settings": "Settings",
             "darkMode": "Dark Mode",
             "lightMode": "Light Mode",
-            "signOut": "Sign Out"
+            "signOut": "Sign Out",
+            "interview": "Interview",
+            "interviewHistory": "Interview History"
         },
         "history": {
             "title": "CV Analysis History",
@@ -534,6 +537,35 @@
                 "changePasswordDescription": "Update your account password"
             },
             "comingSoon": "Coming Soon"
+        },
+        "recentInterviews": {
+            "title": "Recent Interviews",
+            "viewAll": "View All",
+            "empty": {
+                "title": "No interviews yet",
+                "description": "Start practicing with AI mock interviews",
+                "action": "Start Interview"
+            }
+        },
+        "interviewHistory": {
+            "title": "Interview History",
+            "subtitle": "View all your {count} interview analyses",
+            "filters": {
+                "all": "All",
+                "excellent": "Excellent (8+)",
+                "good": "Good (5-7)",
+                "needsImprovement": "Needs Work (<5)"
+            },
+            "feedback": "Feedback",
+            "suggestion": "Suggested Follow-up",
+            "delete": "Delete",
+            "deleteConfirm": "Are you sure you want to delete this interview analysis?",
+            "deleteError": "Failed to delete interview analysis",
+            "empty": {
+                "title": "No interviews yet",
+                "description": "Start practicing with AI mock interviews to build your history",
+                "action": "Start Interview"
+            }
         }
     },
     "ContactPage": {
@@ -604,6 +636,86 @@
             "skillsLabel": "Skills (Press Enter to add)",
             "skillPlaceholder": "Add a skill...",
             "addCategory": "+ Add Skill Category"
+        }
+    },
+    "InterviewPage": {
+        "pageTitle": "AI Mock Interview",
+        "viewHistory": "View History",
+        "history": {
+            "title": "Interview History",
+            "subtitle": "Review your past mock interview sessions",
+            "empty": "No interview history yet",
+            "startFirst": "Start Your First Interview",
+            "score": "Score",
+            "feedback": "Feedback",
+            "suggestedFollowup": "Suggested Follow-up",
+            "question": "Question"
+        }
+    },
+    "EnterpriseDashboard": {
+        "title": "Enterprise Dashboard",
+        "subtitle": "Manage your CV pool and run bulk analyses",
+        "uploadCVs": "Upload CVs",
+        "stats": {
+            "totalCVs": "Total CVs",
+            "pending": "Pending",
+            "analyzed": "Analyzed",
+            "analyses": "Analyses"
+        },
+        "cvPool": {
+            "title": "CV Pool",
+            "search": "Search CVs...",
+            "filterAll": "All Status",
+            "filterPending": "Pending",
+            "filterAnalyzed": "Analyzed",
+            "filterArchived": "Archived",
+            "selected": "{count} CV(s) selected",
+            "delete": "Delete",
+            "analyze": "Analyze Selected"
+        },
+        "table": {
+            "fileName": "File Name",
+            "candidate": "Candidate",
+            "status": "Status",
+            "uploaded": "Uploaded",
+            "actions": "Actions",
+            "notSet": "Not set",
+            "archive": "Archive"
+        },
+        "upload": {
+            "title": "Upload CVs",
+            "dropzone": "Drop CVs here or click to upload",
+            "pdfOnly": "PDF files only, up to 10MB each",
+            "filesSelected": "{count} file(s) selected",
+            "uploading": "Uploading...",
+            "uploadButton": "Upload {count} CV(s)"
+        },
+        "analyze": {
+            "title": "Analyze CVs",
+            "selectedCVs": "Selected CVs",
+            "jobDetails": "Job Details",
+            "jobTitle": "Job Title (Optional)",
+            "jobTitlePlaceholder": "e.g., Senior Software Engineer",
+            "jobDescription": "Job Description",
+            "jobDescriptionPlaceholder": "Paste the full job description here...",
+            "startAnalysis": "Start Analysis",
+            "analyzing": "Analyzing...",
+            "analyzingMessage": "Our AI is evaluating your CVs against the job description",
+            "results": "Ranking Results",
+            "matchScore": "Match Score",
+            "backToDashboard": "Back to Dashboard",
+            "viewFullReport": "View Full Report"
+        },
+        "recentAnalyses": {
+            "title": "Recent Analyses",
+            "cvsAnalyzed": "{count} CVs analyzed",
+            "completed": "Completed",
+            "processing": "Processing",
+            "pending": "Pending"
+        },
+        "empty": {
+            "noCVs": "No CVs uploaded yet",
+            "uploadPrompt": "Upload CVs to start building your talent pool"
         }
     }
 }

@@ -4,15 +4,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CVExperience } from '@/types/cv-builder';
-import { optimizeText } from '@/app/[locale]/profile/actions/optimize';
+import { CVExperience, Props } from '@/types/cv-builder';
+import { optimizeText } from '@/app/actions/optimize';
 import { HiSparkles, HiTrash } from 'react-icons/hi';
 import { Loader2 } from 'lucide-react';
 
-interface Props {
-    data: CVExperience[];
-    updateData: (data: CVExperience[]) => void;
-}
+
 
 export const ExperienceForm: React.FC<Props> = ({ data, updateData }) => {
     const [optimizingIndex, setOptimizingIndex] = useState<number | null>(null);

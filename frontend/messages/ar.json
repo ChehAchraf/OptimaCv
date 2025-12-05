@@ -48,7 +48,8 @@
         "login": "تسجيل الدخول",
         "register": "إنشاء حساب",
         "logout": "تسجيل الخروج",
-        "profile": "الملف الشخصي"
+        "profile": "الملف الشخصي",
+        "interview": "المقابلة"
     },
     "ProcessSection": {
         "badge": "كيف يعمل",
@@ -438,7 +439,9 @@
             "settings": "الإعدادات",
             "darkMode": "الوضع الداكن",
             "lightMode": "الوضع الفاتح",
-            "signOut": "تسجيل الخروج"
+            "signOut": "تسجيل الخروج",
+            "interview": "المقابلة",
+            "interviewHistory": "سجل المقابلات"
         },
         "history": {
             "title": "سجل تحليل السيرة الذاتية",
@@ -488,6 +491,35 @@
                 "changePasswordDescription": "تحديث كلمة مرور حسابك"
             },
             "comingSoon": "قريبا"
+        },
+        "recentInterviews": {
+            "title": "المقابلات الأخيرة",
+            "viewAll": "عرض الكل",
+            "empty": {
+                "title": "لا توجد مقابلات بعد",
+                "description": "ابدأ التدريب مع مقابلات الذكاء الاصطناعي",
+                "action": "بدء مقابلة"
+            }
+        },
+        "interviewHistory": {
+            "title": "سجل المقابلات",
+            "subtitle": "عرض جميع تحليلات المقابلات الخاصة بك ({count})",
+            "filters": {
+                "all": "الكل",
+                "excellent": "ممتاز (8+)",
+                "good": "جيد (5-7)",
+                "needsImprovement": "يحتاج للعمل (<5)"
+            },
+            "feedback": "الملاحظات",
+            "suggestion": "سؤال المتابعة المقترح",
+            "delete": "حذف",
+            "deleteConfirm": "هل أنت متأكد أنك تريد حذف تحليل المقابلة هذا؟",
+            "deleteError": "فشل حذف تحليل المقابلة",
+            "empty": {
+                "title": "لا توجد مقابلات بعد",
+                "description": "ابدأ بالتدريب مع مقابلات الذكاء الاصطناعي لبناء سجلك",
+                "action": "بدء مقابلة"
+            }
         }
     },
     "ContactPage": {
@@ -558,6 +590,20 @@
             "skillsLabel": "المهارات (اضغط Enter للإضافة)",
             "skillPlaceholder": "أضف مهارة...",
             "addCategory": "+ إضافة فئة مهارات"
+        }
+    },
+    "InterviewPage": {
+        "pageTitle": "مقابلة تجريبية بالذكاء الاصطناعي",
+        "viewHistory": "عرض السجل",
+        "history": {
+            "title": "سجل المقابلات",
+            "subtitle": "راجع جلسات المقابلات السابقة",
+            "empty": "لا يوجد سجل مقابلات بعد",
+            "startFirst": "ابدأ مقابلتك الأولى",
+            "score": "الدرجة",
+            "feedback": "الملاحظات",
+            "suggestedFollowup": "سؤال المتابعة المقترح",
+            "question": "السؤال"
         }
     }
 }

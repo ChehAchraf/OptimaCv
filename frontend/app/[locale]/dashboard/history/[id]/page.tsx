@@ -339,7 +339,6 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
 const container = document.createElement('div');
 container.innerHTML = htmlContent;
 
-// Remove all classNames to prevent Tailwind -> lab() conversion
 container.querySelectorAll('*').forEach(el => el.removeAttribute('class'));
 
 container.style.position = 'absolute';

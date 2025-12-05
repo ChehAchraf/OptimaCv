@@ -6,7 +6,6 @@ import HeroSection from '@/components/HeroSection';
 import { useTranslations } from 'next-intl';
 import { SectionLoader } from '@/components/loading';
 
-// Lazy load components that are below the fold with Suspense
 const ProcessSection = dynamic(() => import('@/components/ProcessSection'), {
   loading: () => <SectionLoader />,
   ssr: false,

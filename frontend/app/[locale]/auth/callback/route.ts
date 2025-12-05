@@ -80,7 +80,6 @@ export async function GET(
             );
         }
 
-        // Assign Free plan to new users who don't have any plan yet
         const userId = data.session.user.id;
         await assignFreePlanIfNeeded(supabase, userId);
 
@@ -107,7 +106,6 @@ export async function GET(
  */
 async function assignFreePlanIfNeeded(supabase: any, userId: string) {
     try {
-        // Check if user already has any plan (active or not)
         const { data: existingPlan } = await supabase
             .from('user_plans')
             .select('id')
@@ -115,12 +113,9 @@ async function assignFreePlanIfNeeded(supabase: any, userId: string) {
             .limit(1)
             .single();
 
-        // If user already has a plan, don't assign a new one
         if (existingPlan) {
             return;
         }
-
-        // Get the Free plan
         const { data: freePlan, error: planError } = await supabase
             .from('plans')
             .select('id, duration_days')
@@ -133,12 +128,9 @@ async function assignFreePlanIfNeeded(supabase: any, userId: string) {
             return;
         }
 
-        // Calculate end date based on plan duration
         const startDate = new Date();
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + (freePlan.duration_days || 30));
-
-        // Insert the user_plans record
         const { error: insertError } = await supabase
             .from('user_plans')
             .insert({

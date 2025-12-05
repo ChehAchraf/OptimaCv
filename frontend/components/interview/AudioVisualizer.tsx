@@ -1,13 +1,9 @@
 "use client";
 
+import { AudioVisualizerProps } from "@/types/interview";
 import { useEffect, useRef } from "react";
 
-interface AudioVisualizerProps {
-    stream: MediaStream | null;
-    width?: number;
-    height?: number;
-    barColor?: string;
-}
+
 
 export default function AudioVisualizer({
     stream,
