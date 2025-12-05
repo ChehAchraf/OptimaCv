@@ -72,3 +72,12 @@ export interface UserPlan {
 
 // Supported locales for multilingual features
 export type SupportedLocale = 'en' | 'fr' | 'ar';
+
+
+export interface PlanCardProps {
+    plan: PaymentPlan;
+    selectedPlan: PaymentPlan | null;
+    setSelectedPlan: (plan: PaymentPlan) => void;
+    toast: any;
+    t: any;
+}

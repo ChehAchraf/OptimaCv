@@ -146,7 +146,7 @@ export interface InterviewAnalysis {
     next_question_suggestion?: string;
     is_deleted: boolean;
     created_at: string;
-    updated_at: string;
+    updated_at?: string;
 }
 
 export interface CreateInterviewAnalysisPayload {
@@ -157,3 +157,4 @@ export interface CreateInterviewAnalysisPayload {
     score: number;
     next_question_suggestion?: string;
 }
+
