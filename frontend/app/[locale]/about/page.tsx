@@ -15,7 +15,6 @@ const CardTitle = dynamic(() => import('@/components/ui/card').then(mod => mod.C
 const Button = dynamic(() => import('@/components/ui/button').then(mod => mod.Button));
 const Link = dynamic(() => import('@/i18n/routing').then(mod => mod.Link));
 
-// Lazy load icons
 const Icons = dynamic(() => import('lucide-react').then(mod => ({
     default: () => null,
     CheckCircle2: mod.CheckCircle2,
