@@ -11,21 +11,7 @@ import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { Plan, UserPlan } from "@/types/plan";
 
-/**
- * PricingClient Component
- * 
- * Fetches plans dynamically from Supabase via /api/plans endpoint.
- * 
- * Database fields used from `plans` table:
- * - id (uuid): Unique identifier for the plan
- * - name (text): Internal plan name (e.g., 'free', 'vip', 'enterprise', 'students')
- * - price (numeric): Plan price
- * - duration_days (integer): Subscription duration in days
- * - max_cv_builds (integer): Maximum CV builds allowed
- * - max_cv_analyses (integer): Maximum CV analyses allowed
- * - features (jsonb): Multilingual features { en: string[], fr: string[], ar: string[] }
- * - created_at (timestamp): When the plan was created
- */
+
 export default function PricingClient() {
     const t = useTranslations('PricingPage');
     const params = useParams();
@@ -77,7 +63,7 @@ export default function PricingClient() {
                     title: t('successTitle'),
                     description: t('successMessage'),
                 });
-                fetchData(); // Refresh state
+                fetchData();
                 router.refresh();
             } else {
                 if (res.status === 401) {
