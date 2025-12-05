@@ -2,14 +2,8 @@
 
 import { useState } from "react";
 import { Upload, FileText, Loader2, ArrowRight } from "lucide-react";
-import axios from "axios";
-
-export interface InterviewQuestion {
-    id: number;
-    question: string;
-    context: string;
-    topic: string;
-}
+import path from "@/app/axios/path";
+import { InterviewQuestion } from "@/types/interview";
 
 interface InterviewSetupProps {
     onSessionStart: (questions: InterviewQuestion[]) => void;
@@ -21,7 +15,7 @@ export default function InterviewSetup({ onSessionStart }: InterviewSetupProps) 
     const [isLoading, setIsLoading] = useState(false);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
+        if (e.target.files?.[0]) {
             setResume(e.target.files[0]);
         }
     };
@@ -36,13 +30,9 @@ export default function InterviewSetup({ onSessionStart }: InterviewSetupProps) 
             formData.append("resume", resume);
             formData.append("job_description", jobDescription);
 
-            const response = await axios.post("http://localhost:8000/api/v1/interview/init-session", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            const response = await path.post("/api/v1/interview/init-session", formData);
 
-            if (response.data && response.data.questions) {
+            if (response.data?.questions) {
                 onSessionStart(response.data.questions);
             }
         } catch (error) {
