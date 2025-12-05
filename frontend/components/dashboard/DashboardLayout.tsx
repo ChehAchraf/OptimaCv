@@ -50,9 +50,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             icon: Mic,
         },
         {
+            name: t('nav.interviewHistory'),
+            href: `/${locale}/dashboard/interview-history`,
+            icon: History,
+        },
+        {
             name: t('nav.history'),
             href: `/${locale}/dashboard/history`,
-            icon: History,
+            icon: FileText,
         },
         {
             name: t('nav.profile'),
