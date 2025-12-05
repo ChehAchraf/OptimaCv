@@ -11,6 +11,7 @@ import QueryProvider from '@/components/providers/QueryProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { Toaster } from "@/components/ui/toaster";
 import GlobalNoTrialsAlert from '@/components/GlobalNoTrialsAlert';
+import AnalyticsWrapper from '@/components/AnalyticsWrapper';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -93,6 +94,7 @@ export default async function RootLayout({
               <QueryProvider>
                 <Navbar />
                 <GlobalNoTrialsAlert />
+                <AnalyticsWrapper />
                 <main>
                   {children}
                 </main>
