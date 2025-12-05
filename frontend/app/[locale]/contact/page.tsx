@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { CardLoader } from '@/components/loading';
+import ContactSupportForm from '@/components/contact/ContactSupportForm';
 
 const Card = dynamic(() => import('@/components/ui/card').then(mod => mod.Card), {
     loading: () => <CardLoader />,
@@ -84,115 +85,9 @@ export default function ContactPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2">
                         <Suspense fallback={<CardLoader />}>
-                            <Card className="shadow-xl border-none bg-white dark:bg-gray-900">
-                                <CardHeader>
-                                    <CardTitle className="text-2xl text-gray-900 dark:text-white">{t('form.name')}</CardTitle>
-                                    <CardDescription className="text-gray-500 dark:text-gray-400">{t('description')}</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <form onSubmit={handleSubmit} className="space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                    {t('form.name')}
-                                                </Label>
-                                                <Input
-                                                    id="name"
-                                                    name="name"
-                                                    type="text"
-                                                    required
-                                                    value={formData.name}
-                                                    onChange={handleChange}
-                                                    placeholder={t('form.namePlaceholder')}
-                                                    className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
-                                                />
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                    {t('form.email')}
-                                                </Label>
-                                                <Input
-                                                    id="email"
-                                                    name="email"
-                                                    type="email"
-                                                    required
-                                                    value={formData.email}
-                                                    onChange={handleChange}
-                                                    placeholder={t('form.emailPlaceholder')}
-                                                    className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="subject" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                {t('form.subject')}
-                                            </Label>
-                                            <Input
-                                                id="subject"
-                                                name="subject"
-                                                type="text"
-                                                required
-                                                value={formData.subject}
-                                                onChange={handleChange}
-                                                placeholder={t('form.subjectPlaceholder')}
-                                                className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="message" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                {t('form.message')}
-                                            </Label>
-                                            <Textarea
-                                                id="message"
-                                                name="message"
-                                                required
-                                                value={formData.message}
-                                                onChange={handleChange}
-                                                placeholder={t('form.messagePlaceholder')}
-                                                rows={6}
-                                                className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 resize-none dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
-                                            />
-                                        </div>
-
-                                        <div className="pt-4">
-                                            <Button
-                                                type="submit"
-                                                disabled={isSubmitting}
-                                                className="w-full md:w-auto px-8 py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
-                                            >
-                                                {isSubmitting ? (
-                                                    <>
-                                                        <span className="animate-spin mr-2">⏳</span>
-                                                        {t('form.submitting')}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Send className="w-5 h-5 mr-2" />
-                                                        {t('form.submit')}
-                                                    </>
-                                                )}
-                                            </Button>
-                                        </div>
-
-                                        {submitStatus === 'success' && (
-                                            <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300 animate-in fade-in slide-in-from-top-2">
-                                                <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-                                                <p>{t('successMessage')}</p>
-                                            </div>
-                                        )}
-
-                                        {submitStatus === 'error' && (
-                                            <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 animate-in fade-in slide-in-from-top-2">
-                                                <span className="text-xl flex-shrink-0">⚠️</span>
-                                                <p>{t('errorMessage')}</p>
-                                            </div>
-                                        )}
-                                    </form>
-                                </CardContent>
-                            </Card>
+                            <Suspense fallback={<CardLoader />}>
+                                <ContactSupportForm />
+                            </Suspense>
                         </Suspense>
                     </div>
 
