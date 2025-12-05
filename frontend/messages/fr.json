@@ -470,7 +470,8 @@
             "settings": "Paramètres",
             "history": "Historique",
             "dashboard": "Tableau de bord",
-            "interview": "Entretien"
+            "interview": "Entretien",
+            "interviewHistory": "Historique des Entretiens"
         },
         "settings": {
             "subtitle": "Gérez vos préférences",
@@ -497,6 +498,26 @@
             "empty": {
                 "title": "Aucun entretien",
                 "description": "Commencez à vous entraîner avec des entretiens IA",
+                "action": "Commencer un Entretien"
+            }
+        },
+        "interviewHistory": {
+            "title": "Historique des Entretiens",
+            "subtitle": "Voir toutes vos {count} analyses d'entretien",
+            "filters": {
+                "all": "Tous",
+                "excellent": "Excellent (8+)",
+                "good": "Bon (5-7)",
+                "needsImprovement": "À améliorer (<5)"
+            },
+            "feedback": "Commentaires",
+            "suggestion": "Question de suivi suggérée",
+            "delete": "Supprimer",
+            "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette analyse d'entretien ?",
+            "deleteError": "Échec de la suppression de l'analyse d'entretien",
+            "empty": {
+                "title": "Aucun entretien",
+                "description": "Commencez à vous entraîner avec des entretiens IA pour construire votre historique",
                 "action": "Commencer un Entretien"
             }
         }
