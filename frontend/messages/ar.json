@@ -563,18 +563,49 @@
         "successMessage": "شكرًا لتواصلك معنا! سنرد عليك قريبًا.",
         "errorMessage": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
     },
+    "BuildCVPage": {
+        "personal_info": "المعلومات الشخصية",
+        "experience": "الخبرة",
+        "education": "التعليم",
+        "projects": "المشاريع",
+        "skills": "المهارات",
+        "languages": "اللغات",
+        "certifications": "الشهادات",
+        "interests": "الاهتمامات",
+        "templates": "القوالب",
+        "preview": "معاينة وتحميل",
+        "validation_error": "خطأ في التحقق",
+        "progress_tip": "أكمل جميع الأقسام للحصول على درجة أفضل للسيرة الذاتية",
+        "previous": "السابق",
+        "next": "التالي",
+        "go_pro": "الترقية إلى Pro",
+        "live_preview": "معاينة مباشرة",
+        "download": "تحميل",
+        "preview_scaled_msg": "المعاينة مصغرة. قم بتحميل PDF للحصول على جودة الطباعة."
+    },
     "CVBuilder": {
         "PersonalForm": {
             "fullName": "الاسم الكامل",
             "email": "البريد الإلكتروني",
             "phone": "الهاتف",
+            "jobTitle": "المسمى الوظيفي",
             "location": "الموقع",
             "linkedin": "رابط LinkedIn",
             "github": "رابط GitHub",
             "portfolio": "رابط الملف الشخصي",
             "summary": "الملخص المهني",
+            "generate_summary": "توليد باستخدام الذكاء الاصطناعي",
+            "generating": "جاري التوليد...",
+            "error": "خطأ",
+            "image_too_large": "يجب أن تكون الصورة أقل من 5 ميجابايت",
+            "missing_info": "معلومات مفقودة",
+            "please_fill_name": "يرجى إدخال اسمك الكامل أولاً.",
+            "success": "نجاح",
+            "summary_generated": "تم إنشاء الملخص بنجاح!",
+            "generation_failed": "فشل في إنشاء الملخص. حاول مرة أخرى.",
             "placeholders": {
                 "fullName": "أحمد محمد",
+                "jobTitle": "مثال: مهندس برمجيات",
                 "email": "ahmed@example.com",
                 "phone": "+966 50 123 4567",
                 "location": "الرياض، السعودية",
@@ -584,12 +615,67 @@
                 "summary": "صف بإيجاز خلفيتك المهنية وأهدافك..."
             }
         },
+        "ExperienceForm": {
+            "company": "الشركة",
+            "position": "المسمى الوظيفي",
+            "location": "الموقع",
+            "start_date": "تاريخ البدء",
+            "end_date": "تاريخ الانتهاء",
+            "current_work": "أعمل حاليًا هنا",
+            "description": "الوصف",
+            "add_experience": "إضافة خبرة"
+        },
+        "EducationForm": {
+            "institution": "المؤسسة التعليمية",
+            "degree": "الدرجة العلمية",
+            "field_of_study": "مجال الدراسة",
+            "start_date": "تاريخ البدء",
+            "end_date": "تاريخ الانتهاء",
+            "current_study": "أدرس حاليًا هنا",
+            "add_education": "إضافة تعليم"
+        },
+        "ProjectForm": {
+            "project_name": "اسم المشروع",
+            "description": "الوصف",
+            "technologies": "التقنيات",
+            "link": "الرابط",
+            "add_project": "إضافة مشروع"
+        },
         "SkillsForm": {
             "category": "الفئة",
             "categoryPlaceholder": "مثال، الواجهة الأمامية، الخلفية، المهارات الشخصية",
             "skillsLabel": "المهارات (اضغط Enter للإضافة)",
             "skillPlaceholder": "أضف مهارة...",
-            "addCategory": "+ إضافة فئة مهارات"
+            "addCategory": "إضافة فئة مهارات"
+        },
+        "LanguagesForm": {
+            "language": "اللغة",
+            "proficiency": "المستوى",
+            "addLanguage": "إضافة لغة"
+        },
+        "CertificationsForm": {
+            "name": "اسم الشهادة",
+            "issuer": "الجهة المصدرة",
+            "date": "التاريخ",
+            "link": "الرابط (اختياري)",
+            "addCertification": "إضافة شهادة"
+        },
+        "InterestsForm": {
+            "interestName": "اسم الاهتمام",
+            "keywords": "الكلمات المفتاحية (اضغط Enter للإضافة)",
+            "addInterest": "إضافة اهتمام"
+        },
+        "TemplateSelector": {
+            "choose_template": "اختر القالب",
+            "download_pdf": "تحميل PDF",
+            "modern": "حديث",
+            "classic": "كلاسيكي",
+            "minimal": "بسيط",
+            "executive": "تنفيذي",
+            "tech": "تقني",
+            "global": "عالمي",
+            "upgrade_to_pro": "الترقية إلى Pro",
+            "premium_warning": "هذا قالب متميز. يرجى الترقية لإزالة العلامات المائية أو التحميل."
         }
     },
     "InterviewPage": {
