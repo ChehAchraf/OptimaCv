@@ -225,6 +225,7 @@ export const cvPayloadSchema = z.object({
 
 export const cvPersonalDetailSchema = z.object({
     full_name: nameSchema,
+    job_title: z.string().optional(),
     email: emailSchema,
     phone: phoneSchema,
     location: z.string().optional(),
@@ -232,6 +233,7 @@ export const cvPersonalDetailSchema = z.object({
     github_url: urlSchema.optional(),
     portfolio_url: urlSchema.optional(),
     summary: z.string().optional(),
+    picture_url: z.string().optional(),
 });
 
 // CV Builder specific schemas
@@ -273,6 +275,23 @@ export const cvProjectSchema = z.object({
 export const cvSkillSchema = z.object({
     category: z.string().min(1, 'Category is required').trim(),
     skills: z.array(z.string()).min(1, 'At least one skill is required'),
+});
+
+export const cvLanguageSchema = z.object({
+    language: z.string().min(1, 'Language is required').trim(),
+    proficiency: z.string().min(1, 'Proficiency is required').trim(),
+});
+
+export const cvCertificationSchema = z.object({
+    name: z.string().min(1, 'Certification name is required').trim(),
+    issuer: z.string().min(1, 'Issuer is required').trim(),
+    date: z.string().min(1, 'Date is required'),
+    link: urlSchema.optional(),
+});
+
+export const cvInterestSchema = z.object({
+    name: z.string().min(1, 'Interest is required').trim(),
+    keywords: z.array(z.string()).optional(),
 });
 
 export const companyRankPayloadSchema = z.object({
@@ -361,6 +380,9 @@ export type CVExperienceInput = z.infer<typeof cvExperienceSchema>;
 export type CVEducationInput = z.infer<typeof cvEducationSchema>;
 export type CVProjectInput = z.infer<typeof cvProjectSchema>;
 export type CVSkillInput = z.infer<typeof cvSkillSchema>;
+export type CVLanguageInput = z.infer<typeof cvLanguageSchema>;
+export type CVCertificationInput = z.infer<typeof cvCertificationSchema>;
+export type CVInterestInput = z.infer<typeof cvInterestSchema>;
 export type CompanyRankPayloadInput = z.infer<typeof companyRankPayloadSchema>;
 export type PaymentMethodInput = z.infer<typeof paymentMethodSchema>;
 export type ContactFormInput = z.infer<typeof contactFormSchema>;
