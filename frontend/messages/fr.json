@@ -605,5 +605,71 @@
             "suggestedFollowup": "Question de Suivi Suggérée",
             "question": "Question"
         }
+    },
+    "EnterpriseDashboard": {
+        "title": "Tableau de Bord Entreprise",
+        "subtitle": "gérez votre vivier de CV et lancez des analyses en masse",
+        "uploadCVs": "Télécharger des CV",
+        "stats": {
+            "totalCVs": "Total CVs",
+            "pending": "En attente",
+            "analyzed": "Analysés",
+            "analyses": "Analyses"
+        },
+        "cvPool": {
+            "title": "Vivier de CV",
+            "search": "Rechercher des CV...",
+            "filterAll": "Tous les statuts",
+            "filterPending": "En attente",
+            "filterAnalyzed": "Analysés",
+            "filterArchived": "Archivés",
+            "selected": "{count} CV(s) sélectionné(s)",
+            "delete": "Supprimer",
+            "analyze": "Analyser la sélection"
+        },
+        "table": {
+            "fileName": "Nom du fichier",
+            "candidate": "Candidat",
+            "status": "Statut",
+            "uploaded": "Téléchargé le",
+            "actions": "Actions",
+            "notSet": "Non défini",
+            "archive": "Archiver"
+        },
+        "upload": {
+            "title": "Télécharger des CV",
+            "dropzone": "Déposez les CV ici ou cliquez pour télécharger",
+            "pdfOnly": "Fichiers PDF uniquement, jusqu'à 10 Mo chacun",
+            "filesSelected": "{count} fichier(s) sélectionné(s)",
+            "uploading": "Téléchargement...",
+            "uploadButton": "Télécharger {count} CV(s)"
+        },
+        "analyze": {
+            "title": "Analyser les CV",
+            "selectedCVs": "CV sélectionnés",
+            "jobDetails": "Détails du poste",
+            "jobTitle": "Titre du poste (Optionnel)",
+            "jobTitlePlaceholder": "ex. Ingénieur Logiciel Senior",
+            "jobDescription": "Description du poste",
+            "jobDescriptionPlaceholder": "Collez la description complète du poste ici...",
+            "startAnalysis": "Lancer l'analyse",
+            "analyzing": "Analyse en cours...",
+            "analyzingMessage": "Notre IA évalue vos CV par rapport à la description du poste",
+            "results": "Résultats du classement",
+            "matchScore": "Score de correspondance",
+            "backToDashboard": "Retour au tableau de bord",
+            "viewFullReport": "Voir le rapport complet"
+        },
+        "recentAnalyses": {
+            "title": "Analyses récentes",
+            "cvsAnalyzed": "{count} CV analysés",
+            "completed": "Terminé",
+            "processing": "Traitement",
+            "pending": "En attente"
+        },
+        "empty": {
+            "noCVs": "Aucun CV téléchargé pour le moment",
+            "uploadPrompt": "Téléchargez des CV pour commencer à construire votre vivier de talents"
+        }
     }
 }

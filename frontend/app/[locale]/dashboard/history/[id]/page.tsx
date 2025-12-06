@@ -1,5 +1,8 @@
 'use client';
 
+import { PageLoader } from '@/components/loading';
+import { motion } from 'framer-motion';
+
 import { useEffect, useState, Fragment, JSX, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -7,8 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
 import clsx from 'clsx';
 import { Link } from '@/i18n/routing';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
+// Imports removed (dynamic now)
 import {
     ArrowLeft,
     Calendar,
@@ -330,21 +332,25 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
 
 
     const handleExportPDF = async () => {
+        // Dynamically import heavy libraries only when needed
+        const html2canvas = (await import('html2canvas')).default;
+        const { jsPDF } = await import('jspdf');
+
         const htmlContent = getReportHTML(
             result,
             score,
             config,
             new Date().toLocaleDateString(locale, { dateStyle: 'long' })
         );
-const container = document.createElement('div');
-container.innerHTML = htmlContent;
+        const container = document.createElement('div');
+        container.innerHTML = htmlContent;
 
-container.querySelectorAll('*').forEach(el => el.removeAttribute('class'));
+        container.querySelectorAll('*').forEach(el => el.removeAttribute('class'));
 
-container.style.position = 'absolute';
-container.style.left = '-9999px';
-container.style.top = '0';
-document.body.appendChild(container);
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.style.top = '0';
+        document.body.appendChild(container);
 
         try {
             const canvas = await html2canvas(container.firstElementChild as HTMLElement, {
@@ -375,9 +381,7 @@ document.body.appendChild(container);
     if (loading)
         return (
             <DashboardLayout>
-                <div className="flex items-center justify-center min-h-[60vh]">
-                    <Award className="animate-spin h-12 w-12 text-gray-900 dark:text-white" />
-                </div>
+                <PageLoader />
             </DashboardLayout>
         );
 
@@ -404,7 +408,11 @@ document.body.appendChild(container);
 
     return (
         <DashboardLayout>
-            <div className="max-w-7xl mx-auto p-6 space-y-8">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="max-w-7xl mx-auto p-6 space-y-8"
+            >
 
                 {/* NAV */}
                 <nav className="text-sm text-gray-500 flex items-center">
@@ -578,7 +586,7 @@ document.body.appendChild(container);
                         </SectionCard>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </DashboardLayout>
     );
 }

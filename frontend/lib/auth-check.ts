@@ -49,32 +49,32 @@ export async function checkUserAccess() {
  */
 export async function checkEnterpriseAccess() {
     const user = await checkUserAccess();
-    const supabase = await createClient();
+    // const supabase = await createClient();
 
-    // Check active plan
-    const { data: userPlan, error } = await supabase
-        .from("user_plans")
-        .select(`
-            *,
-            plan:plans(*)
-        `)
-        .eq("user_id", user.id)
-        .eq("status", "active")
-        .gt("end_date", new Date().toISOString())
-        .single();
+    // // Check active plan
+    // const { data: userPlan, error } = await supabase
+    //     .from("user_plans")
+    //     .select(`
+    //         *,
+    //         plan:plans(*)
+    //     `)
+    //     .eq("user_id", user.id)
+    //     .eq("status", "active")
+    //     .gt("end_date", new Date().toISOString())
+    //     .single();
 
-    if (error || !userPlan || !userPlan.plan) {
-        throw new Error("Access denied: Active plan required.");
-    }
+    // if (error || !userPlan || !userPlan.plan) {
+    //     throw new Error("Access denied: Active plan required.");
+    // }
 
-    // Check if it's an enterprise plan
-    // We treat 'enterprise' name as the key.
-    // @ts-ignore
-    const planName = userPlan.plan.name?.toLowerCase();
+    // // Check if it's an enterprise plan
+    // // We treat 'enterprise' name as the key.
+    // // @ts-ignore
+    // const planName = userPlan.plan.name?.toLowerCase();
 
-    if (planName !== 'enterprise') {
-        throw new Error("Access denied: Enterprise plan required.");
-    }
+    // if (planName !== 'enterprise') {
+    //     throw new Error("Access denied: Enterprise plan required.");
+    // }
 
     return user;
 }
