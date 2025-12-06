@@ -10,13 +10,25 @@ export const TemplateMinimal: React.FC<TemplateProps> = ({ data }) => {
 
     return (
         <div className="w-full h-full bg-white text-gray-800 p-12 font-mono text-sm" id="cv-template">
-            <header className="mb-12">
-                <h1 className="text-2xl font-bold mb-2">{personal_details.full_name}</h1>
-                <div className="text-gray-500 space-y-1">
-                    <p>{personal_details.email}</p>
-                    <p>{personal_details.phone}</p>
-                    <p>{personal_details.location}</p>
-                    {personal_details.linkedin_url && <p>{personal_details.linkedin_url}</p>}
+            <header className="mb-12 flex flex-row-reverse justify-between items-start">
+                {personal_details.picture_url && (
+                    <img
+                        src={personal_details.picture_url}
+                        alt={personal_details.full_name}
+                        className="w-24 h-24 object-cover"
+                    />
+                )}
+                <div>
+                    <h1 className="text-3xl font-bold mb-1">{personal_details.full_name}</h1>
+                    {personal_details.job_title && (
+                        <div className="text-xl text-gray-600 mb-4">{personal_details.job_title}</div>
+                    )}
+                    <div className="text-gray-500 space-y-1">
+                        <p>{personal_details.email}</p>
+                        <p>{personal_details.phone}</p>
+                        <p>{personal_details.location}</p>
+                        {personal_details.linkedin_url && <p>{personal_details.linkedin_url}</p>}
+                    </div>
                 </div>
             </header>
 
