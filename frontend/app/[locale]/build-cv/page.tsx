@@ -1,212 +1,258 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { CardLoader } from '@/components/loading';
-import { CVFullProfile } from '@/types/cv-builder';
-import { PersonalForm } from '@/components/cv-builder/PersonalForm';
-import { ExperienceForm } from '@/components/cv-builder/ExperienceForm';
-import { EducationForm } from '@/components/cv-builder/EducationForm';
-import { ProjectForm } from '@/components/cv-builder/ProjectForm';
-import { SkillsForm } from '@/components/cv-builder/SkillsForm';
-import { TemplateSelector } from '@/components/cv-builder/TemplateSelector';
+import { useCVBuilderState } from '@/hooks/useCVBuilderState';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { DataQualityIndicator } from '@/components/cv-builder/DataQualityIndicator';
+import { Separator } from '@/components/ui/separator';
 import {
-  cvPersonalDetailSchema,
-  cvEducationSchema,
-  cvExperienceSchema,
-  cvProjectSchema,
-  cvSkillSchema,
-  validateData
-} from '@/lib/validations';
+  User,
+  Briefcase,
+  GraduationCap,
+  FolderKanban,
+  Wrench,
+  LayoutTemplate,
+  Eye,
+  Download,
+  Crown,
+  ChevronRight,
+  Languages,
+  Award,
+  Heart
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useReactToPrint } from 'react-to-print';
+import { TemplateModern } from '@/components/cv-templates/TemplateModern';
+import { TemplateClassic } from '@/components/cv-templates/TemplateClassic';
+import { TemplateMinimal } from '@/components/cv-templates/TemplateMinimal';
+import { TemplateExecutive } from '@/components/cv-templates/TemplateExecutive';
+import { TemplateTech } from '@/components/cv-templates/TemplateTech';
+import { TemplateGlobal } from '@/components/cv-templates/TemplateGlobal';
+import { Badge } from '@/components/ui/badge';
+import { HiLockClosed } from 'react-icons/hi';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { HiExclamation } from 'react-icons/hi';
+import { CVFullProfile, TemplateType } from '@/types/cv-builder';
+import { TemplateSelector } from '@/components/cv-builder/TemplateSelector';
+import { getUserUsage } from '@/app/actions/analyzeCv';
 
-// Lazy load Stepper and heavy UI components
-const Stepper = dynamic(() => import('@/components/ui/stepper').then(mod => mod.Stepper), {
-  loading: () => <CardLoader />,
+// Dynamic imports for optimized loading
+const PersonalForm = dynamic(() => import('@/components/cv-builder/PersonalForm').then(mod => mod.PersonalForm), {
+  loading: () => <div className="space-y-4"><Skeleton className="h-10 w-full" /><Skeleton className="h-32 w-full" /></div>
+});
+const ExperienceForm = dynamic(() => import('@/components/cv-builder/ExperienceForm').then(mod => mod.ExperienceForm), {
+  loading: () => <div className="space-y-4"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>
+});
+const EducationForm = dynamic(() => import('@/components/cv-builder/EducationForm').then(mod => mod.EducationForm), {
+  loading: () => <div className="space-y-4"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>
+});
+const ProjectForm = dynamic(() => import('@/components/cv-builder/ProjectForm').then(mod => mod.ProjectForm), {
+  loading: () => <div className="space-y-4"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>
+});
+const SkillsForm = dynamic(() => import('@/components/cv-builder/SkillsForm').then(mod => mod.SkillsForm), {
+  loading: () => <div className="space-y-4"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>
+});
+const LanguagesForm = dynamic(() => import('@/components/cv-builder/LanguagesForm').then(mod => mod.LanguagesForm), {
+  loading: () => <div className="space-y-4"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>
+});
+const CertificationsForm = dynamic(() => import('@/components/cv-builder/CertificationsForm').then(mod => mod.CertificationsForm), {
+  // eslint-disable-next-line react/display-name
+  loading: () => <div className="space-y-4"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>
+});
+const InterestsForm = dynamic(() => import('@/components/cv-builder/InterestsForm').then(mod => mod.InterestsForm), {
+  loading: () => <div className="space-y-4"><Skeleton className="h-24 w-full" /><Skeleton className="h-24 w-full" /></div>
 });
 
-const Button = dynamic(() => import('@/components/ui/button').then(mod => mod.Button));
-const Card = dynamic(() => import('@/components/ui/card').then(mod => mod.Card));
-const CardContent = dynamic(() => import('@/components/ui/card').then(mod => mod.CardContent));
-const CardHeader = dynamic(() => import('@/components/ui/card').then(mod => mod.CardHeader));
-const CardTitle = dynamic(() => import('@/components/ui/card').then(mod => mod.CardTitle));
+// Preview Component Logic
+const CVPreview = ({ data, template }: { data: CVFullProfile, template: string }) => {
+  switch (template) {
+    case 'modern': return <TemplateModern data={data} />;
+    case 'classic': return <TemplateClassic data={data} />;
+    case 'minimal': return <TemplateMinimal data={data} />;
+    case 'executive': return <TemplateExecutive data={data} />;
+    case 'tech': return <TemplateTech data={data} />;
+    case 'global': return <TemplateGlobal data={data} />;
+    default: return <TemplateModern data={data} />;
+  }
+};
 
 export default function BuildCVPage() {
   const t = useTranslations('BuildCVPage');
-  const [currentStep, setCurrentStep] = useState(1);
-  const [validationError, setValidationError] = useState<string | null>(null);
-  const [cvData, setCvData] = useState<CVFullProfile>({
-    personal_details: {
-      full_name: '',
-      email: '',
-      phone: '',
-    },
-    experience: [],
-    education: [],
-    projects: [],
-    skills: [],
+  const {
+    currentStep,
+    cvData,
+    validationError,
+    updatePersonalDetails,
+    updateSection,
+    goToStep
+  } = useCVBuilderState();
+
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern');
+  const [isPremium, setIsPremium] = useState(false);
+
+  useEffect(() => {
+    const checkPremiumStatus = async () => {
+      try {
+        const status = await getUserUsage();
+        if (status?.isPlan) {
+          setIsPremium(true);
+        }
+      } catch (error) {
+        console.error("Failed to check premium status", error);
+      }
+    };
+    checkPremiumStatus();
+  }, []);
+
+  // Using a ref for printing
+  const printRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `${cvData.personal_details.full_name?.replace(/\s+/g, '_') || 'My'}_CV`,
   });
 
-  const steps = [
-    "Personal Info",
-    "Experience",
-    "Education",
-    "Projects",
-    "Skills",
-    "Preview & Download"
+  const menuItems = [
+    { id: 1, label: t('personal_info'), icon: User },
+    { id: 2, label: t('skills'), icon: Wrench },
+    { id: 3, label: t('projects'), icon: FolderKanban },
+    { id: 4, label: t('experience'), icon: Briefcase },
+    { id: 5, label: t('education'), icon: GraduationCap },
+    { id: 6, label: t('languages'), icon: Languages },
+    { id: 7, label: t('certifications'), icon: Award },
+    { id: 8, label: t('interests'), icon: Heart },
+    { id: 9, label: t('templates'), icon: LayoutTemplate },
   ];
 
-  const updatePersonalDetails = (key: any, value: any) => {
-    setCvData(prev => ({
-      ...prev,
-      personal_details: { ...prev.personal_details, [key]: value }
-    }));
-    // Clear validation error when user makes changes
-    if (validationError) setValidationError(null);
-  };
-
-  const updateSection = (section: keyof CVFullProfile, value: any) => {
-    setCvData(prev => ({ ...prev, [section]: value }));
-    // Clear validation error when user makes changes
-    if (validationError) setValidationError(null);
-  };
-
-  const validateCurrentStep = (): boolean => {
-    setValidationError(null);
-
+  const renderMainContent = () => {
     switch (currentStep) {
-      case 1: // Personal Info
-        const personalResult = validateData(cvPersonalDetailSchema, cvData.personal_details);
-        if (!personalResult.success) {
-          const firstError = Object.values(personalResult.errors)[0]?.[0];
-          setValidationError(firstError || 'Please fill in all required fields correctly');
-          return false;
-        }
-        break;
-
-      case 2: // Experience (optional but validate if provided)
-        if (cvData.experience.length > 0) {
-          for (let i = 0; i < cvData.experience.length; i++) {
-            const expResult = validateData(cvExperienceSchema, cvData.experience[i]);
-            if (!expResult.success) {
-              const firstError = Object.values(expResult.errors)[0]?.[0];
-              setValidationError(`Experience ${i + 1}: ${firstError}`);
-              return false;
-            }
-          }
-        }
-        break;
-
-      case 3: // Education
-        if (cvData.education.length === 0) {
-          setValidationError('Please add at least one education entry');
-          return false;
-        }
-        for (let i = 0; i < cvData.education.length; i++) {
-          const eduResult = validateData(cvEducationSchema, cvData.education[i]);
-          if (!eduResult.success) {
-            const firstError = Object.values(eduResult.errors)[0]?.[0];
-            setValidationError(`Education ${i + 1}: ${firstError}`);
-            return false;
-          }
-        }
-        break;
-
-      case 4: // Projects (optional but validate if provided)
-        if (cvData.projects.length > 0) {
-          for (let i = 0; i < cvData.projects.length; i++) {
-            const projResult = validateData(cvProjectSchema, cvData.projects[i]);
-            if (!projResult.success) {
-              const firstError = Object.values(projResult.errors)[0]?.[0];
-              setValidationError(`Project ${i + 1}: ${firstError}`);
-              return false;
-            }
-          }
-        }
-        break;
-
-      case 5: // Skills
-        if (cvData.skills.length === 0) {
-          setValidationError('Please add at least one skill category');
-          return false;
-        }
-        for (let i = 0; i < cvData.skills.length; i++) {
-          const skillResult = validateData(cvSkillSchema, cvData.skills[i]);
-          if (!skillResult.success) {
-            const firstError = Object.values(skillResult.errors)[0]?.[0];
-            setValidationError(`Skill category ${i + 1}: ${firstError}`);
-            return false;
-          }
-        }
-        break;
+      case 1: return <PersonalForm data={cvData.personal_details} updateData={updatePersonalDetails} />;
+      case 2: return <SkillsForm data={cvData.skills} updateData={(d) => updateSection('skills', d)} />;
+      case 3: return <ProjectForm data={cvData.projects} updateData={(d) => updateSection('projects', d)} />;
+      case 4: return <ExperienceForm data={cvData.experience} updateData={(d) => updateSection('experience', d)} />;
+      case 5: return <EducationForm data={cvData.education} updateData={(d) => updateSection('education', d)} />;
+      case 6: return <LanguagesForm data={cvData.languages} updateData={(d) => updateSection('languages', d)} />;
+      case 7: return <CertificationsForm data={cvData.certifications} updateData={(d) => updateSection('certifications', d)} />;
+      case 8: return <InterestsForm data={cvData.interests} updateData={(d) => updateSection('interests', d)} />;
+      case 9: return (
+        <TemplateSelector
+          data={cvData}
+          isPremium={isPremium}
+          selectedTemplate={selectedTemplate}
+          onSelectTemplate={setSelectedTemplate}
+        />
+      );
+      default: return null;
     }
-
-    return true;
-  };
-
-  const nextStep = () => {
-    if (validateCurrentStep()) {
-      setCurrentStep(prev => Math.min(prev + 1, steps.length));
-    }
-  };
-
-  const prevStep = () => {
-    setValidationError(null);
-    setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
   return (
-    <div className="container max-w-5xl mx-auto px-4 py-16">
-      <Suspense fallback={<CardLoader />}>
-        <Stepper currentStep={currentStep} steps={steps}>
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>{steps[currentStep - 1]}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {validationError && (
-                <Alert variant="destructive" className="mb-6 animate-in fade-in slide-in-from-top-2">
-                  <HiExclamation className="h-5 w-5" />
-                  <AlertTitle>Validation Error</AlertTitle>
-                  <AlertDescription>{validationError}</AlertDescription>
-                </Alert>
-              )}
+    <div className="flex h-screen bg-gray-50 flex-col lg:flex-row overflow-hidden">
+      {/* Column 1: Left Sidebar (Navigation) */}
+      <aside className="w-full lg:w-64 bg-white border-r flex flex-col shrink-0 z-20">
+        <div className="p-4 border-b flex items-center gap-2">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">OC</div>
+          <span className="font-bold text-lg">OptimaCV</span>
+        </div>
 
-              {currentStep === 1 && (
-                <PersonalForm data={cvData.personal_details} updateData={updatePersonalDetails} />
-              )}
-              {currentStep === 2 && (
-                <ExperienceForm data={cvData.experience} updateData={(d) => updateSection('experience', d)} />
-              )}
-              {currentStep === 3 && (
-                <EducationForm data={cvData.education} updateData={(d) => updateSection('education', d)} />
-              )}
-              {currentStep === 4 && (
-                <ProjectForm data={cvData.projects} updateData={(d) => updateSection('projects', d)} />
-              )}
-              {currentStep === 5 && (
-                <SkillsForm data={cvData.skills} updateData={(d) => updateSection('skills', d)} />
-              )}
-              {currentStep === 6 && (
-                <TemplateSelector data={cvData} />
-              )}
-
-              <div className="flex justify-between mt-8">
-                <Button variant="outline" onClick={prevStep} disabled={currentStep === 1}>
-                  Previous
-                </Button>
-                {currentStep < steps.length && (
-                  <Button onClick={nextStep}>
-                    Next
-                  </Button>
+        <ScrollArea className="flex-1 py-4">
+          <nav className="space-y-1 px-2">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => goToStep(item.id)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                  currentStep === item.id
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700 hover:bg-gray-100"
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        </Stepper>
-      </Suspense>
+              >
+                <item.icon className={cn("w-5 h-5", currentStep === item.id ? "text-blue-600" : "text-gray-400")} />
+                {item.label}
+                {currentStep === item.id && <ChevronRight className="w-4 h-4 ml-auto text-blue-400" />}
+              </button>
+            ))}
+          </nav>
+        </ScrollArea>
+
+        <div className="p-4 border-t bg-gray-50">
+          <DataQualityIndicator data={cvData} className="border-0 shadow-none bg-transparent p-0" />
+        </div>
+      </aside>
+
+      {/* Column 2: Main Editor Area */}
+      <main className="flex-1 flex flex-col min-w-0 bg-white">
+        {/* Mobile Header (only visible on small screens usually, but here we keep it simple) */}
+        <div className="h-16 border-b flex items-center justify-between px-6 bg-white shrink-0">
+          <h2 className="text-xl font-semibold text-gray-800">
+            {menuItems.find(i => i.id === currentStep)?.label}
+          </h2>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon">
+              <Languages className="w-5 h-5 text-gray-500" />
+            </Button>
+            {!isPremium && (
+              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 hover:opacity-90">
+                <Crown className="w-4 h-4 mr-1" /> {t('go_pro')}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 lg:p-10 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+          <div className="max-w-3xl mx-auto pb-20">
+            {validationError && (
+              <Alert variant="destructive" className="mb-6">
+                <HiExclamation className="h-5 w-5" />
+                <AlertTitle>{t('validation_error')}</AlertTitle>
+                <AlertDescription>{validationError}</AlertDescription>
+              </Alert>
+            )}
+            <Suspense fallback={<CardLoader />}>
+              {renderMainContent()}
+            </Suspense>
+          </div>
+        </div>
+      </main>
+
+      {/* Column 3: Right Sidebar (Preview & Actions) */}
+      <aside className="hidden lg:flex w-96 bg-gray-100 border-l flex-col shrink-0">
+        <div className="p-4 border-b bg-white flex items-center justify-between">
+          <span className="font-semibold text-sm text-gray-500 flex items-center gap-2">
+            <Eye className="w-4 h-4" /> {t('live_preview')}
+          </span>
+          <Button size="sm" variant="default" className="bg-slate-900 hover:bg-slate-800" onClick={() => handlePrint()}>
+            <Download className="w-4 h-4 mr-2" /> {t('download')}
+          </Button>
+        </div>
+
+        <div className="flex-1 overflow-hidden p-6 flex flex-col items-center justify-center bg-gray-100">
+          <div className="w-full max-w-[300px] shadow-2xl rounded-sm overflow-hidden bg-white ring-1 ring-black/5 relative group">
+            {/* Scaled Preview Wrapper */}
+            <div className="w-[210mm] h-[297mm] origin-top-left transform scale-[0.35] bg-white pointer-events-none select-none">
+              <CVPreview data={cvData} template={selectedTemplate} />
+            </div>
+            {/* Overlay for quick action or zoom hint */}
+            <div className="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors cursor-pointer" />
+          </div>
+
+          <p className="mt-6 text-xs text-center text-muted-foreground whitespace-pre-line">
+            {t('preview_scaled_msg')}
+          </p>
+        </div>
+      </aside>
+
+      {/* Hidden Print Component (Always rendered but hidden) */}
+      <div style={{ display: 'none' }}>
+        <div ref={printRef}>
+          <CVPreview data={cvData} template={selectedTemplate} />
+        </div>
+      </div>
     </div>
   );
 }
