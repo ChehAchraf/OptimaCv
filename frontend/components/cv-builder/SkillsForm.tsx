@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CVSkill } from '@/types/cv-builder';
 import { HiTrash } from 'react-icons/hi';
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from 'next-intl';
 
 interface Props {
     data: CVSkill[];
@@ -12,6 +13,8 @@ interface Props {
 }
 
 export const SkillsForm: React.FC<Props> = ({ data, updateData }) => {
+    const t = useTranslations('CVBuilder.SkillsForm');
+
     useEffect(() => {
         if (data.length === 0) {
             addSkillGroup();
@@ -74,19 +77,19 @@ export const SkillsForm: React.FC<Props> = ({ data, updateData }) => {
 
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label>Category</Label>
+                            <Label>{t('category')}</Label>
                             <Input
                                 value={group.category}
                                 onChange={(e) => updateSkillGroup(index, 'category', e.target.value)}
-                                placeholder="e.g., Frontend, Backend, Soft Skills"
+                                placeholder={t('categoryPlaceholder')}
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Skills (Press Enter to add)</Label>
+                            <Label>{t('skillsLabel')}</Label>
                             <Input
                                 onKeyDown={(e) => handleSkillKeyDown(index, e)}
-                                placeholder="Add a skill..."
+                                placeholder={t('skillPlaceholder')}
                             />
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {group.skills.map((skill) => (
@@ -101,7 +104,7 @@ export const SkillsForm: React.FC<Props> = ({ data, updateData }) => {
             ))}
 
             <Button onClick={addSkillGroup} variant="outline" className="w-full border-dashed">
-                + Add Skill Category
+                + {t('addCategory')}
             </Button>
         </div>
     );
