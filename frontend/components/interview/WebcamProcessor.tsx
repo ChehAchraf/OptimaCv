@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from 'next/dynamic';
 import { FaceLandmarkerResult } from "@mediapipe/tasks-vision";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
-import AudioVisualizer from "./AudioVisualizer";
 import { Mic, Square, Play, Loader2, CheckCircle, Circle, Clock, ArrowRight, Save } from "lucide-react";
 import { analyzeInterviewAnswer } from "@/app/actions/analyzeInterview";
 import { InterviewAnalysisResult, InterviewQuestion } from "@/types/interview";
+
+const AudioVisualizer = dynamic(() => import('./AudioVisualizer'), {
+    ssr: false
+});
 
 
 

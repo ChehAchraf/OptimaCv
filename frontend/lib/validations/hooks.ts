@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from 'react';
 import { ZodSchema } from 'zod';
 import { validateData } from './utils';

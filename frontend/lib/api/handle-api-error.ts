@@ -13,11 +13,20 @@ interface ApiErrorResponse {
 export function handleApiError(error: unknown): never {
     if (error instanceof AxiosError) {
         const data = error.response?.data as ApiErrorResponse | undefined;
-        const message =
+        let message =
             data?.detail ||
             data?.message ||
             data?.error ||
             error.message;
+
+        if (typeof message === 'object') {
+            try {
+                message = JSON.stringify(message);
+            } catch (e) {
+                message = "Unknown error object";
+            }
+        }
+
         throw new Error(message);
     }
 

@@ -1,7 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { checkUserAccess } from "@/lib/auth-check";
+import { checkUserAccess, checkEnterpriseAccess } from "@/lib/auth-check";
+import { revalidatePath, revalidateTag } from "next/cache";
 import {
     EnterpriseCV,
     EnterpriseAnalysis,
@@ -9,7 +10,6 @@ import {
     CreateEnterpriseAnalysisPayload,
     EnterpriseCVFilters
 } from "@/types/enterprise";
-import { revalidateTag } from "next/cache";
 
 /**
  * Get all CVs for the current enterprise user
@@ -195,6 +195,8 @@ export async function getEnterpriseCVFiles(cvIds: string[]): Promise<File[]> {
     const user = await checkUserAccess();
     const supabase = await createClient();
 
+    console.log(`[getEnterpriseCVFiles] Fetching files for ${cvIds.length} IDs for user ${user.id}`);
+
     // Get CV metadata
     const { data: cvs, error } = await supabase
         .from("enterprise_cvs")
@@ -203,29 +205,91 @@ export async function getEnterpriseCVFiles(cvIds: string[]): Promise<File[]> {
         .eq("user_id", user.id)
         .eq("is_deleted", false);
 
-    if (error || !cvs) {
-        console.error("Error fetching CVs:", error);
-        throw new Error("Failed to fetch CVs");
+    if (error) {
+        console.error("[getEnterpriseCVFiles] Error fetching CV metadata:", error);
+        throw new Error(`Failed to fetch CVs: ${error.message}`);
     }
 
+    if (!cvs || cvs.length === 0) {
+        console.warn(`[getEnterpriseCVFiles] No metadata records found for IDs: ${cvIds.join(', ')} and user: ${user.id}`);
+        throw new Error(`No CV records found in database for the selected candidates. Please ensure they haven't been deleted. (User: ${user.id})`);
+    }
+
+    console.log(`[getEnterpriseCVFiles] Found ${cvs.length} metadata records`);
+
     const files: File[] = [];
+    const downloadErrors: string[] = [];
 
     for (const cv of cvs) {
-        // Download file from storage
-        const { data, error: downloadError } = await supabase.storage
-            .from("enterprise-cvs")
-            .download(cv.file_path);
-
-        if (downloadError) {
-            console.error(`Error downloading CV ${cv.file_name}:`, downloadError);
+        if (!cv.file_size || cv.file_size === 0 || cv.file_size === "0") {
+            const errorMsg = `CV "${cv.file_name}" is a metadata-only record (size 0) and cannot be re-analyzed because the original file was not saved.`;
+            downloadErrors.push(errorMsg);
             continue;
         }
 
-        // Convert Blob to File
-        const file = new File([data], cv.file_name, { type: "application/pdf" });
-        files.push(file);
+        const cleanPath = cv.file_path.startsWith('/') ? cv.file_path.slice(1) : cv.file_path;
+
+        const { data, error: downloadError } = await supabase.storage
+            .from("enterprise-cvs")
+            .download(cleanPath);
+
+        if (downloadError) {
+            const errorDetails = JSON.stringify(downloadError, Object.getOwnPropertyNames(downloadError));
+            const errorMsg = `Error downloading CV ${cv.file_name} (${cleanPath}): ${errorDetails}`;
+            downloadErrors.push(errorMsg);
+
+            // Auto-clean: Soft delete the broken record
+            console.error(`[getEnterpriseCVFiles] File missing for ${cv.id}. Auto-deleting record.`);
+            await supabase
+                .from("enterprise_cvs")
+                .update({ is_deleted: true })
+                .eq("id", cv.id);
+
+            // Revalidate to update UI immediately
+            revalidateTag("enterprise-cvs", {});
+            revalidatePath("/entreprise");
+
+            continue;
+        }
+
+        if (!data) {
+            const errorMsg = `No data returned for ${cv.file_path}`;
+            downloadErrors.push(errorMsg);
+
+            // Auto-clean
+            await supabase
+                .from("enterprise_cvs")
+                .update({ is_deleted: true })
+                .eq("id", cv.id);
+
+            // Revalidate to update UI immediately
+            revalidateTag("enterprise-cvs", {});
+            revalidatePath("/entreprise");
+
+            continue;
+        }
+
+        try {
+            const file = new File([data], cv.file_name, { type: "application/pdf" });
+            files.push(file);
+        } catch (fileError) {
+            downloadErrors.push(`Failed to create File object for ${cv.file_name}`);
+        }
     }
 
+    if (files.length === 0) {
+        // Collect names of failed CVs for the error message
+        const failedNames = cvs.map(cv => cv.file_name).join(", ");
+        const errorMsg = `
+            Unable to retrieve source files for: ${failedNames}.
+            These missing records have been automatically removed from your dashboard.
+            Action: Please re-upload the CVs to analyze them.
+        `.trim();
+
+        throw new Error(errorMsg);
+    }
+
+    console.log(`[getEnterpriseCVFiles] Returning ${files.length} valid files`);
     return files;
 }
 
@@ -236,6 +300,7 @@ export async function updateEnterpriseCV(
     cvId: string,
     updates: Partial<Pick<EnterpriseCV, 'candidate_name' | 'candidate_email' | 'tags' | 'status'>>
 ): Promise<EnterpriseCV> {
+    // const user = await checkEnterpriseAccess();
     const user = await checkUserAccess();
     const supabase = await createClient();
 
@@ -307,16 +372,26 @@ export async function getEnterpriseCVsByIds(cvIds: string[]): Promise<Enterprise
     const user = await checkUserAccess();
     const supabase = await createClient();
 
+    const validIds = cvIds.filter(id =>
+        id && id.trim().length > 0 && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id.trim())
+    );
+
+    if (validIds.length === 0) {
+        return [];
+    }
+
     const { data, error } = await supabase
         .from("enterprise_cvs")
         .select("*")
-        .in("id", cvIds)
+        .in("id", validIds)
         .eq("user_id", user.id)
         .eq("is_deleted", false);
 
     if (error) {
-        console.error("Error fetching enterprise CVs by IDs:", error);
-        throw new Error("Failed to fetch CVs");
+        console.error("Supabase Error fetching enterprise CVs by IDs:", error);
+        // Supabase error object usually has code, message, details, hint
+        console.error("Error Details:", { code: error.code, message: error.message, details: error.details });
+        throw new Error(`Failed to fetch CVs: ${error.message}`);
     }
 
     return data || [];
@@ -510,12 +585,12 @@ export async function saveDirectAnalysisResults(payload: {
             user_id: user.id,
             job_description: payload.job_description,
             job_title: payload.job_title,
-            cv_ids: [], 
+            cv_ids: [],
             total_cvs: payload.results.length,
             status: "completed",
             analyzed_count: payload.results.length,
             completed_at: new Date().toISOString(),
-            results: payload.results 
+            results: payload.results
         })
         .select()
         .single();
@@ -529,27 +604,38 @@ export async function saveDirectAnalysisResults(payload: {
     const newCvIds: string[] = [];
 
     for (const res of payload.results) {
-        const { data: cv, error: cvError } = await supabase
-            .from("enterprise_cvs")
-            .insert({
-                user_id: user.id,
-                file_name: res.filename || "Unknown CV",
-                file_path: `direct-upload/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.pdf`,
-                file_size: 0,
-                mime_type: "application/pdf",
-                candidate_name: res.contact_info?.name,
-                candidate_email: res.contact_info?.email,
-                status: "analyzed",
-                is_deleted: false
-            })
-            .select()
-            .single();
+        let cvId = res.cv_id;
 
-        if (cv && !cvError) {
-            newCvIds.push(cv.id);
+        // Only create a new "ghost" CV if we don't already have an ID
+        if (!cvId) {
+            const { data: cv, error: cvError } = await supabase
+                .from("enterprise_cvs")
+                .insert({
+                    user_id: user.id,
+                    file_name: res.filename || "Unknown CV",
+                    file_path: `direct-upload/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.pdf`,
+                    file_size: 0,
+                    mime_type: "application/pdf",
+                    candidate_name: res.contact_info?.name,
+                    candidate_email: res.contact_info?.email,
+                    status: "analyzed",
+                    is_deleted: false
+                })
+                .select()
+                .single();
+
+            if (cv && !cvError) {
+                cvId = cv.id;
+                newCvIds.push(cvId);
+            }
+        } else {
+            newCvIds.push(cvId);
+        }
+
+        if (cvId) {
             resultsToInsert.push({
                 analysis_id: analysis.id,
-                cv_id: cv.id,
+                cv_id: cvId,
                 match_score: res.match_score,
                 summary: res.summary,
                 strengths: res.strengths,

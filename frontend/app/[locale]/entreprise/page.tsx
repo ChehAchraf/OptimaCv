@@ -49,7 +49,6 @@ export default function EnterpriseDashboardPage() {
   const { toast } = useToast();
   const t = useTranslations("EnterpriseDashboard");
 
-  // State
   const [cvs, setCVs] = useState<EnterpriseCV[]>([]);
   const [analyses, setAnalyses] = useState<EnterpriseAnalysis[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -58,11 +57,9 @@ export default function EnterpriseDashboardPage() {
   const [totalCVs, setTotalCVs] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  // Fetch CVs
   const fetchCVs = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -82,7 +79,6 @@ export default function EnterpriseDashboardPage() {
     }
   }, [currentPage, searchQuery, statusFilter, toast]);
 
-  // Fetch analyses
   const fetchAnalyses = useCallback(async () => {
     try {
       const { data } = await getEnterpriseAnalyses(5, 0);
@@ -97,7 +93,6 @@ export default function EnterpriseDashboardPage() {
     fetchAnalyses();
   }, [fetchCVs, fetchAnalyses]);
 
-  // Handle bulk delete
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
 
@@ -111,9 +106,13 @@ export default function EnterpriseDashboardPage() {
     }
   };
 
-  // Handle analyze - now just redirects to analyze page
   const handleAnalyze = () => {
-    router.push("/entreprise/analyze");
+    if (selectedIds.length === 0) {
+      toast({ title: "Please select at least one CV", variant: "destructive" });
+      return;
+    }
+    const idsString = selectedIds.join(",");
+    router.push(`/entreprise/analyze?ids=${idsString}`);
   };
 
   const totalPages = Math.ceil(totalCVs / ITEMS_PER_PAGE);
@@ -123,7 +122,6 @@ export default function EnterpriseDashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-8 px-4">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -165,7 +163,6 @@ export default function EnterpriseDashboardPage() {
             </Dialog>
           </div>
         </div>
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-6">
@@ -232,13 +229,11 @@ export default function EnterpriseDashboardPage() {
           </Card>
         </div>
 
-        {/* CV Management Section */}
         <Card>
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <CardTitle>CV Pool</CardTitle>
 
-              {/* Filters & Search */}
               <div className="flex flex-wrap items-center gap-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -275,7 +270,6 @@ export default function EnterpriseDashboardPage() {
           </CardHeader>
 
           <CardContent>
-            {/* Action Bar */}
             {selectedIds.length > 0 && (
               <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-between">
                 <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
@@ -303,7 +297,6 @@ export default function EnterpriseDashboardPage() {
               </div>
             )}
 
-            {/* Table */}
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <RefreshCw className="w-8 h-8 animate-spin text-gray-400" />
@@ -317,7 +310,6 @@ export default function EnterpriseDashboardPage() {
               />
             )}
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between mt-6 pt-4 border-t">
                 <p className="text-sm text-gray-500">
@@ -347,7 +339,6 @@ export default function EnterpriseDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Recent Analyses */}
         {analyses.length > 0 && (
           <Card>
             <CardHeader>

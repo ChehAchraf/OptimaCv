@@ -109,6 +109,7 @@ const HeroSection = ({ title, subtitle, cta }: HeroSectionProps) => {
                 width={400}
                 height={300}
                 className="object-cover"
+                priority
               />
             </Card>
           </motion.div>
@@ -163,6 +164,7 @@ const HeroSection = ({ title, subtitle, cta }: HeroSectionProps) => {
                 width={400}
                 height={300}
                 className="object-cover"
+                priority
               />
             </Card>
           </motion.div>

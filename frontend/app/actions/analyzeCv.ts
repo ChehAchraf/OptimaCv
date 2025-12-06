@@ -8,16 +8,8 @@ import { checkUserAccess } from "@/lib/auth-check";
 import path from "@/app/axios/path";
 import { handleApiError } from "@/lib/api/handle-api-error";
 
-// Constants
-const FREE_TRIAL_LIMIT = 5;
-
-const ERROR_MESSAGES = {
-    USAGE_UPDATE_FAILED: "Failed to update usage count",
-    PLAN_LIMIT_REACHED: (limit: number) =>
-        `You've reached your monthly limit of ${limit} CV analyses. Please upgrade your plan or wait for the next billing cycle.`,
-    FREE_LIMIT_REACHED:
-        `You've used all ${FREE_TRIAL_LIMIT} free trial analyses. Please subscribe to a plan to continue using CV analysis features.`,
-} as const;
+import { validateOrThrow, cvPayloadSchema } from "@/lib/validations";
+import { validateAndUpdateUsage, FREE_TRIAL_LIMIT } from "@/lib/usage-limits";
 
 /**
  * Analyze a CV against a job description
@@ -26,6 +18,9 @@ const ERROR_MESSAGES = {
 export async function analyzeCv(payload: CVPayload) {
     const supabase = await createClient();
     const user = await checkUserAccess();
+
+    // Validate payload
+    validateOrThrow(cvPayloadSchema, payload);
 
     logServerAction('analyzeCv', user.id, { fileName: payload.cv_pdf.name });
 
@@ -39,59 +34,6 @@ export async function analyzeCv(payload: CVPayload) {
     await saveAnalysisResult(supabase, user.id, payload.cv_pdf.name, analysisResult);
 
     return analysisResult;
-}
-
-/**
- * Validates user's usage limits and increments usage count
- */
-async function validateAndUpdateUsage(supabase: any, userId: string) {
-    const { data: userPlan } = await supabase
-        .from("user_plans")
-        .select(`*, plan:plans(*)`)
-        .eq("user_id", userId)
-        .eq("status", "active")
-        .gt("end_date", new Date().toISOString())
-        .single();
-
-    if (userPlan) {
-        await validatePlanUsage(supabase, userId, userPlan);
-    } else {
-        await validateFreeUsage(supabase, userId);
-    }
-}
-
-/**
- * Validates and increments usage for paid plan users
- */
-async function validatePlanUsage(supabase: any, userId: string, userPlan: any) {
-    const { data: canProceed, error } = await supabase
-        .rpc("increment_plan_usage", { p_user_id: userId });
-
-    if (error) {
-        logger.error("Error incrementing plan usage", error, { userId });
-        throw new Error(ERROR_MESSAGES.USAGE_UPDATE_FAILED);
-    }
-
-    if (!canProceed) {
-        throw new Error(ERROR_MESSAGES.PLAN_LIMIT_REACHED(userPlan.plan.max_cv_analyses));
-    }
-}
-
-/**
- * Validates and increments usage for free trial users
- */
-async function validateFreeUsage(supabase: any, userId: string) {
-    const { data: canProceed, error } = await supabase
-        .rpc("increment_free_usage", { user_uuid: userId });
-
-    if (error) {
-        logger.error("Error incrementing free usage", error, { userId });
-        throw new Error(ERROR_MESSAGES.USAGE_UPDATE_FAILED);
-    }
-
-    if (!canProceed) {
-        throw new Error(ERROR_MESSAGES.FREE_LIMIT_REACHED);
-    }
 }
 
 /**

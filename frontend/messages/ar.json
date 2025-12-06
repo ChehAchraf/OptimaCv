@@ -605,5 +605,71 @@
             "suggestedFollowup": "سؤال المتابعة المقترح",
             "question": "السؤال"
         }
+    },
+    "EnterpriseDashboard": {
+        "title": "لوحة تحكم الشركات",
+        "subtitle": "إدارة مجموعة السير الذاتية وإجراء تحليلات جماعية",
+        "uploadCVs": "رفع السير الذاتية",
+        "stats": {
+            "totalCVs": "إجمالي السير الذاتية",
+            "pending": "قيد الانتظار",
+            "analyzed": "تم التحليل",
+            "analyses": "تحليلات"
+        },
+        "cvPool": {
+            "title": "مجموعة السير الذاتية",
+            "search": "بحث في السير الذاتية...",
+            "filterAll": "كل الحالات",
+            "filterPending": "قيد الانتظار",
+            "filterAnalyzed": "تم التحليل",
+            "filterArchived": "مؤرشف",
+            "selected": "{count} سيرة ذاتية مختارة",
+            "delete": "حذف",
+            "analyze": "تحليل المحدد"
+        },
+        "table": {
+            "fileName": "اسم الملف",
+            "candidate": "المرشح",
+            "status": "الحالة",
+            "uploaded": "تاريخ الرفع",
+            "actions": "إجراءات",
+            "notSet": "غير محدد",
+            "archive": "أرشفة"
+        },
+        "upload": {
+            "title": "رفع السير الذاتية",
+            "dropzone": "أفلت السير الذاتية هنا أو انقر للرفع",
+            "pdfOnly": "ملفات PDF فقط، حتى 10 ميجابايت لكل منها",
+            "filesSelected": "{count} ملف(ات) محددة",
+            "uploading": "جاري الرفع...",
+            "uploadButton": "رفع {count} سيرة ذاتية"
+        },
+        "analyze": {
+            "title": "تحليل السير الذاتية",
+            "selectedCVs": "السير الذاتية المحددة",
+            "jobDetails": "تفاصيل الوظيفة",
+            "jobTitle": "المسمى الوظيفي (اختياري)",
+            "jobTitlePlaceholder": "مثال: مهندس برمجيات أول",
+            "jobDescription": "الوصف الوظيفي",
+            "jobDescriptionPlaceholder": "الصق الوصف الوظيفي الكامل هنا...",
+            "startAnalysis": "بدء التحليل",
+            "analyzing": "جاري التحليل...",
+            "analyzingMessage": "يقوم الذكاء الاصطناعي بتقييم سيرتك الذاتية مقابل الوصف الوظيفي",
+            "results": "نتائج الترتيب",
+            "matchScore": "درجة التطابق",
+            "backToDashboard": "العودة للوحة التحكم",
+            "viewFullReport": "عرض التقرير الكامل"
+        },
+        "recentAnalyses": {
+            "title": "التحليلات الأخيرة",
+            "cvsAnalyzed": "{count} سيرة ذاتية تم تحليلها",
+            "completed": "مكتمل",
+            "processing": "جاري المعالجة",
+            "pending": "قيد الانتظار"
+        },
+        "empty": {
+            "noCVs": "لم يتم رفع أي سير ذاتية بعد",
+            "uploadPrompt": "ارفع السير الذاتية لبدء بناء قاعدة المواهب الخاصة بك"
+        }
     }
 }
