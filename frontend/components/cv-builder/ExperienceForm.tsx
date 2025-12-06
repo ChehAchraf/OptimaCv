@@ -8,10 +8,10 @@ import { CVExperience, Props } from '@/types/cv-builder';
 import { optimizeText } from '@/app/actions/optimize';
 import { HiSparkles, HiTrash } from 'react-icons/hi';
 import { Loader2 } from 'lucide-react';
-
-
+import { useTranslations } from 'next-intl';
 
 export const ExperienceForm: React.FC<Props> = ({ data, updateData }) => {
+    const t = useTranslations('CVBuilder.ExperienceForm');
     const [optimizingIndex, setOptimizingIndex] = useState<number | null>(null);
 
     useEffect(() => {
@@ -75,33 +75,33 @@ export const ExperienceForm: React.FC<Props> = ({ data, updateData }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>Company</Label>
+                            <Label>{t('company')}</Label>
                             <Input
                                 value={exp.company}
                                 onChange={(e) => updateExperience(index, 'company', e.target.value)}
-                                placeholder="Company Name"
+                                placeholder={t('company')}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Position</Label>
+                            <Label>{t('position')}</Label>
                             <Input
                                 value={exp.position}
                                 onChange={(e) => updateExperience(index, 'position', e.target.value)}
-                                placeholder="Job Title"
+                                placeholder={t('position')}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Location</Label>
+                            <Label>{t('location')}</Label>
                             <Input
                                 value={exp.location || ''}
                                 onChange={(e) => updateExperience(index, 'location', e.target.value)}
-                                placeholder="City, Country"
+                                placeholder={t('location')}
                             />
                         </div>
                         <div className="space-y-2">
                             <div className="flex gap-4">
                                 <div className="flex-1 space-y-2">
-                                    <Label>Start Date</Label>
+                                    <Label>{t('start_date')}</Label>
                                     <Input
                                         value={exp.start_date}
                                         onChange={(e) => updateExperience(index, 'start_date', e.target.value)}
@@ -109,7 +109,7 @@ export const ExperienceForm: React.FC<Props> = ({ data, updateData }) => {
                                     />
                                 </div>
                                 <div className="flex-1 space-y-2">
-                                    <Label>End Date</Label>
+                                    <Label>{t('end_date')}</Label>
                                     <Input
                                         value={exp.end_date || ''}
                                         onChange={(e) => updateExperience(index, 'end_date', e.target.value)}
@@ -124,14 +124,14 @@ export const ExperienceForm: React.FC<Props> = ({ data, updateData }) => {
                                     checked={exp.current}
                                     onCheckedChange={(checked) => updateExperience(index, 'current', checked)}
                                 />
-                                <Label htmlFor={`current-${index}`}>I currently work here</Label>
+                                <Label htmlFor={`current-${index}`}>{t('current_work')}</Label>
                             </div>
                         </div>
                     </div>
 
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <Label>Description</Label>
+                            <Label>{t('description')}</Label>
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -150,7 +150,7 @@ export const ExperienceForm: React.FC<Props> = ({ data, updateData }) => {
                         <Textarea
                             value={exp.description}
                             onChange={(e) => updateExperience(index, 'description', e.target.value)}
-                            placeholder="Describe your responsibilities and achievements..."
+                            placeholder={t('description')}
                             className="h-32"
                         />
                     </div>
@@ -158,7 +158,7 @@ export const ExperienceForm: React.FC<Props> = ({ data, updateData }) => {
             ))}
 
             <Button onClick={addExperience} variant="outline" className="w-full border-dashed">
-                + Add Experience
+                + {t('add_experience')}
             </Button>
         </div>
     );

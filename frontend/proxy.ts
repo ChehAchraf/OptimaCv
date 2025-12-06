@@ -13,8 +13,18 @@ export async function proxy(request: NextRequest) {
     console.log(`Proxy Middleware: User authenticated: ${!!user}`);
 
     // Protect routes
-    const protectedPaths = ['/entreprise', '/build-cv', '/CV_analyze', '/interview',];
+    const protectedPaths =
+        [
+            '/entreprise',
+            '/build-cv',
+            '/CV_analyze',
+            '/interview',
+            '/dashboard',
+            '/dashboard/history',
+            '/dashboard/analyze',
+        ];
     const isProtected = protectedPaths.some(path => request.nextUrl.pathname.includes(path));
+    
 
     if (isProtected && !user) {
         const locale = request.nextUrl.pathname.split('/')[1] || 'en';

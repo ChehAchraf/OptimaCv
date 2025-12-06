@@ -1,6 +1,5 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-
 import { Check } from "lucide-react"
 
 interface StepperProps {
@@ -8,21 +7,31 @@ interface StepperProps {
   steps: string[]
   children: React.ReactNode
   className?: string
+  onStepClick?: (step: number) => void
 }
 
-export function Stepper({ currentStep, steps, children, className }: StepperProps) {
+export function Stepper({ currentStep, steps, children, className, onStepClick }: StepperProps) {
   return (
     <div className={cn("space-y-6", className)}>
-      { }
       <div className="flex items-center justify-between mb-8">
         {steps.map((step, index) => {
           const stepNumber = index + 1
           const isCompleted = stepNumber < currentStep
           const isCurrent = stepNumber === currentStep
+          // Allow clicking only on previous steps or current step (optional)
+          // or allow clicking any step if validation logic permits (but usually we restrict forward)
+          // Here we allow clicking previous steps.
+          const isClickable = !!onStepClick && stepNumber < currentStep;
 
           return (
             <React.Fragment key={index}>
-              <div className="flex flex-col items-center flex-1">
+              <div
+                className={cn(
+                  "flex flex-col items-center flex-1",
+                  isClickable ? "cursor-pointer" : "cursor-default"
+                )}
+                onClick={() => isClickable && onStepClick && onStepClick(stepNumber)}
+              >
                 <div
                   className={cn(
                     "flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors",
@@ -58,11 +67,9 @@ export function Stepper({ currentStep, steps, children, className }: StepperProp
         })}
       </div>
 
-      { }
       <div>
         {children}
       </div>
     </div>
   )
 }
-

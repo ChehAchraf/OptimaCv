@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CVProject } from '@/types/cv-builder';
 import { HiTrash } from 'react-icons/hi';
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from 'next-intl';
 
 interface Props {
     data: CVProject[];
@@ -13,6 +14,8 @@ interface Props {
 }
 
 export const ProjectForm: React.FC<Props> = ({ data, updateData }) => {
+    const t = useTranslations('CVBuilder.ProjectForm');
+
     useEffect(() => {
         if (data.length === 0) {
             addProject();
@@ -77,28 +80,28 @@ export const ProjectForm: React.FC<Props> = ({ data, updateData }) => {
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Project Name</Label>
+                                <Label>{t('project_name')}</Label>
                                 <Input
                                     value={proj.name}
                                     onChange={(e) => updateProject(index, 'name', e.target.value)}
-                                    placeholder="Project Title"
+                                    placeholder={t('project_name')}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Link (Optional)</Label>
+                                <Label>{t('link')}</Label>
                                 <Input
                                     value={proj.link || ''}
                                     onChange={(e) => updateProject(index, 'link', e.target.value)}
-                                    placeholder="https://..."
+                                    placeholder={t('link')}
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Technologies (Press Enter to add)</Label>
+                            <Label>{t('technologies')}</Label>
                             <Input
                                 onKeyDown={(e) => handleTechKeyDown(index, e)}
-                                placeholder="React, Python, AWS..."
+                                placeholder={t('technologies')}
                             />
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {proj.technologies.map((tech) => (
@@ -110,11 +113,11 @@ export const ProjectForm: React.FC<Props> = ({ data, updateData }) => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Description</Label>
+                            <Label>{t('description')}</Label>
                             <Textarea
                                 value={proj.description}
                                 onChange={(e) => updateProject(index, 'description', e.target.value)}
-                                placeholder="Describe the project..."
+                                placeholder={t('description')}
                                 className="h-24"
                             />
                         </div>
@@ -123,7 +126,7 @@ export const ProjectForm: React.FC<Props> = ({ data, updateData }) => {
             ))}
 
             <Button onClick={addProject} variant="outline" className="w-full border-dashed">
-                + Add Project
+                + {t('add_project')}
             </Button>
         </div>
     );

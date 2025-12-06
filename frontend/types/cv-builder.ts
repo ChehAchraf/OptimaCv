@@ -1,5 +1,6 @@
 export interface CVPersonalDetail {
     full_name: string;
+    job_title?: string;
     email: string;
     phone: string;
     linkedin_url?: string;
@@ -7,6 +8,7 @@ export interface CVPersonalDetail {
     portfolio_url?: string;
     summary?: string;
     location?: string;
+    picture_url?: string;
 }
 
 export interface CVEducation {
@@ -41,12 +43,32 @@ export interface CVSkill {
     skills: string[];
 }
 
+export interface CVLanguage {
+    language: string;
+    proficiency: string;
+}
+
+export interface CVCertification {
+    name: string;
+    issuer: string;
+    date: string;
+    link?: string;
+}
+
+export interface CVInterest {
+    name: string;
+    keywords?: string[];
+}
+
 export interface CVFullProfile {
     personal_details: CVPersonalDetail;
     education: CVEducation[];
     experience: CVExperience[];
     projects: CVProject[];
     skills: CVSkill[];
+    languages: CVLanguage[];
+    certifications: CVCertification[];
+    interests: CVInterest[];
 }
 
 export interface OptimizationResponse {
@@ -61,3 +83,5 @@ export interface Props {
     data: CVExperience[];
     updateData: (data: CVExperience[]) => void;
 }
+
+export type TemplateType = 'modern' | 'classic' | 'minimal' | 'executive' | 'tech' | 'global';

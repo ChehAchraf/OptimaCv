@@ -299,6 +299,30 @@ class GeminiService:
             return None
 
 
+
+    async def generate_profile_summary(self, data: dict) -> str:
+        prompt = f"""
+        You are a professional CV writer.
+        Based on the following information, write a compelling, 3-4 sentence professional summary focusing on the candidate's value proposition.
+        
+        Candidate Name: {data.get("full_name", "")}
+        Job Title: {data.get("job_title", "")}
+        Experience Level: {data.get("experience_level", "")}
+        Skills: {", ".join(data.get("skills", []))}
+        
+        The summary should be written in the first person (implied) or third person as is standard for CVs, but keep it engaging.
+        Do NOT mention the name in the text.
+        Do NOT include "Summary:" or any labels. just the text.
+        """
+
+        try:
+            response = await self._generate_content_with_retry(self.model_flash, prompt)
+        except RetryError:
+            response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            
+        return response.text.strip()
+
+
     async def generate_cv_from_data(self, user_data: dict) -> dict:
                                                          
 

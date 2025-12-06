@@ -100,24 +100,24 @@
         }
     },
     "BuildCVPage": {
-        "steps": {
-            "personalInfo": "Personal Info",
-            "experience": "Experience",
-            "education": "Education",
-            "projects": "Projects",
-            "skills": "Skills",
-            "preview": "Preview & Download"
-        },
-        "navigation": {
-            "previous": "Previous",
-            "next": "Next"
-        },
-        "validation": {
-            "error": "Validation Error",
-            "fillRequired": "Please fill in all required fields correctly",
-            "addEducation": "Please add at least one education entry",
-            "addSkills": "Please add at least one skill category"
-        }
+        "personal_info": "Personal Info",
+        "experience": "Experience",
+        "education": "Education",
+        "projects": "Projects",
+        "skills": "Skills",
+        "languages": "Languages",
+        "certifications": "Certifications",
+        "interests": "Interests",
+        "templates": "Templates",
+        "preview": "Preview & Download",
+        "validation_error": "Validation Error",
+        "progress_tip": "Complete all sections for a better CV score",
+        "previous": "Previous",
+        "next": "Next",
+        "go_pro": "Go Pro",
+        "live_preview": "Live Preview",
+        "download": "Download",
+        "preview_scaled_msg": "Preview is scaled. Download PDF for print quality."
     },
     "AboutPage": {
         "hero": {
@@ -167,460 +167,29 @@
             }
         }
     },
-    "TrustSection": {
-        "badge": "Join thousands of satisfied professionals",
-        "title": "We will <span>help you</span> succeed",
-        "description": "Join these professionals who have transformed their careers with our intelligent CV analysis technology.",
-        "cta": "Start Now",
-        "floatingCard": {
-            "title": "+500 candidates",
-            "description": "found their ideal job this month"
-        },
-        "stats": {
-            "success": {
-                "label": "Success Rate",
-                "description": "of our users land an interview"
-            },
-            "optimized": {
-                "label": "Optimized CVs",
-                "description": "candidates trust us"
-            },
-            "satisfaction": {
-                "label": "Satisfaction",
-                "description": "average rating from our users"
-            }
-        },
-        "features": {
-            "ranking": {
-                "title": "Automatic Intelligent Ranking",
-                "description": "All candidates are automatically ranked by relevance thanks to our AI."
-            },
-            "analysis": {
-                "title": "Multi-criteria Analysis",
-                "description": "Experience, skills, education, soft skills - everything is analyzed in depth."
-            },
-            "reports": {
-                "title": "Detailed Reports",
-                "description": "Get actionable insights on each candidate in a single click."
-            }
-        }
-    },
-    "CompanySection": {
-        "badge": "Enterprise Solution",
-        "title": "Recruit <span>intelligently</span> with our <highlight>AI-powered ATS</highlight>",
-        "subtitle": "Save time, reduce costs, and find the best candidates in <strong>one click</strong>. Our advanced AI technology automatically analyzes and ranks all your CVs.",
-        "featureCard": {
-            "badge": "Key Feature",
-            "title": "Filtering in <highlight>one click</highlight>",
-            "description": "Upload your CVs, paste your job description, and instantly get an intelligent ranking of all your candidates by relevance.",
-            "features": {
-                "autoAnalysis": "Automatic analysis of all CVs",
-                "smartRanking": "Intelligent ranking by match score",
-                "detailedReports": "Detailed reports on each candidate",
-                "timeSaving": "Time saving: from 2 hours to 5 minutes"
-            },
-            "cta": "Try now"
-        },
-        "benefits": {
-            "instantAnalysis": {
-                "title": "Instant Analysis",
-                "description": "Process hundreds of CVs in seconds, not hours",
-                "stat": "90% faster"
-            },
-            "oneClickFiltering": {
-                "title": "One-click filtering",
-                "description": "Find the ideal candidate instantly with our advanced AI",
-                "stat": "1 click = results"
-            },
-            "maxPrecision": {
-                "title": "Maximum precision",
-                "description": "Our AI analyzes 50+ criteria for perfect matching",
-                "stat": "95% accuracy"
-            },
-            "guaranteedROI": {
-                "title": "Guaranteed ROI",
-                "description": "Reduce your recruitment costs by 70%",
-                "stat": "70% savings"
-            }
-        },
-        "metricsTitle": "Results that speak for themselves",
-        "metricsSubtitle": "Our enterprise clients see immediate improvements",
-        "metrics": {
-            "analysisTime": {
-                "label": "Average analysis time",
-                "description": "vs 2 hours manually"
-            },
-            "cvsProcessed": {
-                "label": "CVs processed",
-                "description": "by our enterprise clients"
-            },
-            "accuracyRate": {
-                "label": "Accuracy rate",
-                "description": "in candidate-job matching"
-            },
-            "costReduction": {
-                "label": "Cost reduction",
-                "description": "in recruitment on average"
-            }
-        },
-        "whyChooseTitle": "Why choose our solution?",
-        "whyChooseSubtitle": "Cutting-edge AI technology serving your recruitment",
-        "tabs": {
-            "ranking": "AI Ranking",
-            "analysis": "Multi-criteria analysis",
-            "reports": "Detailed reports"
-        },
-        "tabsFeatures": {
-            "complete": "Complete automation",
-            "bulk": "Bulk processing",
-            "instant": "Instant results"
-        },
-        "features": {
-            "ranking": {
-                "title": "Automatic smart ranking",
-                "description": "All candidates are automatically ranked by relevance thanks to our AI."
-            },
-            "analysis": {
-                "title": "Multi-criteria analysis",
-                "description": "Experience, skills, education, soft skills - everything is analyzed in depth."
-            },
-            "reports": {
-                "title": "Detailed reports",
-                "description": "Get actionable insights on each candidate with one click."
-            }
-        },
-        "ctaTitle": "Ready to transform your recruitment?",
-        "ctaSubtitle": "Join companies that recruit faster and smarter",
-        "ctaButtons": {
-            "startTrial": "Start Free Trial",
-            "requestDemo": "Request Demo"
-        }
-    },
-    "CVAnalyze": {
-        "title": "CV Analysis",
-        "form": {
-            "cvLabel": "Upload your CV (PDF)",
-            "jdLabel": "Paste Job Description",
-            "jdPlaceholder": "Paste the full job description here...",
-            "visualLabel": "Also analyze Design (Template)? (Optional)",
-            "imageLabel": "Upload an image of your CV (PNG, JPG)",
-            "submitLoading": "Analyzing...",
-            "submitDefault": "Analyze CV",
-            "errorMissing": "Please provide a CV (PDF) and a job description.",
-            "errorVisual": "Please upload an image of your CV for visual analysis."
-        },
-        "results": {
-            "title": "Analysis Result",
-            "matchScore": "Match Score: {score}%",
-            "strengths": "Strengths:",
-            "weaknesses": "Weaknesses:",
-            "detailed": "Detailed Analysis:",
-            "visualTitle": "Design Analysis",
-            "presentationScore": "Presentation Score",
-            "layout": "Layout",
-            "fonts": "Font Choice",
-            "suggestions": "Improvement Suggestions"
-        }
-    },
-    "AuthPage": {
-        "login": {
-            "title": "Welcome Back",
-            "subtitle": "Sign in to access your account and continue optimizing your CV",
-            "googleButton": "Sign in with Google",
-            "submit": "Sign In",
-            "or": "Or continue with",
-            "noAccount": "Don't have an account?",
-            "registerLink": "Sign Up"
-        },
-        "register": {
-            "title": "Get Started",
-            "subtitle": "Create your account and start building professional CVs with AI",
-            "googleButton": "Sign up with Google",
-            "submit": "Create Account",
-            "or": "Or continue with",
-            "hasAccount": "Already have an account?",
-            "loginLink": "Sign In"
-        },
-        "email": "Email Address",
-        "password": "Password",
-        "logout": "Logout",
-        "profile": "Profile",
-        "forgotPassword": {
-            "title": "Forgot Password",
-            "subtitle": "Enter your email to reset your password",
-            "submit": "Send Reset Link",
-            "backToLogin": "Back to Login",
-            "successMessage": "Check your email for the reset link."
-        },
-        "resetPassword": {
-            "title": "Reset Password",
-            "subtitle": "Enter your new password",
-            "submit": "Update Password",
-            "successMessage": "Password updated successfully. Redirecting...",
-            "newPassword": "New Password",
-            "confirmPassword": "Confirm Password"
-        }
-    },
-    "ProfilePage": {
-        "loading": "Loading your profile...",
-        "error": "Failed to load profile",
-        "tryAgain": "Try Again",
-        "title": "My Profile",
-        "subtitle": "Manage your account and subscription",
-        "memberSince": "Member Since",
-        "userId": "User ID",
-        "quickActions": "Quick Actions",
-        "analyzeCv": "Analyze CV",
-        "viewPlans": "View Plans",
-        "currentPlan": "Current Plan",
-        "planDetails": "Your subscription details and benefits",
-        "price": "Price",
-        "free": "Free",
-        "perMonth": "/mo",
-        "status": "Status",
-        "active": "Active",
-        "freeTrial": "Free Trial",
-        "subscriptionPeriod": "Subscription Period",
-        "ends": "Ends:",
-        "upgradePrompt": "You're currently on a <strong>Free Trial</strong>. Upgrade to unlock more features!",
-        "upgradeNow": "Upgrade Now",
-        "usageStats": "Usage Statistics",
-        "trackUsage": "Track your CV analysis usage",
-        "analysesThisMonth": "CV Analyses This Month",
-        "analysesThisTrial": "CV Analyses This Trial",
-        "remaining": "Remaining",
-        "used": "used",
-        "warningRemaining": "⚠️ You have <strong>{count}</strong> analysis{s} remaining.",
-        "considerUpgrading": " Consider upgrading to continue using CV analysis features.",
-        "limitReached": "🚫 You've used all your CV analyses.",
-        "limitReset": " Your limit will reset at the start of your next billing cycle.",
-        "upgradeToContinue": " Upgrade to a paid plan to continue."
-    },
-    "PricingPage": {
-        "title": "Choose Your Plan",
-        "subtitle": "Unlock the full potential of your career with our premium tools.",
-        "popular": "POPULAR",
-        "free": "Free",
-        "perMonth": "/month",
-        "prioritySupport": "Priority Support",
-        "currentPlan": "Current Plan",
-        "subscribeNow": "Subscribe Now",
-        "successTitle": "Success!",
-        "successMessage": "You have successfully subscribed to the plan.",
-        "errorTitle": "Error",
-        "errorMessage": "Failed to subscribe",
-        "genericError": "Something went wrong. Please try again."
-    },
-    "PaymentPage": {
-        "title": "Choose Your Plan",
-        "subtitle": "Select the perfect plan for your career goals",
-        "plans": {
-            "Basic": {
-                "name": "Basic",
-                "price": "Free",
-                "features": [
-                    "1 CV Analysis per month",
-                    "Basic suggestions",
-                    "PDF Export"
-                ]
-            },
-            "VIP": {
-                "name": "VIP",
-                "price": "$9.99 /month",
-                "features": [
-                    "Unlimited CV Analyses",
-                    "Advanced AI suggestions",
-                    "Priority Support"
-                ]
-            },
-            "Entreprise": {
-                "name": "Enterprise",
-                "price": "Contact Us",
-                "features": [
-                    "Bulk Analysis",
-                    "API Access",
-                    "Dedicated Account Manager"
-                ]
-            },
-            "Students": {
-                "name": "Student",
-                "price": "$4.99 /month",
-                "features": [
-                    "5 CV Analyses per month",
-                    "Career guidance",
-                    "Template library",
-                    "Student discount applied"
-                ]
-            }
-        },
-        "studentOffer": "Valid student ID required",
-        "securePayment": "Secure payment via Stripe. Cancel anytime.",
-        "recommended": "Recommended",
-        "selectPlan": "Select Plan"
-    },
-    "Dashboard": {
-        "welcome": "Welcome",
-        "subtitle": "Track your CVs and prepare for interviews with AI assistance",
-        "stats": {
-            "totalAnalyses": "Total Analyses",
-            "remainingAnalyses": "Remaining",
-            "averageScore": "Average Score",
-            "lastAnalysis": "Last Analysis",
-            "noAnalysis": "N/A"
-        },
-        "recentAnalyses": {
-            "title": "Recent Analyses",
-            "viewAll": "View All",
-            "empty": {
-                "title": "No analyses yet",
-                "description": "Start analyzing your CV to get personalized feedback",
-                "action": "Analyze CV"
-            }
-        },
-        "nav": {
-            "dashboard": "Dashboard",
-            "cvAnalysis": "Analyze CV",
-            "history": "History",
-            "profile": "Profile",
-            "settings": "Settings",
-            "darkMode": "Dark Mode",
-            "lightMode": "Light Mode",
-            "signOut": "Sign Out",
-            "interview": "Interview",
-            "interviewHistory": "Interview History"
-        },
-        "history": {
-            "title": "CV Analysis History",
-            "subtitle": "View all your {count} CV analyses",
-            "filters": {
-                "all": "All",
-                "excellent": "Excellent (80%+)",
-                "good": "Good (65-79%)",
-                "needsImprovement": "Needs Improvement (<65%)"
-            },
-            "empty": {
-                "title": "No analyses found",
-                "description": "Try adjusting your filters or analyze a new CV",
-                "action": "Analyze New CV"
-            }
-        },
-        "profile": {
-            "title": "My Profile",
-            "subtitle": "Manage your account information",
-            "email": "Email",
-            "memberSince": "Member Since",
-            "plan": "Subscription Plan",
-            "status": "Account Status",
-            "verified": "Verified",
-            "unverified": "Unverified",
-            "usage": {
-                "title": "Usage Statistics",
-                "cvAnalyses": "CV Analyses"
-            },
-            "upgradePlan": "Upgrade Plan"
-        },
-        "settings": {
-            "title": "Settings",
-            "subtitle": "Manage your preferences",
-            "language": {
-                "title": "Language",
-                "description": "Choose your preferred language"
-            },
-            "notifications": {
-                "title": "Notifications",
-                "email": "Email Notifications",
-                "emailDescription": "Receive updates about your CV analyses"
-            },
-            "security": {
-                "title": "Security",
-                "changePassword": "Change Password",
-                "changePasswordDescription": "Update your account password"
-            },
-            "comingSoon": "Coming Soon"
-        },
-        "recentInterviews": {
-            "title": "Recent Interviews",
-            "viewAll": "View All",
-            "empty": {
-                "title": "No interviews yet",
-                "description": "Start practicing with AI mock interviews",
-                "action": "Start Interview"
-            }
-        },
-        "interviewHistory": {
-            "title": "Interview History",
-            "subtitle": "View all your {count} interview analyses",
-            "filters": {
-                "all": "All",
-                "excellent": "Excellent (8+)",
-                "good": "Good (5-7)",
-                "needsImprovement": "Needs Work (<5)"
-            },
-            "feedback": "Feedback",
-            "suggestion": "Suggested Follow-up",
-            "delete": "Delete",
-            "deleteConfirm": "Are you sure you want to delete this interview analysis?",
-            "deleteError": "Failed to delete interview analysis",
-            "empty": {
-                "title": "No interviews yet",
-                "description": "Start practicing with AI mock interviews to build your history",
-                "action": "Start Interview"
-            }
-        }
-    },
-    "ContactPage": {
-        "title": "Contact Us",
-        "subtitle": "Get in touch with our team",
-        "description": "Have a question or need assistance? We're here to help! Fill out the form below and our team will get back to you as soon as possible.",
-        "form": {
-            "name": "Full Name",
-            "namePlaceholder": "John Doe",
-            "email": "Email Address",
-            "emailPlaceholder": "john@example.com",
-            "subject": "Subject",
-            "subjectPlaceholder": "How can we help you?",
-            "message": "Message",
-            "messagePlaceholder": "Tell us more about your inquiry...",
-            "submit": "Send Message",
-            "submitting": "Sending..."
-        },
-        "info": {
-            "email": {
-                "title": "Email",
-                "value": "support@optimacv.com"
-            },
-            "phone": {
-                "title": "Phone",
-                "value": "+1 (555) 123-4567"
-            },
-            "address": {
-                "title": "Address",
-                "value": "123 Business St, Suite 100, New York, NY 10001"
-            },
-            "hours": {
-                "title": "Business Hours",
-                "value": "Monday - Friday: 9:00 AM - 6:00 PM EST"
-            },
-            "social": {
-                "title": "Follow Us",
-                "description": "Stay connected on social media"
-            }
-        },
-        "successMessage": "Thank you for contacting us! We'll get back to you soon.",
-        "errorMessage": "Something went wrong. Please try again."
-    },
     "CVBuilder": {
         "PersonalForm": {
             "fullName": "Full Name",
             "email": "Email",
             "phone": "Phone",
+            "jobTitle": "Job Title",
             "location": "Location",
             "linkedin": "LinkedIn URL",
             "github": "GitHub URL",
             "portfolio": "Portfolio URL",
             "summary": "Professional Summary",
+            "generate_summary": "Generate with AI",
+            "generating": "Generating...",
+            "error": "Error",
+            "image_too_large": "Image must be less than 5MB",
+            "missing_info": "Missing Information",
+            "please_fill_name": "Please enter your full name first.",
+            "success": "Success",
+            "summary_generated": "Summary generated successfully!",
+            "generation_failed": "Failed to generate summary. Please try again.",
             "placeholders": {
                 "fullName": "John Doe",
+                "jobTitle": "e.g. Software Engineer",
                 "email": "john@example.com",
                 "phone": "+1 (555) 123-4567",
                 "location": "New York, USA",
@@ -630,12 +199,67 @@
                 "summary": "Briefly describe your professional background and goals..."
             }
         },
+        "ExperienceForm": {
+            "company": "Company",
+            "position": "Position",
+            "location": "Location",
+            "start_date": "Start Date",
+            "end_date": "End Date",
+            "current_work": "I currently work here",
+            "description": "Description",
+            "add_experience": "Add Experience"
+        },
+        "EducationForm": {
+            "institution": "Institution",
+            "degree": "Degree",
+            "field_of_study": "Field of Study",
+            "start_date": "Start Date",
+            "end_date": "End Date",
+            "current_study": "I am currently studying here",
+            "add_education": "Add Education"
+        },
+        "ProjectForm": {
+            "project_name": "Project Name",
+            "description": "Description",
+            "technologies": "Technologies",
+            "link": "Link",
+            "add_project": "Add Project"
+        },
         "SkillsForm": {
             "category": "Category",
             "categoryPlaceholder": "e.g. Frontend, Backend, Soft Skills",
             "skillsLabel": "Skills (Press Enter to add)",
             "skillPlaceholder": "Add a skill...",
-            "addCategory": "+ Add Skill Category"
+            "addCategory": "Add Skill Category"
+        },
+        "LanguagesForm": {
+            "language": "Language",
+            "proficiency": "Proficiency",
+            "addLanguage": "Add Language"
+        },
+        "CertificationsForm": {
+            "name": "Certification Name",
+            "issuer": "Issuer",
+            "date": "Date",
+            "link": "Link (Optional)",
+            "addCertification": "Add Certification"
+        },
+        "InterestsForm": {
+            "interestName": "Interest Name",
+            "keywords": "Keywords (Press Enter to add)",
+            "addInterest": "Add Interest"
+        },
+        "TemplateSelector": {
+            "choose_template": "Choose Template",
+            "download_pdf": "Download PDF",
+            "modern": "Modern",
+            "classic": "Classic",
+            "minimal": "Minimal",
+            "executive": "Executive",
+            "tech": "Tech",
+            "global": "Global",
+            "upgrade_to_pro": "Upgrade to Pro",
+            "premium_warning": "This is a premium template. Please upgrade to remove watermarks or download."
         }
     },
     "InterviewPage": {
