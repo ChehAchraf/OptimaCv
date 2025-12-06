@@ -563,18 +563,49 @@
         "successMessage": "Merci de nous avoir contactés ! Nous vous répondrons bientôt.",
         "errorMessage": "Une erreur s'est produite. Veuillez réessayer."
     },
+    "BuildCVPage": {
+        "personal_info": "Infos Personnelles",
+        "experience": "Expérience",
+        "education": "Formation",
+        "projects": "Projets",
+        "skills": "Compétences",
+        "languages": "Langues",
+        "certifications": "Certifications",
+        "interests": "Intérêts",
+        "templates": "Modèles",
+        "preview": "Aperçu & Téléchargement",
+        "validation_error": "Erreur de validation",
+        "progress_tip": "Complétez toutes les sections pour un meilleur score CV",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "go_pro": "Passer Pro",
+        "live_preview": "Aperçu en direct",
+        "download": "Télécharger",
+        "preview_scaled_msg": "L'aperçu est mis à l'échelle. Téléchargez le PDF pour la qualité d'impression."
+    },
     "CVBuilder": {
         "PersonalForm": {
             "fullName": "Nom complet",
             "email": "Email",
             "phone": "Téléphone",
+            "jobTitle": "Titre du poste",
             "location": "Localisation",
             "linkedin": "URL LinkedIn",
             "github": "URL GitHub",
             "portfolio": "URL Portfolio",
             "summary": "Résumé professionnel",
+            "generate_summary": "Générer avec l'IA",
+            "generating": "Génération...",
+            "error": "Erreur",
+            "image_too_large": "L'image doit être inférieure à 5 Mo",
+            "missing_info": "Information manquante",
+            "please_fill_name": "Veuillez d'abord entrer votre nom complet.",
+            "success": "Succès",
+            "summary_generated": "Résumé généré avec succès !",
+            "generation_failed": "Échec de la génération du résumé. Veuillez réessayer.",
             "placeholders": {
                 "fullName": "Jean Dupont",
+                "jobTitle": "ex. Ingénieur Logiciel",
                 "email": "jean@exemple.fr",
                 "phone": "+33 6 12 34 56 78",
                 "location": "Paris, France",
@@ -584,12 +615,67 @@
                 "summary": "Décrivez brièvement votre parcours professionnel et vos objectifs..."
             }
         },
+        "ExperienceForm": {
+            "company": "Entreprise",
+            "position": "Poste",
+            "location": "Lieu",
+            "start_date": "Date de début",
+            "end_date": "Date de fin",
+            "current_work": "Je travaille actuellement ici",
+            "description": "Description",
+            "add_experience": "Ajouter une expérience"
+        },
+        "EducationForm": {
+            "institution": "Établissement",
+            "degree": "Diplôme",
+            "field_of_study": "Domaine d'études",
+            "start_date": "Date de début",
+            "end_date": "Date de fin",
+            "current_study": "J'étudie actuellement ici",
+            "add_education": "Ajouter une formation"
+        },
+        "ProjectForm": {
+            "project_name": "Nom du projet",
+            "description": "Description",
+            "technologies": "Technologies",
+            "link": "Lien",
+            "add_project": "Ajouter un projet"
+        },
         "SkillsForm": {
             "category": "Catégorie",
             "categoryPlaceholder": "ex., Frontend, Backend, Compétences interpersonnelles",
             "skillsLabel": "Compétences (Appuyez sur Entrée pour ajouter)",
             "skillPlaceholder": "Ajouter une compétence...",
-            "addCategory": "+ Ajouter une catégorie de compétences"
+            "addCategory": "Ajouter une catégorie"
+        },
+        "LanguagesForm": {
+            "language": "Langue",
+            "proficiency": "Niveau",
+            "addLanguage": "Ajouter une langue"
+        },
+        "CertificationsForm": {
+            "name": "Nom de la Certification",
+            "issuer": "Organisme",
+            "date": "Date",
+            "link": "Lien (Optionnel)",
+            "addCertification": "Ajouter une certification"
+        },
+        "InterestsForm": {
+            "interestName": "Nom du Centre d'intérêt",
+            "keywords": "Mots-clés (Appuyez sur Entrée pour ajouter)",
+            "addInterest": "Ajouter un intérêt"
+        },
+        "TemplateSelector": {
+            "choose_template": "Choisir un modèle",
+            "download_pdf": "Télécharger le PDF",
+            "modern": "Moderne",
+            "classic": "Classique",
+            "minimal": "Minimaliste",
+            "executive": "Exécutif",
+            "tech": "Tech",
+            "global": "Global",
+            "upgrade_to_pro": "Passer Pro",
+            "premium_warning": "Ceci est un modèle premium. Veuillez passer à la version Pro pour supprimer les filigranes ou télécharger."
         }
     },
     "InterviewPage": {
