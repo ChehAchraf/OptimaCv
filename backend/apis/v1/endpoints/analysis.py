@@ -30,7 +30,11 @@ from backend.schemas.analysis_schemas import (
 
     CVBuildInput,      
 
-    CVBuildResponse
+    CVBuildResponse,
+
+    ProfileSummaryInput,
+
+    ProfileSummaryResponse
 
 )
 
@@ -645,9 +649,19 @@ async def handle_build_cv(
 
 
     except Exception as e:
-
         print(f"--- 🔴 error in CV Builder 🔴 ---")
-
         print(f"Error Details: {repr(e)}")
-
         raise HTTPException(status_code=500, detail=f"Error: {repr(e)}")
+
+@router.post(
+    "/generate-profile-summary/",
+    response_model=ProfileSummaryResponse,
+    tags=["AI Tools"]
+)
+async def handle_generate_profile_summary(data: ProfileSummaryInput):
+    try:
+        summary_text = await gemini_service.generate_profile_summary(data.model_dump())
+        return ProfileSummaryResponse(summary=summary_text)
+    except Exception as e:
+        print(f"Error generating summary: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
