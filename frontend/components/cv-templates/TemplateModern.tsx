@@ -8,53 +8,66 @@ interface TemplateProps {
 }
 
 export const TemplateModern: React.FC<TemplateProps> = ({ data }) => {
-    const { personal_details, experience, education, projects, skills } = data;
+    const { personal_details, experience, education, projects, skills, languages, certifications, interests } = data;
 
     return (
         <div className="w-full h-full bg-white text-gray-800 p-8 font-sans" id="cv-template">
             <header className="border-b-2 border-blue-600 pb-6 mb-6">
-                <h1 className="text-4xl font-bold text-gray-900 uppercase tracking-wider">{personal_details.full_name}</h1>
-                <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
-                    {personal_details.email && (
-                        <div className="flex items-center gap-1">
-                            <HiMail className="text-blue-600" />
-                            <span>{personal_details.email}</span>
+                <div className="flex justify-between items-start gap-6">
+                    <div className="flex-1">
+                        <h1 className="text-4xl font-bold text-gray-900 uppercase tracking-wider">{personal_details.full_name}</h1>
+                        <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-600">
+                            {personal_details.email && (
+                                <div className="flex items-center gap-1">
+                                    <HiMail className="text-blue-600" />
+                                    <span>{personal_details.email}</span>
+                                </div>
+                            )}
+                            {personal_details.phone && (
+                                <div className="flex items-center gap-1">
+                                    <HiPhone className="text-blue-600" />
+                                    <span>{personal_details.phone}</span>
+                                </div>
+                            )}
+                            {personal_details.location && (
+                                <div className="flex items-center gap-1">
+                                    <HiLocationMarker className="text-blue-600" />
+                                    <span>{personal_details.location}</span>
+                                </div>
+                            )}
+                            {personal_details.linkedin_url && (
+                                <div className="flex items-center gap-1">
+                                    <FaLinkedin className="text-blue-600" />
+                                    <a href={personal_details.linkedin_url} target="_blank" rel="noreferrer" className="hover:underline">LinkedIn</a>
+                                </div>
+                            )}
+                            {personal_details.github_url && (
+                                <div className="flex items-center gap-1">
+                                    <FaGithub className="text-blue-600" />
+                                    <a href={personal_details.github_url} target="_blank" rel="noreferrer" className="hover:underline">GitHub</a>
+                                </div>
+                            )}
+                            {personal_details.portfolio_url && (
+                                <div className="flex items-center gap-1">
+                                    <FaGlobe className="text-blue-600" />
+                                    <a href={personal_details.portfolio_url} target="_blank" rel="noreferrer" className="hover:underline">Portfolio</a>
+                                </div>
+                            )}
                         </div>
-                    )}
-                    {personal_details.phone && (
-                        <div className="flex items-center gap-1">
-                            <HiPhone className="text-blue-600" />
-                            <span>{personal_details.phone}</span>
-                        </div>
-                    )}
-                    {personal_details.location && (
-                        <div className="flex items-center gap-1">
-                            <HiLocationMarker className="text-blue-600" />
-                            <span>{personal_details.location}</span>
-                        </div>
-                    )}
-                    {personal_details.linkedin_url && (
-                        <div className="flex items-center gap-1">
-                            <FaLinkedin className="text-blue-600" />
-                            <a href={personal_details.linkedin_url} target="_blank" rel="noreferrer" className="hover:underline">LinkedIn</a>
-                        </div>
-                    )}
-                    {personal_details.github_url && (
-                        <div className="flex items-center gap-1">
-                            <FaGithub className="text-blue-600" />
-                            <a href={personal_details.github_url} target="_blank" rel="noreferrer" className="hover:underline">GitHub</a>
-                        </div>
-                    )}
-                    {personal_details.portfolio_url && (
-                        <div className="flex items-center gap-1">
-                            <FaGlobe className="text-blue-600" />
-                            <a href={personal_details.portfolio_url} target="_blank" rel="noreferrer" className="hover:underline">Portfolio</a>
+                        {personal_details.summary && (
+                            <p className="mt-4 text-gray-700 leading-relaxed">{personal_details.summary}</p>
+                        )}
+                    </div>
+                    {personal_details.picture_url && (
+                        <div className="shrink-0">
+                            <img
+                                src={personal_details.picture_url}
+                                alt={personal_details.full_name}
+                                className="w-32 h-32 rounded-full object-cover border-4 border-gray-100 shadow-sm"
+                            />
                         </div>
                     )}
                 </div>
-                {personal_details.summary && (
-                    <p className="mt-4 text-gray-700 leading-relaxed">{personal_details.summary}</p>
-                )}
             </header>
 
             <div className="grid grid-cols-3 gap-8">
@@ -89,6 +102,31 @@ export const TemplateModern: React.FC<TemplateProps> = ({ data }) => {
                                             {edu.start_date} - {edu.current ? 'Present' : edu.end_date}
                                         </p>
                                     </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {languages && languages.length > 0 && (
+                        <section>
+                            <h2 className="text-lg font-bold text-blue-600 uppercase mb-3 border-b border-gray-200 pb-1">Languages</h2>
+                            <ul className="space-y-2">
+                                {languages.map((lang, idx) => (
+                                    <li key={idx} className="flex flex-col text-sm">
+                                        <span className="font-semibold text-gray-800">{lang.language}</span>
+                                        <span className="text-gray-500 text-xs">{lang.proficiency}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+                    )}
+
+                    {interests && interests.length > 0 && (
+                        <section>
+                            <h2 className="text-lg font-bold text-blue-600 uppercase mb-3 border-b border-gray-200 pb-1">Interests</h2>
+                            <div className="flex flex-wrap gap-2">
+                                {interests.map((interest, idx) => (
+                                    <span key={idx} className="text-xs border border-gray-300 px-2 py-1 rounded text-gray-600">{interest.name}</span>
                                 ))}
                             </div>
                         </section>
@@ -135,6 +173,26 @@ export const TemplateModern: React.FC<TemplateProps> = ({ data }) => {
                                                 <span key={tIdx} className="text-xs text-gray-500 italic">#{tech}</span>
                                             ))}
                                         </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {certifications && certifications.length > 0 && (
+                        <section>
+                            <h2 className="text-lg font-bold text-blue-600 uppercase mb-3 border-b border-gray-200 pb-1">Certifications</h2>
+                            <div className="space-y-4">
+                                {certifications.map((cert, idx) => (
+                                    <div key={idx}>
+                                        <div className="flex justify-between items-baseline">
+                                            <h3 className="font-bold text-gray-900">{cert.name}</h3>
+                                            <span className="text-sm text-gray-500">{cert.date}</span>
+                                        </div>
+                                        <p className="text-sm text-blue-600">{cert.issuer}</p>
+                                        {cert.link && (
+                                            <a href={cert.link} target="_blank" rel="noreferrer" className="text-xs text-gray-500 hover:underline">View Credential</a>
+                                        )}
                                     </div>
                                 ))}
                             </div>
