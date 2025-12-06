@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ export interface Props {
 }
 
 export const EducationForm: React.FC<Props> = ({ data, updateData }) => {
+    const t = useTranslations('EducationForm');
     useEffect(() => {
         if (data.length === 0) {
             addEducation();
@@ -58,7 +60,7 @@ export const EducationForm: React.FC<Props> = ({ data, updateData }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>Institution</Label>
+                            <Label>{t('institution')}</Label>
                             <Input
                                 value={edu.institution}
                                 onChange={(e) => updateEducation(index, 'institution', e.target.value)}
@@ -66,7 +68,7 @@ export const EducationForm: React.FC<Props> = ({ data, updateData }) => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Degree</Label>
+                            <Label>{t('degree')}</Label>
                             <Input
                                 value={edu.degree}
                                 onChange={(e) => updateEducation(index, 'degree', e.target.value)}
@@ -74,7 +76,7 @@ export const EducationForm: React.FC<Props> = ({ data, updateData }) => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Field of Study</Label>
+                            <Label>{t('field_of_study')}</Label>
                             <Input
                                 value={edu.field_of_study}
                                 onChange={(e) => updateEducation(index, 'field_of_study', e.target.value)}
@@ -84,7 +86,7 @@ export const EducationForm: React.FC<Props> = ({ data, updateData }) => {
                         <div className="space-y-2">
                             <div className="flex gap-4">
                                 <div className="flex-1 space-y-2">
-                                    <Label>Start Date</Label>
+                                    <Label>{t('start_date')}</Label>
                                     <Input
                                         value={edu.start_date}
                                         onChange={(e) => updateEducation(index, 'start_date', e.target.value)}
@@ -92,7 +94,7 @@ export const EducationForm: React.FC<Props> = ({ data, updateData }) => {
                                     />
                                 </div>
                                 <div className="flex-1 space-y-2">
-                                    <Label>End Date</Label>
+                                    <Label>{t('end_date')}</Label>
                                     <Input
                                         value={edu.end_date || ''}
                                         onChange={(e) => updateEducation(index, 'end_date', e.target.value)}
@@ -107,7 +109,7 @@ export const EducationForm: React.FC<Props> = ({ data, updateData }) => {
                                     checked={edu.current}
                                     onCheckedChange={(checked) => updateEducation(index, 'current', checked)}
                                 />
-                                <Label htmlFor={`edu-current-${index}`}>I am currently studying here</Label>
+                                <Label htmlFor={`edu-current-${index}`}>{t('current_study')}</Label>
                             </div>
                         </div>
                     </div>
@@ -115,7 +117,7 @@ export const EducationForm: React.FC<Props> = ({ data, updateData }) => {
             ))}
 
             <Button onClick={addEducation} variant="outline" className="w-full border-dashed">
-                + Add Education
+                + {t('add_education')}
             </Button>
         </div>
     );
