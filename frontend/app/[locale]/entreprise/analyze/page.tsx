@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
     ArrowLeft,
     FileText,
@@ -9,8 +9,6 @@ import {
     CheckCircle2,
     Sparkles,
     Trophy,
-    Upload,
-    X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,19 +17,30 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { rankCandidates } from "@/app/actions/company";
-import { saveDirectAnalysisResults } from "@/app/actions/enterpriseActions";
+import { rankStoredCandidates } from "@/app/actions/company";
+import { saveDirectAnalysisResults, getEnterpriseCVsByIds, deleteMultipleEnterpriseCVs } from "@/app/actions/enterpriseActions";
+import { processSingleBatch } from "@/app/actions/bulkAnalysis";
 import { useToast } from "@/hooks/use-toast";
+import { EnterpriseCV } from "@/types/enterprise";
 
 type AnalysisStep = "configure" | "analyzing" | "results";
 
-export default function AnalyzePage() {
+import { Suspense } from "react";
+
+function AnalyzeContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { toast } = useToast();
-    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Get IDs from URL - handle potential string parsing issues
+    const idsString = searchParams.get("ids");
+    const cvIds = idsString
+        ? idsString.split(",").map(id => id.trim()).filter(id => id.length > 0)
+        : [];
 
     const [step, setStep] = useState<AnalysisStep>("configure");
-    const [files, setFiles] = useState<File[]>([]);
+    const [cvs, setCvs] = useState<EnterpriseCV[]>([]);
+    const [isLoadingCVs, setIsLoadingCVs] = useState(true);
     const [jobTitle, setJobTitle] = useState("");
     const [jobDescription, setJobDescription] = useState("");
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -39,70 +48,161 @@ export default function AnalyzePage() {
     const [results, setResults] = useState<any[]>([]);
     const [analysisId, setAnalysisId] = useState<string | null>(null);
 
-    // Handle file selection
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const newFiles = Array.from(e.target.files).filter(
-                file => file.type === "application/pdf"
-            );
-            setFiles(prev => [...prev, ...newFiles]);
-        }
-    };
+    // Batch processing state
+    const [currentBatch, setCurrentBatch] = useState(0);
+    const [totalBatches, setTotalBatches] = useState(0);
+    const [processedCount, setProcessedCount] = useState(0);
+    const [batchErrors, setBatchErrors] = useState<string[]>([]);
 
-    // Remove file
-    const removeFile = (index: number) => {
-        setFiles(prev => prev.filter((_, i) => i !== index));
-    };
+    // Fetch CV details on mount
+    useEffect(() => {
+        let isMounted = true;
 
-    // Handle drag and drop
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        if (e.dataTransfer.files) {
-            const newFiles = Array.from(e.dataTransfer.files).filter(
-                file => file.type === "application/pdf"
-            );
-            setFiles(prev => [...prev, ...newFiles]);
-        }
-    };
+        const loadCVs = async () => {
+            if (cvIds.length === 0) {
+                if (isMounted) setIsLoadingCVs(false);
+                return;
+            }
 
-    // Handle analysis
+            try {
+                // Ensure IDs are unique
+                const uniqueIds = Array.from(new Set(cvIds));
+                const data = await getEnterpriseCVsByIds(uniqueIds);
+                console.log("Fetched CVs for analysis:", data);
+
+                if (isMounted) {
+                    setCvs(data);
+
+                    if (data.length === 0 && cvIds.length > 0) {
+                        toast({
+                            title: "Could not find selected CVs",
+                            description: "The CVs might have been deleted or you don't have access.",
+                            variant: "destructive"
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to load CVs:", error);
+                if (isMounted) {
+                    toast({ title: "Failed to load selected CVs", variant: "destructive" });
+                }
+            } finally {
+                if (isMounted) setIsLoadingCVs(false);
+            }
+        };
+
+        loadCVs();
+        return () => { isMounted = false; };
+    }, [idsString]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Handle analysis with batch processing
     const handleAnalyze = async () => {
         if (!jobDescription.trim()) {
             toast({ title: "Please enter a job description", variant: "destructive" });
             return;
         }
 
-        if (files.length === 0) {
-            toast({ title: "Please upload at least one CV", variant: "destructive" });
+        if (cvs.length === 0) {
+            toast({ title: "No CVs selected for analysis", variant: "destructive" });
             return;
         }
 
+        // Pre-flight check: Filter out metadata-only CVs (file_size = 0 or null)
+        const validCVs = cvs.filter(cv => cv.file_size && cv.file_size > 0);
+        const metadataOnlyCVs = cvs.filter(cv => !cv.file_size || cv.file_size === 0);
+
+        if (metadataOnlyCVs.length > 0) {
+            const metadataNames = metadataOnlyCVs.map(cv => cv.file_name).join(", ");
+            toast({
+                title: "Some CVs cannot be analyzed",
+                description: `${metadataOnlyCVs.length} CV(s) are metadata-only records without source files: ${metadataNames}. These were likely from previous direct analyses. Please re-upload them to analyze.`,
+                variant: "destructive",
+                duration: 10000
+            });
+        }
+
+        if (validCVs.length === 0) {
+            toast({
+                title: "No valid CVs to analyze",
+                description: "All selected CVs are metadata-only records without source files. Please upload new CVs with files to analyze them.",
+                variant: "destructive",
+                duration: 8000
+            });
+            return;
+        }
+
+        // Update CVs list to only include valid ones
+        setCvs(validCVs);
+
         setIsAnalyzing(true);
         setStep("analyzing");
-        setAnalysisProgress(20);
+        setAnalysisProgress(5);
+        setBatchErrors([]);
+        setProcessedCount(0);
 
         try {
-            // Call the ranking API with actual files
-            const response = await rankCandidates({
-                jobDescription,
-                files: files
-            });
+            const BATCH_SIZE = 5; // Process 5 CVs at a time
+            const cvIdsList = validCVs.map(cv => cv.id); // Use validCVs, not cvs
+            const batches: string[][] = [];
 
-            setAnalysisProgress(80);
+            // Split CVs into batches
+            for (let i = 0; i < cvIdsList.length; i += BATCH_SIZE) {
+                batches.push(cvIdsList.slice(i, i + BATCH_SIZE));
+            }
 
-            // Process results
-            const rankedResults = response.ranked_results.map((result: any, index: number) => ({
-                match_score: result.analysis.match_score ?? 0,
-                summary: result.analysis.summary ?? "",
-                strengths: result.analysis.strengths ?? [],
-                weaknesses: result.analysis.weaknesses ?? [],
-                rank: index + 1,
-                filename: result.filename,
-                contact_info: result.analysis.contact_info,
-                detailed_analysis: result.analysis.detailed_analysis || {}
-            }));
+            setTotalBatches(batches.length);
+            console.log(`Processing ${cvIdsList.length} valid CVs in ${batches.length} batches of ${BATCH_SIZE}`);
 
-            setAnalysisProgress(90);
+            const allResults: any[] = [];
+            const errors: string[] = [];
+
+            // Process each batch
+            for (let i = 0; i < batches.length; i++) {
+                setCurrentBatch(i + 1);
+                const batch = batches[i];
+
+                console.log(`Processing batch ${i + 1}/${batches.length}`);
+
+                try {
+                    const batchResult = await processSingleBatch({
+                        cvIds: batch,
+                        jobDescription,
+                        batchIndex: i,
+                        totalBatches: batches.length
+                    });
+
+                    if (batchResult.success) {
+                        allResults.push(...batchResult.results);
+                        setProcessedCount(prev => prev + batchResult.results.length);
+                    } else {
+                        errors.push(`Batch ${i + 1}: ${batchResult.error || 'Unknown error'}`);
+                    }
+                } catch (error: any) {
+                    console.error(`Error in batch ${i + 1}:`, error);
+                    errors.push(`Batch ${i + 1}: ${error.message || 'Processing failed'}`);
+                }
+
+                // Update progress
+                const progress = Math.min(90, 5 + ((i + 1) / batches.length) * 85);
+                setAnalysisProgress(Math.round(progress));
+            }
+
+            setBatchErrors(errors);
+
+            if (allResults.length === 0) {
+                throw new Error("No CVs were successfully analyzed. " + (errors.length > 0 ? errors.join("; ") : ""));
+            }
+
+            // Rank all results by match score
+            const rankedResults = allResults
+                .sort((a, b) => b.match_score - a.match_score)
+                .map((result, index) => ({
+                    ...result,
+                    rank: index + 1,
+                    cv_id: cvs.find(cv => cv.file_name === result.filename)?.id
+                }));
+
+            setAnalysisProgress(95);
 
             // Save results to history
             try {
@@ -121,7 +221,16 @@ export default function AnalyzePage() {
             setResults(rankedResults);
             setStep("results");
 
-            toast({ title: "Analysis completed successfully!" });
+            // Show success toast with warnings if any
+            if (errors.length > 0) {
+                toast({
+                    title: `Analysis completed with warnings`,
+                    description: `${rankedResults.length} CVs analyzed successfully. ${errors.length} batch(es) had issues.`,
+                    variant: "default"
+                });
+            } else {
+                toast({ title: "Analysis completed successfully!" });
+            }
         } catch (error: any) {
             console.error("Analysis error:", error);
             toast({
@@ -148,10 +257,19 @@ export default function AnalyzePage() {
                     </Button>
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                            Bulk CV Analysis
+                            Analyze Selected CVs
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400">
-                            Upload CVs and rank candidates against a job description
+                            {cvs.length > 0 ? (
+                                <>
+                                    {cvs.filter(cv => cv.file_size && cv.file_size > 0).length} valid CV(s)
+                                    {cvs.filter(cv => !cv.file_size || cv.file_size === 0).length > 0 && (
+                                        <span className="text-yellow-600"> ({cvs.filter(cv => !cv.file_size || cv.file_size === 0).length} metadata-only)</span>
+                                    )}
+                                </>
+                            ) : (
+                                "No candidates selected"
+                            )}
                         </p>
                     </div>
                 </div>
@@ -177,8 +295,8 @@ export default function AnalyzePage() {
                             </div>
                             {i < 2 && (
                                 <div className={`w-24 h-1 mx-2 ${i < ["configure", "analyzing", "results"].indexOf(step)
-                                        ? "bg-green-500"
-                                        : "bg-gray-200 dark:bg-gray-700"
+                                    ? "bg-green-500"
+                                    : "bg-gray-200 dark:bg-gray-700"
                                     }`} />
                             )}
                         </div>
@@ -188,77 +306,61 @@ export default function AnalyzePage() {
                 {/* Step Content */}
                 {step === "configure" && (
                     <div className="space-y-6">
-                        {/* CV Upload */}
+                        {/* Selected CVs List */}
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <Upload className="w-5 h-5" />
-                                    1. Upload CVs
+                                    <FileText className="w-5 h-5" />
+                                    Selected Candidates ({cvs.length})
                                 </CardTitle>
-                                <CardDescription>
-                                    Upload the candidate CVs you want to analyze (PDF only)
-                                </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div
-                                    className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-blue-500 transition-colors"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    onDrop={handleDrop}
-                                    onDragOver={(e) => e.preventDefault()}
-                                >
-                                    <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                                    <p className="text-gray-600 dark:text-gray-300 font-medium">
-                                        Drop CVs here or click to upload
-                                    </p>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        PDF files only
-                                    </p>
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept=".pdf"
-                                        multiple
-                                        className="hidden"
-                                        onChange={handleFileChange}
-                                    />
-                                </div>
-
-                                {files.length > 0 && (
-                                    <div className="mt-4 space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                {files.length} file(s) selected
-                                            </p>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setFiles([])}
-                                                className="text-red-500 hover:text-red-600"
-                                            >
-                                                Clear all
-                                            </Button>
-                                        </div>
+                                {isLoadingCVs ? (
+                                    <div className="flex justify-center py-4">
+                                        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                                    </div>
+                                ) : cvs.length > 0 ? (
+                                    <div className="space-y-3">
                                         <div className="flex flex-wrap gap-2">
-                                            {files.map((file, index) => (
-                                                <Badge
-                                                    key={index}
-                                                    variant="secondary"
-                                                    className="py-2 px-3 flex items-center gap-2"
-                                                >
-                                                    <FileText className="w-4 h-4 text-red-500" />
-                                                    <span className="max-w-[150px] truncate">{file.name}</span>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            removeFile(index);
-                                                        }}
-                                                        className="ml-1 hover:text-red-500"
+                                            {cvs.map((cv) => {
+                                                const hasFile = cv.file_size && cv.file_size > 0;
+                                                return (
+                                                    <Badge
+                                                        key={cv.id}
+                                                        variant={hasFile ? "secondary" : "destructive"}
+                                                        className={`py-2 px-3 flex items-center gap-2 ${!hasFile ? "opacity-60" : ""
+                                                            }`}
                                                     >
-                                                        <X className="w-3 h-3" />
-                                                    </button>
-                                                </Badge>
-                                            ))}
+                                                        <FileText className={`w-4 h-4 ${hasFile ? "text-blue-500" : "text-red-400"
+                                                            }`} />
+                                                        <span className="max-w-[200px] truncate">
+                                                            {cv.candidate_name || cv.file_name}
+                                                        </span>
+                                                        {!hasFile && (
+                                                            <span className="text-xs ml-1">⚠️</span>
+                                                        )}
+                                                    </Badge>
+                                                );
+                                            })}
                                         </div>
+                                        {cvs.some(cv => !cv.file_size || cv.file_size === 0) && (
+                                            <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                                                <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                                                    ⚠️ CVs marked with warning are metadata-only records without source files. They will be skipped during analysis.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 text-gray-500">
+                                        <p>No CVs selected. Please go back to the dashboard to select candidates.</p>
+                                        <Button
+                                            variant="link"
+                                            onClick={() => router.push("/entreprise")}
+                                            className="mt-2"
+                                        >
+                                            Go to Dashboard
+                                        </Button>
                                     </div>
                                 )}
                             </CardContent>
@@ -269,7 +371,7 @@ export default function AnalyzePage() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Sparkles className="w-5 h-5" />
-                                    2. Job Details
+                                    Job Details
                                 </CardTitle>
                                 <CardDescription>
                                     Enter the job requirements to match candidates against
@@ -301,7 +403,7 @@ export default function AnalyzePage() {
 
                                 <Button
                                     onClick={handleAnalyze}
-                                    disabled={!jobDescription.trim() || files.length === 0 || isAnalyzing}
+                                    disabled={!jobDescription.trim() || cvs.length === 0 || isAnalyzing}
                                     className="w-full"
                                     size="lg"
                                 >
@@ -313,7 +415,7 @@ export default function AnalyzePage() {
                                     ) : (
                                         <>
                                             <Sparkles className="w-5 h-5 mr-2" />
-                                            Analyze {files.length} CV(s)
+                                            Analyze {cvs.length} CV(s)
                                         </>
                                     )}
                                 </Button>
@@ -331,16 +433,33 @@ export default function AnalyzePage() {
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                                        Analyzing {files.length} CVs...
+                                        Analyzing {cvs.length} CVs in Batches...
                                     </h2>
                                     <p className="text-gray-500 dark:text-gray-400">
                                         Our AI is ranking candidates against your job description
                                     </p>
+                                    {totalBatches > 0 && (
+                                        <div className="mt-4 space-y-2">
+                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                Processing Batch {currentBatch} of {totalBatches}
+                                            </p>
+                                            <p className="text-sm text-gray-500">
+                                                {processedCount} / {cvs.length} CVs processed
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="max-w-md mx-auto">
                                     <Progress value={analysisProgress} className="h-2" />
                                     <p className="text-sm text-gray-500 mt-2">{analysisProgress}%</p>
                                 </div>
+                                {batchErrors.length > 0 && (
+                                    <div className="max-w-md mx-auto mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                                        <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                                            Some batches encountered issues, but processing continues...
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -348,6 +467,29 @@ export default function AnalyzePage() {
 
                 {step === "results" && (
                     <div className="space-y-6">
+                        {/* Warning Banner for Batch Errors */}
+                        {batchErrors.length > 0 && (
+                            <Card className="border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/10">
+                                <CardHeader>
+                                    <CardTitle className="text-yellow-800 dark:text-yellow-200 text-base">
+                                        ⚠️ Some CVs Could Not Be Processed
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                                            The following batches encountered issues:
+                                        </p>
+                                        <ul className="list-disc list-inside space-y-1 text-xs text-yellow-600 dark:text-yellow-400">
+                                            {batchErrors.map((error, idx) => (
+                                                <li key={idx}>{error}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
@@ -443,7 +585,7 @@ export default function AnalyzePage() {
                             <Button
                                 onClick={() => {
                                     setStep("configure");
-                                    setFiles([]);
+                                    // Keep CVs selected
                                     setJobDescription("");
                                     setJobTitle("");
                                     setResults([]);
@@ -465,5 +607,17 @@ export default function AnalyzePage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function AnalyzePage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+        }>
+            <AnalyzeContent />
+        </Suspense>
     );
 }

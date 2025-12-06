@@ -1,0 +1,207 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from "@/components/ui/label";
+import { HiCheckCircle, HiExclamation, HiDocumentText, HiPhotograph } from 'react-icons/hi';
+import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+
+interface AnalysisResultsProps {
+    result: any;
+}
+
+const VisualFeedbackDisplay = ({ feedback }: { feedback: any }) => {
+    const t = useTranslations('CVAnalyze');
+    return (
+        <Card className="mt-6 bg-white dark:bg-gray-800 shadow-lg border-0 ring-1 ring-gray-200 dark:ring-gray-700">
+            <CardHeader>
+                <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                    <HiPhotograph className="h-5 w-5 text-purple-500" />
+                    {t('results.visualTitle')}
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl">
+                        <Label className="text-muted-foreground mb-2 block">{t('results.presentationScore')}</Label>
+                        <div className="flex items-end gap-2">
+                            <h3 className="text-4xl font-bold text-purple-600 dark:text-purple-400">{feedback.layout_score}/10</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-2">{feedback.overall_professionalism}</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div>
+                            <Label className="font-semibold text-gray-900 dark:text-gray-100">{t('results.layout')}</Label>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{feedback.layout_notes}</p>
+                        </div>
+                        <div>
+                            <Label className="font-semibold text-gray-900 dark:text-gray-100">{t('results.fonts')}</Label>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{feedback.font_choice_notes}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl">
+                    <Label className="font-semibold text-blue-900 dark:text-blue-100 flex items-center gap-2 mb-3">
+                        <HiCheckCircle className="h-4 w-4" />
+                        {t('results.suggestions')}
+                    </Label>
+                    <ul className="space-y-2">
+                        {feedback.suggestions.map((sug: string, i: number) => (
+                            <li key={i} className="text-sm text-blue-800 dark:text-blue-200 flex items-start gap-2">
+                                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0" />
+                                {sug}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
+export function AnalysisResults({ result }: AnalysisResultsProps) {
+    const t = useTranslations('CVAnalyze');
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-8"
+        >
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+                <div className="p-6 sm:p-8 border-b border-gray-200 dark:border-gray-800">
+                    <h3 className="text-2xl font-bold flex items-center gap-3">
+                        {t('results.title')}
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${result.analysis_vs_jd.match_score >= 70 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                            result.analysis_vs_jd.match_score >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                            } `}>
+                            {t('results.matchScore', { score: result.analysis_vs_jd.match_score })}
+                        </span>
+                    </h3>
+                </div>
+
+                <div className="p-6 sm:p-8 space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-green-600 dark:text-green-400">
+                                <HiCheckCircle className="h-5 w-5" />
+                                {t('results.strengths')}
+                            </h5>
+                            <ul className="space-y-2">
+                                {result.analysis_vs_jd.strengths.map((s: string, i: number) => (
+                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
+                                        {s}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-red-600 dark:text-red-400">
+                                <HiExclamation className="h-5 w-5" />
+                                {t('results.weaknesses')}
+                            </h5>
+                            <ul className="space-y-2">
+                                {result.analysis_vs_jd.weaknesses.map((w: string, i: number) => (
+                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                                        {w}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 className="font-semibold text-lg mb-4">{t('results.detailed')}</h5>
+                        <div className="space-y-6">
+                            {/* Hard Skills */}
+                            <div className="space-y-3">
+                                <h6 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                    <span className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+                                        <HiDocumentText className="w-4 h-4" />
+                                    </span>
+                                    Hard Skills
+                                </h6>
+                                <div className="grid grid-cols-1 gap-3">
+                                    {result.analysis_vs_jd.detailed_analysis.hard_skills.map((skill: any, i: number) => (
+                                        <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <span className="font-medium text-gray-900 dark:text-gray-100">{skill.skill}</span>
+                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${skill.match === 'High' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                    skill.match === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                    }`}>
+                                                    {skill.match}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">{skill.comment}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Soft Skills */}
+                            <div className="space-y-3">
+                                <h6 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                    <span className="p-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
+                                        <HiCheckCircle className="w-4 h-4" />
+                                    </span>
+                                    Soft Skills
+                                </h6>
+                                <div className="grid grid-cols-1 gap-3">
+                                    {result.analysis_vs_jd.detailed_analysis.soft_skills.map((skill: any, i: number) => (
+                                        <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <span className="font-medium text-gray-900 dark:text-gray-100">{skill.skill}</span>
+                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${skill.match === 'High' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                    skill.match === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                    }`}>
+                                                    {skill.match}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">{skill.comment}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Experience */}
+                            <div className="space-y-3">
+                                <h6 className="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                    <span className="p-1.5 bg-orange-100 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400">
+                                        <HiDocumentText className="w-4 h-4" />
+                                    </span>
+                                    Experience
+                                </h6>
+                                <div className="grid grid-cols-1 gap-3">
+                                    {result.analysis_vs_jd.detailed_analysis.experience.map((exp: any, i: number) => (
+                                        <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <span className="font-medium text-gray-900 dark:text-gray-100">{exp.requirement}</span>
+                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${exp.match === 'Yes' || exp.match === 'High' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                    exp.match === 'Partial' || exp.match === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                    }`}>
+                                                    {exp.match}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">{exp.comment}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {result.visual_analysis && (
+                <VisualFeedbackDisplay feedback={result.visual_analysis} />
+            )}
+        </motion.div>
+    );
+}
