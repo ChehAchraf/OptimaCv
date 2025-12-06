@@ -10,8 +10,18 @@ export const TemplateClassic: React.FC<TemplateProps> = ({ data }) => {
 
     return (
         <div className="w-full h-full bg-white text-gray-900 p-10 font-serif" id="cv-template">
-            <div className="text-center border-b-2 border-gray-800 pb-6 mb-8">
-                <h1 className="text-3xl font-bold uppercase tracking-widest mb-2">{personal_details.full_name}</h1>
+            <div className="text-center border-b-2 border-gray-800 pb-6 mb-8 flex flex-col items-center">
+                {personal_details.picture_url && (
+                    <img
+                        src={personal_details.picture_url}
+                        alt={personal_details.full_name}
+                        className="w-28 h-28 rounded-full object-cover border-2 border-gray-800 mb-4 shadow-sm"
+                    />
+                )}
+                <h1 className="text-3xl font-bold uppercase tracking-widest mb-1">{personal_details.full_name}</h1>
+                {personal_details.job_title && (
+                    <div className="text-xl text-gray-700 italic mb-2">{personal_details.job_title}</div>
+                )}
                 <div className="text-sm flex justify-center gap-4 flex-wrap text-gray-700">
                     {personal_details.email && <span>{personal_details.email}</span>}
                     {personal_details.phone && <span>• {personal_details.phone}</span>}
