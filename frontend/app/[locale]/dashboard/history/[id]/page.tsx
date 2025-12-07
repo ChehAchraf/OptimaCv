@@ -25,6 +25,10 @@ import {
 } from 'lucide-react';
 
 import { AnalysisResult, CVAnalysis } from '@/types/dashboard';
+// Hook renamed to .tsx
+import { useExportPdf } from '@/hooks/use-export-pdf';
+import { useAnalysis } from '@/hooks/use-analysis';
+import { Loader2 } from 'lucide-react';
 
 
 
@@ -227,158 +231,47 @@ function BulletList({ items, color }: { items: string[]; color: keyof typeof col
 
 export const dynamic = 'force-dynamic';
 
-const getReportHTML = (result: AnalysisResult, score: number, config: { label: string; color: string }, date: string) => {
-    return `
-        <div style="font-family: Arial, sans-serif; padding: 40px; color: #000; background: #fff; width: 210mm; box-sizing: border-box;">
-            <div style="border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px;">
-                <h1 style="margin: 0; font-size: 28px; color: #111;">Analysis Report</h1>
-                <p style="color: #666; margin: 5px 0 0; font-size: 14px;">Generated on ${date}</p>
-            </div>
-
-            <div style="margin-bottom: 30px;">
-                <h2 style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px;">Overview</h2>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: bold; width: 150px; color: #555;">Job Title:</td>
-                        <td style="padding: 8px 0; color: #000;">${result.job_title || 'N/A'}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: bold; color: #555;">Company:</td>
-                        <td style="padding: 8px 0; color: #000;">${result.company_name || 'N/A'}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: bold; color: #555;">Match Score:</td>
-                        <td style="padding: 8px 0;">
-                            <span style="display: inline-block; padding: 4px 12px; border-radius: 4px; background-color: ${score >= 70 ? '#d1fae5' : score >= 60 ? '#fef3c7' : '#ffe4e6'}; color: ${score >= 70 ? '#065f46' : score >= 60 ? '#92400e' : '#9f1239'}; font-weight: bold;">
-                                ${score}/100 - ${config.label}
-                            </span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-            ${result.analysis_vs_jd?.summary ? `
-            <div style="margin-bottom: 30px;">
-                <h3 style="font-size: 16px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #333; margin-bottom: 12px;">Executive Summary</h3>
-                <p style="line-height: 1.6; font-size: 14px; color: #444; margin: 0;">
-                    ${result.analysis_vs_jd.summary}
-                </p>
-            </div>
-            ` : ''}
-
-            <div style="margin-bottom: 30px;">
-                <h3 style="font-size: 16px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #333; margin-bottom: 12px;">Key Strengths</h3>
-                <ul style="margin: 0; padding-left: 20px;">
-                    ${(result.strengths || result.analysis_vs_jd?.strengths || []).slice(0, 5).map(item =>
-        `<li style="margin-bottom: 8px; font-size: 14px; color: #444;">${item}</li>`
-    ).join('')}
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px;">
-                <h3 style="font-size: 16px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #333; margin-bottom: 12px;">Areas for Improvement</h3>
-                <ul style="margin: 0; padding-left: 20px;">
-                    ${(result.improvements || result.analysis_vs_jd?.improvements || []).slice(0, 5).map(item =>
-        `<li style="margin-bottom: 8px; font-size: 14px; color: #444;">${item}</li>`
-    ).join('')}
-                </ul>
-            </div>
-            
-            <div style="margin-top: 50px; font-size: 12px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
-                Powered by OptimaCV
-            </div>
-        </div>
-    `;
-};
+// getReportHTML moved to @/lib/services/pdf-service
 
 export default function AnalysisDetailPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
     const { locale, id } = use(params);
     const router = useRouter();
     const t = useTranslations('Dashboard');
 
-    const [analysis, setAnalysis] = useState<CVAnalysis | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { data: analysis, isLoading, error } = useAnalysis(id);
 
     useEffect(() => {
-        if (!id) return;
-
-        const fetchData = async () => {
-            try {
-                const supabase = createClient();
-
-                const { data, error } = await supabase
-                    .from('ai_cv_results')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-
-                if (error) throw error;
-
-                const parsed =
-                    typeof data.result === 'string'
-                        ? JSON.parse(data.result)
-                        : data.result;
-
-                setAnalysis({ ...data, result: parsed });
-            } catch (err) {
-                router.push('/dashboard/history');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [id, router]);
+        if (error) {
+            router.push('/dashboard/history');
+        }
+    }, [error, router]);
 
 
-    const handleExportPDF = async () => {
-        // Dynamically import heavy libraries only when needed
-        const html2canvas = (await import('html2canvas')).default;
-        const { jsPDF } = await import('jspdf');
+    // Use the export analysis hook
+    const { mutate: exportPdf, isPending: isExporting, variables: exportVariables, statusLabel } = useExportPdf();
 
-        const htmlContent = getReportHTML(
+
+
+    const handleExport = (actionType: 'export' | 'share') => {
+        if (!analysis) return;
+
+        const result = analysis.result as AnalysisResult;
+        const score = result.analysis_vs_jd?.match_score || 0;
+        const config = getScoreConfig(score);
+
+        exportPdf({
             result,
             score,
             config,
-            new Date().toLocaleDateString(locale, { dateStyle: 'long' })
-        );
-        const container = document.createElement('div');
-        container.innerHTML = htmlContent;
-
-        container.querySelectorAll('*').forEach(el => el.removeAttribute('class'));
-
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.top = '0';
-        document.body.appendChild(container);
-
-        try {
-            const canvas = await html2canvas(container.firstElementChild as HTMLElement, {
-                scale: 2,
-                backgroundColor: "#ffffff",
-                useCORS: true,
-                logging: false
-            });
-
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("p", "mm", "a4");
-
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-            pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-            pdf.save(`${result.job_title || "analysis"}.pdf`);
-        } catch (error) {
-            console.error("PDF generation failed:", error);
-            alert("Failed to generate PDF. Please try again.");
-        } finally {
-            document.body.removeChild(container);
-        }
+            date: new Date().toLocaleDateString(locale, { dateStyle: 'long' }),
+            filename: result.job_title || "analysis",
+            actionType
+        });
     };
 
 
 
-    if (loading)
+    if (isLoading)
         return (
             <DashboardLayout>
                 <PageLoader />
@@ -414,7 +307,6 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
                 className="max-w-7xl mx-auto p-6 space-y-8"
             >
 
-                {/* NAV */}
                 <nav className="text-sm text-gray-500 flex items-center">
                     <Link href="/dashboard" className="hover:text-gray-900">Dashboard</Link>
                     <span className="mx-2">/</span>
@@ -425,7 +317,6 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
                     </span>
                 </nav>
 
-                {/* HERO */}
                 <div className="relative bg-white dark:bg-gray-800 border rounded-3xl p-10 shadow-sm">
                     <div className={clsx('absolute top-0 left-0 h-2 w-full', config.color === 'emerald' && 'bg-emerald-500', config.color === 'amber' && 'bg-amber-500', config.color === 'rose' && 'bg-rose-500')} />
 
@@ -464,21 +355,39 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
 
                             <div className="flex gap-4">
                                 <button
-                                    onClick={() => handleExportPDF()}
-                                    className="inline-flex items-center px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium hover:opacity-90 transition-all shadow-lg shadow-gray-200 dark:shadow-none"
+                                    onClick={() => handleExport('export')}
+                                    disabled={isExporting}
+                                    className="inline-flex items-center px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium hover:opacity-90 transition-all shadow-lg shadow-gray-200 dark:shadow-none disabled:opacity-70 disabled:cursor-not-allowed min-w-[160px] justify-center"
                                 >
-                                    <Download className="h-4 w-4 mr-2" /> Export Report
+                                    {isExporting && exportVariables?.actionType === 'export' ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            {statusLabel}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Download className="h-4 w-4 mr-2" />
+                                            Export Report
+                                        </>
+                                    )}
                                 </button>
 
                                 <button
-                                    onClick={async () => {
-                                        await handleExportPDF();
-                                        window.open('https://www.linkedin.com/feed/', '_blank');
-                                        alert("PDF Downloaded! Please upload it to your LinkedIn post.");
-                                    }}
-                                    className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-white border border-gray-200 dark:border-gray-600 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-all"
+                                    onClick={() => handleExport('share')}
+                                    disabled={isExporting}
+                                    className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-white border border-gray-200 dark:border-gray-600 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-all disabled:opacity-70 disabled:cursor-not-allowed min-w-[180px] justify-center"
                                 >
-                                    <Share2 className="h-4 w-4 mr-2" /> Share on LinkedIn
+                                    {isExporting && exportVariables?.actionType === 'share' ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            {statusLabel}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Share2 className="h-4 w-4 mr-2" />
+                                            Share on LinkedIn
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -543,11 +452,29 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
                     <div className="space-y-6">
                         <SectionCard icon={<Download />} title="Quick Actions" color="gray">
                             <div className="space-y-3">
-                                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white">
-                                    Download PDF <Download className="h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                <button
+                                    onClick={() => handleExport('export')}
+                                    disabled={isExporting}
+                                    className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white disabled:opacity-50"
+                                >
+                                    Download PDF
+                                    {isExporting && exportVariables?.actionType === 'export' ? (
+                                        <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
+                                    ) : (
+                                        <Download className="h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                    )}
                                 </button>
-                                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white">
-                                    Share Analysis <Share2 className="h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                <button
+                                    onClick={() => handleExport('share')}
+                                    disabled={isExporting}
+                                    className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white disabled:opacity-50"
+                                >
+                                    Share Analysis
+                                    {isExporting && exportVariables?.actionType === 'share' ? (
+                                        <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
+                                    ) : (
+                                        <Share2 className="h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                    )}
                                 </button>
                             </div>
                         </SectionCard>
