@@ -20,13 +20,13 @@ class GeminiService:
             genai.configure(api_key=api_key)
 
             # Initialize the Gemini models
-            # Primary: gemini-2.0-flash
-            self.model_flash = genai.GenerativeModel("models/gemini-2.0-flash")
-            self.model_pro = genai.GenerativeModel("models/gemini-2.0-flash")
-            self.model_pro_vision = genai.GenerativeModel("models/gemini-2.0-flash")
+            # Primary: gemini-2.5 series
+            self.model_flash = genai.GenerativeModel("models/gemini-2.5-flash")
+            self.model_pro = genai.GenerativeModel("models/gemini-2.5-pro")
+            self.model_pro_vision = genai.GenerativeModel("models/gemini-2.5-pro")
             
-            # Fallback: gemini-2.0-flash-lite-preview-02-05
-            self.model_fallback = genai.GenerativeModel("models/gemini-2.0-flash-lite-preview-02-05")
+            # Fallback: gemini-2.5-flash-lite
+            self.model_fallback = genai.GenerativeModel("models/gemini-2.5-flash-lite")
 
         except Exception as e:
 
@@ -118,7 +118,10 @@ class GeminiService:
             response = await self._generate_content_with_retry(self.model_flash, prompt)
         except RetryError:
             print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (CV Only) ⚠️ ---")
-            response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            try:
+                response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            except RetryError:
+                raise ValueError("Service temporarily unavailable: AI Model Quota Exceeded. Please try again later.")
 
         print("--- 💡 RAW GEMINI (CV Only) RESPONSE 💡 ---")
 
@@ -190,7 +193,10 @@ class GeminiService:
             response = await self._generate_content_with_retry(self.model_pro, prompt_in_english)
         except RetryError:
             print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (CV vs JD) ⚠️ ---")
-            response = await self._generate_content_with_retry(self.model_fallback, prompt_in_english)
+            try:
+                response = await self._generate_content_with_retry(self.model_fallback, prompt_in_english)
+            except RetryError:
+                 raise ValueError("Service temporarily unavailable: AI Model Quota Exceeded. Please try again later.")
 
         
 
@@ -258,7 +264,10 @@ class GeminiService:
                 response = await self._generate_content_with_retry(self.model_pro_vision, [prompt, img])
             except RetryError:
                 print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (Visual) ⚠️ ---")
-                response = await self._generate_content_with_retry(self.model_fallback, [prompt, img])
+                try:
+                    response = await self._generate_content_with_retry(self.model_fallback, [prompt, img])
+                except RetryError:
+                     raise ValueError("Service temporarily unavailable: AI Model Quota Exceeded. Please try again later.")
 
             
 
@@ -318,7 +327,10 @@ class GeminiService:
         try:
             response = await self._generate_content_with_retry(self.model_flash, prompt)
         except RetryError:
-            response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            try:
+                response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            except RetryError:
+                raise ValueError("Service temporarily unavailable: AI Model Quota Exceeded. Please try again later.")
             
         return response.text.strip()
 
@@ -380,7 +392,10 @@ class GeminiService:
             response = await self._generate_content_with_retry(self.model_pro, prompt)
         except RetryError:
             print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (CV Builder) ⚠️ ---")
-            response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            try:
+                response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            except RetryError:
+                 raise ValueError("Service temporarily unavailable: AI Model Quota Exceeded. Please try again later.")
 
         
 
@@ -443,7 +458,11 @@ class GeminiService:
                 response = await self._generate_content_with_retry(self.model_flash, prompt)
             except RetryError:
                 print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (Questions) ⚠️ ---")
-                response = await self._generate_content_with_retry(self.model_fallback, prompt)
+                try:
+                    response = await self._generate_content_with_retry(self.model_fallback, prompt)
+                except RetryError:
+                    print("--- 🔴 Critical: All models exhausted for Interview Questions 🔴 ---")
+                    return {"questions": []}
             
             cleaned_text = self._clean_json_response(response.text)
             return json.loads(cleaned_text)
@@ -499,11 +518,14 @@ class GeminiService:
             )
         except RetryError:
              print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (Answer Analysis) ⚠️ ---")
-             response = await self._generate_content_with_retry(
-                self.model_fallback, 
-                [prompt, audio_file],
-                generation_config={"response_mime_type": "application/json"}
-            )
+             try:
+                 response = await self._generate_content_with_retry(
+                    self.model_fallback, 
+                    [prompt, audio_file],
+                    generation_config={"response_mime_type": "application/json"}
+                )
+             except RetryError:
+                  raise ValueError("Service temporarily unavailable: AI Model Quota Exceeded. Please try again later.")
         
         # Parse Response
         return json.loads(response.text)

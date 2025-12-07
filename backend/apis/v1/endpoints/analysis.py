@@ -245,15 +245,16 @@ async def handle_full_analysis(
         text_analysis_result = None
 
         try:
-
             text_analysis_result = await gemini_service.analyze_cv_vs_jd(cv_text, job_description)
 
+        except ValueError as e:
+            print(f"--- ⚠️ Service Warning ⚠️ ---")
+            print(f"Detail: {e}")
+            raise HTTPException(status_code=503, detail=str(e))
+
         except Exception as e:
-
             print(f"--- 🔴 Error Anylsing text 🔴 ---")
-
             print(f"Error Details: {repr(e)}")
-
             raise HTTPException(status_code=500, detail=f"Erreur analyse texte: {e}")
 
 
@@ -341,278 +342,79 @@ async def handle_full_analysis(
 
 
 @router.post(
-
     "/companies/rank-candidates/",
-
     response_model=FullRankingResponse, 
-
     tags=["Company Tools (B2B)"] 
-
 )
-
 async def handle_rank_candidates(
-
     job_description: str = Form(..., description="La description de poste (JD)."),
-
     cv_pdfs: List[UploadFile] = File(..., description="Liste des CVs (PDFs) à analyser.")
-
 ):
-
     if not job_description.strip():
-
         raise HTTPException(status_code=400, detail="La description de poste ne peut pas être vide.")
-
     
-
     results_list = [] 
-
+    errors = []
     
-
-                       
-
     notify_esp32("busy")
-
-
-
-                                         
 
     try:
-
         for cv_pdf in cv_pdfs:
-
             if cv_pdf.content_type != "application/pdf":
-
                 print(f"Skipping non-PDF file: {cv_pdf.filename}")
-
                 continue
 
-
-
             try:
-
-                                      
-
                 pdf_bytes = await cv_pdf.read()
-
                 cv_text = pdf_service.parse_text(pdf_bytes)
-
                 analysis_data = await gemini_service.analyze_cv_vs_jd(cv_text, job_description)
-
                 
-
                 results_list.append(
-
                     RankedAnalysisItem(
-
                         filename=cv_pdf.filename,
-
                         analysis=analysis_data
-
                     )
-
                 )
-
-
 
             except Exception as e:
-
-                                                   
-
                 print(f"--- 🔴 Failed to process CV: {cv_pdf.filename} 🔴 ---")
-
                 print(f"Error: {repr(e)}")
-
-                                                             
-
-        
+                errors.append(str(e))
 
         if not results_list:
-
-            notify_esp32("error")                                              
-
-            raise HTTPException(status_code=400, detail="No valid PDFs were processed or all failed.")
-
-
-
-                              
-
-                                        
+            notify_esp32("error")
+            
+            # Check for quota exhaustion in errors
+            if any("Quota Exceeded" in err or "429" in err for err in errors):
+                raise HTTPException(
+                    status_code=503, 
+                    detail="Service temporarily unavailable: AI Model Quota Exceeded. Please try again later."
+                )
+            
+            error_msg = f"No valid PDFs were processed. Errors: {'; '.join(errors[:3])}"
+            raise HTTPException(status_code=400, detail=error_msg)
 
         sorted_results = sorted(
-
             results_list,
-
             key=get_sort_key,
-
             reverse=True
-
         )
-
-
-
-                                      
-
-                                        
 
         top_score = get_sort_key(sorted_results[0])
-
         notify_esp32("success", score=top_score)
 
-
-
-                         
-
         return FullRankingResponse(
-
             total_processed=len(sorted_results),
-
             ranked_results=sorted_results
-
         )
 
-
+    except HTTPException:
+        raise
 
     except Exception as e:
-
-                                                              
-
         print(f"--- 🔴 CRITICAL FAILURE in rank-candidates: {repr(e)} 🔴 ---")
-
         notify_esp32("error")                                      
-
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {repr(e)}")
-
-    if not job_description.strip():
-
-        raise HTTPException(status_code=400, detail="La description de poste ne peut pas être vide.")
-
-    
-
-    results_list = [] 
-
-    
-
-    notify_esp32("busy")
-
-
-
-    for cv_pdf in cv_pdfs:
-
-        if cv_pdf.content_type != "application/pdf":
-
-            print(f"Skipping non-PDF file: {cv_pdf.filename}")
-
-            continue
-
-
-
-        try:
-
-            pdf_bytes = await cv_pdf.read()
-
-            cv_text = pdf_service.parse_text(pdf_bytes)
-
-            
-
-            analysis_data = await gemini_service.analyze_cv_vs_jd(cv_text, job_description)
-
-            
-
-            results_list.append(
-
-                RankedAnalysisItem(
-
-                    filename=cv_pdf.filename,
-
-                    analysis=analysis_data
-
-                )
-
-            )
-
-
-
-        except Exception as e:
-
-            print(f"--- 🔴 Failed to process CV: {cv_pdf.filename} 🔴 ---")
-
-            print(f"Error: {repr(e)}")
-
-            notify_esp32("error")
-
-    
-
-
-
-    if not results_list:
-
-        raise HTTPException(status_code=400, detail="No valid PDFs were processed.")
-
-
-
-    if not results_list:
-
-        notify_esp32("error") 
-
-        raise HTTPException(status_code=400, detail="No valid PDFs were processed.")
-
-
-
-                                                 
-
-    sorted_results = sorted(
-
-        results_list,
-
-                             
-
-        reverse=True
-
-    )
-
-    
-
-                                            
-
-                               
-
-    top_score = 0
-
-    if sorted_results:
-
-                                                      
-
-        analysis = sorted_results[0].analysis
-
-        if analysis and analysis.match_score is not None:
-
-            top_score = analysis.match_score
-
-            
-
-    notify_esp32("success", score=top_score)
-
-
-
-    sorted_results = sorted(
-
-        results_list,
-
-        key=lambda item: item.analysis.match_score if item.analysis and item.analysis.match_score is not None else 0,
-
-        reverse=True
-
-    )
-
-
-
-    return FullRankingResponse(
-
-        total_processed=len(sorted_results),
-
-        ranked_results=sorted_results
-
-    )
 
 
 
