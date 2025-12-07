@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { HiUpload, HiDocumentText } from 'react-icons/hi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { Button } from '../ui/button';
 
 interface AnalysisFormProps {
     onSubmit: (data: { filePDF: File; jobDescription: string; fileImage?: File; analyzeVisuals: boolean }) => void;
@@ -115,14 +116,13 @@ export function AnalysisForm({ onSubmit, isLoading }: AnalysisFormProps) {
                 </div>
             </div>
 
-            <LoadingButton
+            <Button
                 type="submit"
-                isLoading={isLoading}
-                loadingText={t('form.submitLoading')}
+                disabled={isLoading}
                 className="w-full h-11 sm:h-12 text-base sm:text-lg font-semibold transition-all duration-300 shadow-lg"
             >
                 {t('form.submitDefault')}
-            </LoadingButton>
+            </Button>
         </form>
     );
 }
