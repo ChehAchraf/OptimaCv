@@ -7,66 +7,466 @@ interface PdfConfig {
 }
 
 export const getReportHTML = (result: AnalysisResult, score: number, config: PdfConfig, date: string) => {
+    const jobTitle = result.job_title || 'CV Analysis Report';
+    const company = result.company_name || 'OptimaCV';
+
+    const summary = result.cv_coach_analysis?.summary_feedback ||
+        result.cv_coach_analysis?.summary ||
+        result.analysis_vs_jd?.summary ||
+        (typeof result.summary === 'string' ? result.summary : 'No summary available.');
+
+    const strengths = result.cv_coach_analysis?.key_strengths ||
+        result.analysis_vs_jd?.strengths ||
+        result.strengths || [];
+    const detailedImprovements = result.cv_coach_analysis?.critical_improvements || [];
+    const simpleImprovements = result.analysis_vs_jd?.improvements || result.improvements || [];
+    const hasDetailed = detailedImprovements.length > 0;
+
+    const scoreBreakdown = result.cv_coach_analysis?.score_breakdown || {};
+    const atsKeywords = result.cv_coach_analysis?.ats_keywords_missing || [];
+    const primaryColor = '#0F172A'; 
+    const accentColor = '#6366F1'; 
+    const successColor = '#10B981';
+    const warningColor = '#F59E0B'; 
+    const errorColor = '#EF4444'; 
+
+    const scoreColor = score >= 70 ? successColor : score >= 50 ? warningColor : errorColor;
+
     return `
-        <div style="font-family: Arial, sans-serif; padding: 40px; color: #000; background: #fff; width: 210mm; box-sizing: border-box;">
-            <div style="border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px;">
-                <h1 style="margin: 0; font-size: 28px; color: #111;">Analysis Report</h1>
-                <p style="color: #666; margin: 5px 0 0; font-size: 14px;">Generated on ${date}</p>
-            </div>
-
-            <div style="margin-bottom: 30px;">
-                <h2 style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px;">Overview</h2>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: bold; width: 150px; color: #555;">Job Title:</td>
-                        <td style="padding: 8px 0; color: #000;">${result.job_title || 'N/A'}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: bold; color: #555;">Company:</td>
-                        <td style="padding: 8px 0; color: #000;">${result.company_name || 'N/A'}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: bold; color: #555;">Match Score:</td>
-                        <td style="padding: 8px 0;">
-                            <span style="display: inline-block; padding: 4px 12px; border-radius: 4px; background-color: ${score >= 70 ? '#d1fae5' : score >= 60 ? '#fef3c7' : '#ffe4e6'}; color: ${score >= 70 ? '#065f46' : score >= 60 ? '#92400e' : '#9f1239'}; font-weight: bold;">
-                                ${score}/100 - ${config.label}
-                            </span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-            ${result.analysis_vs_jd?.summary ? `
-            <div style="margin-bottom: 30px;">
-                <h3 style="font-size: 16px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #333; margin-bottom: 12px;">Executive Summary</h3>
-                <p style="line-height: 1.6; font-size: 14px; color: #444; margin: 0;">
-                    ${result.analysis_vs_jd.summary}
-                </p>
-            </div>
-            ` : ''}
-
-            <div style="margin-bottom: 30px;">
-                <h3 style="font-size: 16px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #333; margin-bottom: 12px;">Key Strengths</h3>
-                <ul style="margin: 0; padding-left: 20px;">
-                    ${(result.strengths || result.analysis_vs_jd?.strengths || []).slice(0, 5).map(item =>
-        `<li style="margin-bottom: 8px; font-size: 14px; color: #444;">${item}</li>`
-    ).join('')}
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px;">
-                <h3 style="font-size: 16px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #333; margin-bottom: 12px;">Areas for Improvement</h3>
-                <ul style="margin: 0; padding-left: 20px;">
-                    ${(result.improvements || result.analysis_vs_jd?.improvements || []).slice(0, 5).map(item =>
-        `<li style="margin-bottom: 8px; font-size: 14px; color: #444;">${item}</li>`
-    ).join('')}
-                </ul>
-            </div>
+    <div id="pdf-report-root" class="pdf-report-root">
+        <style id="report-styles">
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap');
             
-            <div style="margin-top: 50px; font-size: 12px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
-                Powered by OptimaCV
+            * { box-sizing: border-box; }
+            
+            .pdf-report-root {
+                margin: 0;
+                padding: 0;
+                font-family: 'Inter', sans-serif;
+                background: #f3f4f6;
+                -webkit-font-smoothing: antialiased;
+                color: #334155;
+            }
+
+            .page-container {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0 auto;
+                background: #ffffff;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Header */
+            .header {
+                background-color: ${primaryColor};
+                color: white;
+                padding: 40px 50px;
+                position: relative;
+            }
+            
+            .header::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 6px;
+                background: linear-gradient(90deg, ${accentColor}, ${successColor});
+            }
+
+            .brand-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+            }
+
+            .brand-logo {
+                font-family: 'Outfit', sans-serif;
+                font-weight: 800;
+                font-size: 24px;
+                letter-spacing: -0.5px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: white;
+            }
+            
+            .brand-logo span { color: ${accentColor}; }
+
+            .report-date {
+                font-size: 14px;
+                opacity: 0.8;
+                font-weight: 500;
+                background: rgba(255,255,255,0.1);
+                padding: 6px 14px;
+                border-radius: 20px;
+                color: white;
+            }
+
+            .title-row h1 {
+                font-family: 'Outfit', sans-serif;
+                font-size: 36px;
+                font-weight: 700;
+                margin: 0;
+                line-height: 1.2;
+                color: white;
+            }
+            
+            .title-row h2 {
+                font-family: 'Inter', sans-serif;
+                font-size: 18px;
+                font-weight: 400;
+                margin: 8px 0 0 0;
+                opacity: 0.9;
+                color: #cbd5e1;
+            }
+
+            /* Layout */
+            .content-grid {
+                display: flex;
+                min-height: 230mm;
+            }
+
+            .main-column {
+                width: 65%;
+                padding: 40px 50px;
+                border-right: 1px solid #f1f5f9;
+            }
+
+            .sidebar {
+                width: 35%;
+                padding: 40px 30px;
+                background-color: #F8FAFC;
+            }
+
+            /* Typography & Components */
+            .section-title {
+                font-family: 'Outfit', sans-serif;
+                font-size: 16px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1.2px;
+                color: ${primaryColor};
+                margin: 0 0 20px 0;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .section-title::before {
+                content: '';
+                display: block;
+                width: 4px;
+                height: 18px;
+                background: ${accentColor};
+                border-radius: 2px;
+            }
+
+            /* AI Summary Box */
+            .ai-summary-box {
+                background: white;
+                border-left: 4px solid ${accentColor};
+                padding: 25px;
+                margin-bottom: 40px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+                border-radius: 0 12px 12px 0;
+                position: relative;
+            }
+            
+            .ai-icon {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                font-size: 40px;
+                opacity: 0.05;
+                font-family: serif;
+                font-weight: bold;
+                color: ${primaryColor};
+            }
+
+            .summary-text {
+                font-size: 15px;
+                line-height: 1.7;
+                color: #334155;
+                font-weight: 500;
+            }
+
+            /* Lists */
+            .list-item {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 15px;
+                align-items: flex-start;
+            }
+
+            .list-icon {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                margin-top: 3px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+            
+            .icon-check {
+                background: #ecfdf5;
+                color: ${successColor};
+            }
+            
+            .icon-alert {
+                background: #fef2f2;
+                color: ${errorColor};
+            }
+
+            .list-content {
+                font-size: 14px;
+                line-height: 1.6;
+                color: #475569;
+            }
+            
+            .list-content strong {
+                color: ${primaryColor};
+                display: block;
+                margin-bottom: 2px;
+            }
+
+            /* Sidebar Components */
+            .score-card {
+                background: white;
+                padding: 30px 20px;
+                border-radius: 20px;
+                text-align: center;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                margin-bottom: 40px;
+                border: 1px solid #e2e8f0;
+            }
+
+            .score-circle {
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                border: 8px solid ${scoreColor};
+                margin: 0 auto 15px auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: ${scoreColor};
+            }
+
+            .score-value {
+                font-size: 32px;
+                font-weight: 800;
+                font-family: 'Outfit', sans-serif;
+                line-height: 1;
+            }
+            
+            .score-label {
+                font-size: 13px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .score-verdict {
+                font-size: 16px;
+                font-weight: 700;
+                color: ${primaryColor};
+                margin-top: 5px;
+            }
+
+            /* Progress Bars */
+            .metric-item {
+                margin-bottom: 15px;
+            }
+
+            .metric-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #475569;
+            }
+
+            .progress-track {
+                height: 8px;
+                background: #e2e8f0;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: ${accentColor};
+                border-radius: 4px;
+            }
+
+            /* Tags */
+            .tag-cloud {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .tag {
+                padding: 6px 12px;
+                background: white;
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                color: #475569;
+            }
+            
+            .footer {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                text-align: center;
+                padding: 20px;
+                font-size: 11px;
+                color: #94a3b8;
+                border-top: 1px solid #f1f5f9;
+                background: white;
+            }
+
+        </style>
+
+        <div class="page-container">
+            <header class="header">
+                <div class="brand-row">
+                    <div class="brand-logo">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                           <rect width="24" height="24" rx="6" fill="white"/>
+                           <path d="M7 12L10.5 15.5L17 8.5" stroke="${primaryColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        OPTIMA<span>CV</span>
+                    </div>
+                    <div class="report-date">${date}</div>
+                </div>
+                <div class="title-row">
+                    <h1>${jobTitle}</h1>
+                    ${company ? `<h2>${company}</h2>` : ''}
+                </div>
+            </header>
+
+            <div class="content-grid">
+                <!-- Main Column -->
+                <main class="main-column">
+                    <!-- Executive Summary -->
+                    <div class="ai-summary-box">
+                        <div class="ai-icon">✨</div>
+                        <h3 class="section-title" style="margin-top:0; font-size: 14px; margin-bottom: 12px;">Executive Summary</h3>
+                        <div class="summary-text">
+                            ${summary}
+                        </div>
+                    </div>
+
+                    <!-- Strengths -->
+                    <div style="margin-bottom: 40px;">
+                        <h3 class="section-title">Key Strengths</h3>
+                        ${strengths.slice(0, 5).map(strength => `
+                            <div class="list-item">
+                                <div class="list-icon icon-check">✓</div>
+                                <div class="list-content">${strength}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Improvements -->
+                    <div>
+                        <h3 class="section-title">Critical Improvements</h3>
+                        ${hasDetailed ?
+            (detailedImprovements as any[]).slice(0, 4).map(imp => `
+                                <div class="list-item">
+                                    <div class="list-icon icon-alert">!</div>
+                                    <div class="list-content">
+                                        <strong>${imp.section || 'General'}</strong>
+                                        ${imp.issue}. <br/>
+                                        <span style="color: ${accentColor}">Fix: ${imp.fix}</span>
+                                    </div>
+                                </div>
+                            `).join('')
+            :
+            (simpleImprovements as string[]).slice(0, 5).map(imp => `
+                                <div class="list-item">
+                                    <div class="list-icon icon-alert">!</div>
+                                    <div class="list-content">${imp}</div>
+                                </div>
+                            `).join('')
+        }
+                    </div>
+                </main>
+
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <!-- Score Card -->
+                    <div class="score-card">
+                        <div class="score-circle">
+                            <span class="score-value">${score}</span>
+                        </div>
+                        <div class="score-verdict" style="color: ${scoreColor}">${config.label}</div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 5px;">Overall Match Score</div>
+                    </div>
+
+                    <!-- Metrics / Breakdown -->
+                    ${Object.keys(scoreBreakdown).length > 0 ? `
+                        <div style="margin-bottom: 40px;">
+                            <h3 class="section-title">Analysis Metrics</h3>
+                            ${Object.entries(scoreBreakdown).map(([key, val]) => `
+                                <div class="metric-item">
+                                    <div class="metric-header">
+                                        <span>${key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</span>
+                                        <span>${val}%</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div class="progress-fill" style="width: ${val}%"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    <!-- Stats / Details -->
+                     <div style="margin-bottom: 40px;">
+                        <h3 class="section-title">Details</h3>
+                        <table style="width: 100%; font-size: 13px; color: #475569; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding-bottom: 8px;">Analysis ID</td>
+                                <td style="text-align: right; font-family: monospace; padding-bottom: 8px;">#${result.job_title ? result.job_title.substring(0, 6).toUpperCase() : 'CV-ANA'}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-bottom: 8px;">Format</td>
+                                <td style="text-align: right; padding-bottom: 8px;">PDF/Auto</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- ATS Keywords -->
+                    ${atsKeywords.length > 0 ? `
+                        <div>
+                            <h3 class="section-title">Missing Keywords</h3>
+                            <div class="tag-cloud">
+                                ${atsKeywords.slice(0, 10).map(kw => `<span class="tag">${kw}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                </aside>
             </div>
+
+            <footer class="footer">
+                Generated by OptimaCV • The #1 AI-Powered Resume Optimizer
+            </footer>
         </div>
+    </div>
     `;
 };
 
@@ -182,7 +582,8 @@ export async function generatePdf({ htmlContent, filename, onStatusChange }: Gen
         sanitizeContainerStyles(container);
 
         // Stage 2.5: Remove classes NOW that styles are baked to avoid issues
-        container.querySelectorAll('*').forEach(el => el.removeAttribute('class'));
+        // Commenting this out to preserve classes for internal styles to match
+        // container.querySelectorAll('*').forEach(el => el.removeAttribute('class'));
 
         onStatusChange?.('rendering');
 
@@ -198,11 +599,11 @@ export async function generatePdf({ htmlContent, filename, onStatusChange }: Gen
             // Since we baked all styles into inline attributes, we don't need the external CSS.
             // This prevents html2canvas from parsing Tailwind's oklch() colors in the stylesheet.
             onclone: (clonedDoc) => {
-                const styles = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
+                const styles = clonedDoc.querySelectorAll('style:not(#report-styles), link[rel="stylesheet"]');
                 styles.forEach(style => style.remove());
 
                 // Also ensure the cloned body uses standard font in case it was on the body tag
-                clonedDoc.body.style.fontFamily = 'Arial, sans-serif';
+                clonedDoc.body.style.fontFamily = 'Inter, sans-serif';
             }
         });
 
