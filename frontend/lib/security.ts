@@ -1,11 +1,52 @@
 /**
  * Security utilities for input sanitization and validation
  * Prevents XSS, SQL Injection, and other common vulnerabilities
+ * 
+ * PROPOSED SERVER-SIDE RATE LIMIT ARCHITECTURE:
+ * 
+ * Since client-side checks can be bypassed, a middleware-based approach on the Python Backend (FastAPI) is recommended.
+ * 
+ * Architecture:
+ * 1. Store: Use Redis (or Memcached) as a fast, in-memory store for tracking request counts per IP/User.
+ * 2. Key Generation: Keys should be `rate_limit:{user_id_or_ip}:{endpoint_path}:{time_window}`.
+ * 3. Middleware: Create a FastAPIMiddleware that intercepts requests before they reach endpoints.
+ *    - Check if key exists and count > LIMIT.
+ *    - If exceeded, return HTTP 429 Too Many Requests immediately.
+ *    - If not, increment count and set expiry (TTL) for the time window.
+ * 4. Configuration: Allow configurable limits per endpoint (e.g., /analysis: 5 req/min, /profile: 50 req/min).
+ * 
+ * Implementation Example (Python/FastAPI):
+ * ```python
+ * from fastapi import Request, HTTPException
+ * import redis
+ * 
+ * r = redis.Redis(...)
+ * 
+ * async def rate_limit_middleware(request: Request, call_next):
+ *     client_ip = request.client.host
+ *     key = f"rate_limit:{client_ip}:1min"
+ *     current = r.get(key)
+ *     
+ *     if current and int(current) > 50:
+ *         return JSONResponse(status_code=429, content={"error": "Too many requests"})
+ *         
+ *     pipe = r.pipeline()
+ *     pipe.incr(key)
+ *     pipe.expire(key, 60)
+ *     pipe.execute()
+ *     
+ *     return await call_next(request)
+ * ```
  */
 
 /**
  * Sanitize HTML input to prevent XSS attacks
  * Removes potentially dangerous HTML tags and attributes
+ * 
+ * Confirmed usage in:
+ * - AnalysisResults.tsx (CV Summaries)
+ * - DashboardPage.tsx (Recent Activity)
+ * - InterviewFeedback.tsx (Feedback Notes)
  */
 export function sanitizeHtml(input: string): string {
     if (!input) return '';
