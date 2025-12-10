@@ -444,7 +444,8 @@
             "totalAnalyses": "Analyses totales",
             "remainingAnalyses": "Restantes",
             "noAnalysis": "N/A",
-            "lastAnalysis": "Dernière analyse"
+            "lastAnalysis": "Dernière analyse",
+            "performanceTrend": "Tendance de Performance"
         },
         "history": {
             "empty": {
@@ -471,7 +472,8 @@
             "history": "Historique",
             "dashboard": "Tableau de bord",
             "interview": "Entretien",
-            "interviewHistory": "Historique des Entretiens"
+            "interviewHistory": "Historique des Entretiens",
+            "analytics": "Analytique"
         },
         "settings": {
             "subtitle": "Gérez vos préférences",
