@@ -55,16 +55,23 @@ export async function processBatchAnalysis(params: {
             });
 
             // Process and store results
-            const batchResults = response.ranked_results.map((result: any, index: number) => ({
-                match_score: result.analysis.match_score ?? 0,
-                summary: result.analysis.summary ?? "",
-                strengths: result.analysis.strengths ?? [],
-                weaknesses: result.analysis.weaknesses ?? [],
-                filename: result.filename,
-                contact_info: result.analysis.contact_info,
-                detailed_analysis: result.analysis.detailed_analysis || {},
-                batch: batchIndex + 1
-            }));
+            const batchResults = response.ranked_results.map((result: any, index: number) => {
+                const recruiter = result.recruiter_analysis;
+                const legacy = result.analysis;
+
+                return {
+                    match_score: recruiter ? recruiter.match_percentage : (legacy?.match_score ?? 0),
+                    summary: recruiter ? recruiter.executive_summary : (legacy?.summary ?? ""),
+                    strengths: recruiter ? recruiter.key_strengths : (legacy?.strengths ?? []),
+                    weaknesses: recruiter ?
+                        recruiter.gaps_and_red_flags?.map((g: any) => `${g.severity}: ${g.issue}`) || []
+                        : (legacy?.weaknesses ?? []),
+                    filename: result.filename,
+                    contact_info: recruiter?.contact_info || legacy?.contact_info,
+                    detailed_analysis: recruiter || legacy?.detailed_analysis || {},
+                    batch: batchIndex + 1
+                };
+            });
 
             allResults.push(...batchResults);
             processedCount += files.length;
@@ -133,15 +140,23 @@ export async function processSingleBatch(params: {
         });
 
         // Process results
-        const batchResults = response.ranked_results.map((result: any) => ({
-            match_score: result.analysis.match_score ?? 0,
-            summary: result.analysis.summary ?? "",
-            strengths: result.analysis.strengths ?? [],
-            weaknesses: result.analysis.weaknesses ?? [],
-            filename: result.filename,
-            contact_info: result.analysis.contact_info,
-            detailed_analysis: result.analysis.detailed_analysis || {}
-        }));
+        // Process results
+        const batchResults = response.ranked_results.map((result: any) => {
+            const recruiter = result.recruiter_analysis;
+            const legacy = result.analysis;
+
+            return {
+                match_score: recruiter ? recruiter.match_percentage : (legacy?.match_score ?? 0),
+                summary: recruiter ? recruiter.executive_summary : (legacy?.summary ?? ""),
+                strengths: recruiter ? recruiter.key_strengths : (legacy?.strengths ?? []),
+                weaknesses: recruiter ?
+                    recruiter.gaps_and_red_flags?.map((g: any) => `${g.severity}: ${g.issue}`) || []
+                    : (legacy?.weaknesses ?? []),
+                filename: result.filename,
+                contact_info: recruiter?.contact_info || legacy?.contact_info,
+                detailed_analysis: recruiter || legacy?.detailed_analysis || {}
+            };
+        });
 
         return {
             success: true,
