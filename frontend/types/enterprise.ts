@@ -48,7 +48,15 @@ export interface EnterpriseAnalysisResult {
         hard_skills?: Array<{ skill: string; match: string; comment: string }>;
         soft_skills?: Array<{ skill: string; match: string; comment: string }>;
         experience?: Array<{ requirement: string; match: string; comment: string }>;
+        // Co-exists with recruiter analysis fields or we can merge
     };
+    recruiter_analysis?: {
+        hiring_recommendation?: string;
+        fit_analysis?: any;
+        gaps_and_red_flags?: any[];
+        suggested_interview_questions?: any[];
+    };
+
     rank: number;
     created_at: string;
     // Joined data
