@@ -420,7 +420,8 @@
             "remainingAnalyses": "المتبقي",
             "averageScore": "المتوسط",
             "lastAnalysis": "آخر تحليل",
-            "noAnalysis": "غير متوفر"
+            "noAnalysis": "غير متوفر",
+            "performanceTrend": "اتجاه الأداء"
         },
         "recentAnalyses": {
             "title": "التحليلات الأخيرة",
