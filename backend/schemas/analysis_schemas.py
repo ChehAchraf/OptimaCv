@@ -86,15 +86,65 @@ class VisualAnalysisResponse(BaseModel):
     analysis_type: str = "Visual Analysis"
     feedback: VisualFeedback
 
+# Coach API Schemas
+class CriticalImprovement(BaseModel):
+    section: str
+    issue: str
+    fix: str
+
+class ScoreBreakdown(BaseModel):
+    impact: int
+    brevity: int
+    style: int
+    structure: int
+
+class CVCoachAnalysis(BaseModel):
+    overall_score: int
+    score_breakdown: ScoreBreakdown
+    summary_feedback: str
+    key_strengths: List[str]
+    critical_improvements: List[CriticalImprovement]
+    ats_keywords_missing: List[str]
+    job_title_detected: Optional[str] = None
+
 class FullAnalysisResponse(BaseModel):
     filename_pdf: str
     filename_image: Optional[str] = None
-    analysis_vs_jd: CVvsJDAnalysis
+    analysis_vs_jd: Optional[CVvsJDAnalysis] = None 
+    cv_coach_analysis: Optional[CVCoachAnalysis] = None
     visual_analysis: Optional[VisualFeedback] = None
+
+# Recruiter API Schemas (B2B)
+class RecruiterGap(BaseModel):
+    severity: str 
+    issue: str
+    detail: str
+
+class RecruiterQuestion(BaseModel):
+    focus_area: str
+    question: str
+
+class RecruiterFitAnalysis(BaseModel):
+    technical_skills_match: int
+    experience_relevance: int
+    cultural_culture_fit: int
+    education_requirements: str
+
+class RecruiterAnalysis(BaseModel):
+    contact_info: Optional[ContactInfoSchema] = None
+    match_percentage: int
+    hiring_recommendation: str
+    executive_summary: str
+    fit_analysis: RecruiterFitAnalysis
+    key_strengths: List[str]
+    gaps_and_red_flags: List[RecruiterGap]
+    missing_critical_skills: List[str]
+    suggested_interview_questions: List[RecruiterQuestion]
 
 class RankedAnalysisItem(BaseModel):
     filename: str
-    analysis: CVvsJDAnalysis
+    analysis: Optional[CVvsJDAnalysis] = None
+    recruiter_analysis: Optional[RecruiterAnalysis] = None # Added field
 
 class FullRankingResponse(BaseModel):
     total_processed: int
