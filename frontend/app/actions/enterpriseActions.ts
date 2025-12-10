@@ -120,7 +120,13 @@ export async function createMultipleEnterpriseCVs(
 /**
  * Upload CVs to Supabase Storage and save metadata
  */
-export async function uploadEnterpriseCVs(formData: FormData): Promise<EnterpriseCV[]> {
+/**
+ * Upload CVs to Supabase Storage and save metadata
+ */
+export async function uploadEnterpriseCVs(formData: FormData): Promise<{
+    success: string[];
+    failed: { file_name: string; error: string }[];
+}> {
     const user = await checkUserAccess();
     const supabase = await createClient();
 
@@ -130,62 +136,73 @@ export async function uploadEnterpriseCVs(formData: FormData): Promise<Enterpris
         throw new Error("No files provided");
     }
 
-    const uploadedCVs: EnterpriseCV[] = [];
+    const result = {
+        success: [] as string[],
+        failed: [] as { file_name: string; error: string }[]
+    };
 
     for (const file of files) {
-        // Generate unique file path
-        const timestamp = Date.now();
-        const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-        const filePath = `${user.id}/${timestamp}-${safeName}`;
+        try {
+            // Generate unique file path
+            const timestamp = Date.now();
+            const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+            const filePath = `${user.id}/${timestamp}-${safeName}`;
 
-        // Get file content as ArrayBuffer
-        const arrayBuffer = await file.arrayBuffer();
-        const fileBuffer = new Uint8Array(arrayBuffer);
+            // Get file content as ArrayBuffer
+            const arrayBuffer = await file.arrayBuffer();
+            const fileBuffer = new Uint8Array(arrayBuffer);
 
-        // Upload to Supabase Storage
-        const { error: uploadError } = await supabase.storage
-            .from("enterprise-cvs")
-            .upload(filePath, fileBuffer, {
-                contentType: "application/pdf",
-                upsert: false
-            });
+            // Upload to Supabase Storage
+            const { error: uploadError } = await supabase.storage
+                .from("enterprise-cvs")
+                .upload(filePath, fileBuffer, {
+                    contentType: "application/pdf",
+                    upsert: false
+                });
 
-        if (uploadError) {
-            console.error("Error uploading file:", uploadError);
-            // Continue with other files even if one fails
-            continue;
+            if (uploadError) {
+                console.error(`Error uploading file ${file.name}:`, uploadError);
+                result.failed.push({ file_name: file.name, error: "Upload failed" });
+                continue;
+            }
+
+            // Save CV metadata to database
+            const { data, error: dbError } = await supabase
+                .from("enterprise_cvs")
+                .insert({
+                    user_id: user.id,
+                    file_name: file.name,
+                    file_path: filePath,
+                    file_size: file.size,
+                    mime_type: "application/pdf",
+                    status: "pending"
+                })
+                .select()
+                .single();
+
+            if (dbError) {
+                console.error(`Error saving metadata for ${file.name}:`, dbError);
+                // Cleanup
+                await supabase.storage.from("enterprise-cvs").remove([filePath]);
+                result.failed.push({ file_name: file.name, error: "Database error" });
+                continue;
+            }
+
+            result.success.push(data.id);
+
+        } catch (error: any) {
+            console.error(`Unexpected error for ${file.name}:`, error);
+            result.failed.push({ file_name: file.name, error: error.message || "Unknown error" });
         }
-
-        // Save CV metadata to database
-        const { data, error: dbError } = await supabase
-            .from("enterprise_cvs")
-            .insert({
-                user_id: user.id,
-                file_name: file.name,
-                file_path: filePath,
-                file_size: file.size,
-                mime_type: "application/pdf",
-                status: "pending"
-            })
-            .select()
-            .single();
-
-        if (dbError) {
-            console.error("Error saving CV metadata:", dbError);
-            // Try to delete the uploaded file
-            await supabase.storage.from("enterprise-cvs").remove([filePath]);
-            continue;
-        }
-
-        uploadedCVs.push(data);
     }
 
-    if (uploadedCVs.length === 0) {
-        throw new Error("Failed to upload any CVs");
+    if (result.success.length === 0 && result.failed.length > 0) {
+        // If all failed, throw an error to alert the user clearly
+        throw new Error(`Failed to upload any CVs. Errors: ${result.failed.map(f => f.file_name).join(', ')}`);
     }
 
     revalidateTag("enterprise-cvs", {});
-    return uploadedCVs;
+    return result;
 }
 
 /**
@@ -536,7 +553,7 @@ export async function saveEnterpriseAnalysisResults(
 
     if (resultsError) {
         console.error("Error saving analysis results:", resultsError);
-        throw new Error("Failed to save results");
+        throw new Error(`Failed to save results: ${resultsError.message || resultsError.details || "Database insertion failed"}`);
     }
 
     const { error: updateError } = await supabase
@@ -597,7 +614,7 @@ export async function saveDirectAnalysisResults(payload: {
 
     if (error) {
         console.error("Error saving direct analysis:", error);
-        throw new Error("Failed to save analysis history");
+        throw new Error(`Failed to save analysis history: ${error.message || error.details || "Database error"}`);
     }
 
     const resultsToInsert = [];
@@ -636,11 +653,13 @@ export async function saveDirectAnalysisResults(payload: {
             resultsToInsert.push({
                 analysis_id: analysis.id,
                 cv_id: cvId,
-                match_score: res.match_score,
-                summary: res.summary,
-                strengths: res.strengths,
-                weaknesses: res.weaknesses,
-                detailed_analysis: res.detailed_analysis,
+                match_score: res.recruiter_analysis ? res.recruiter_analysis.match_percentage : res.match_score,
+                summary: res.recruiter_analysis ? res.recruiter_analysis.executive_summary : res.summary,
+                strengths: res.recruiter_analysis ? res.recruiter_analysis.key_strengths : res.strengths,
+                weaknesses: res.recruiter_analysis ?
+                    res.recruiter_analysis.gaps_and_red_flags?.map((g: any) => `${g.severity}: ${g.issue}`) :
+                    res.weaknesses,
+                detailed_analysis: res.recruiter_analysis || res.detailed_analysis,
                 rank: res.rank
             });
         }

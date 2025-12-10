@@ -206,9 +206,8 @@ export const cvPayloadSchema = z.object({
         }),
     job_description: z
         .string()
-        .min(50, 'Job description should be at least 50 characters')
-        .max(5000, 'Job description must be less than 5000 characters')
-        .trim(),
+        .optional()
+        .or(z.literal('')),
     cv_image: z
         .instanceof(File)
         .refine((file) => file.size <= 10 * 1024 * 1024, {

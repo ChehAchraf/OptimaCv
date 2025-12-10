@@ -62,6 +62,133 @@ const VisualFeedbackDisplay = ({ feedback }: { feedback: any }) => {
 export function AnalysisResults({ result }: AnalysisResultsProps) {
     const t = useTranslations('CVAnalyze');
 
+    // Check for new Coach Analysis format
+    const coach = result.cv_coach_analysis;
+
+    // Fallback to legacy format
+    const legacy = result.analysis_vs_jd || result.analysis;
+
+    if (coach) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-8"
+            >
+                {/* Overall Score & Job Title */}
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+                    <div className="p-6 sm:p-8 border-b border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 className="text-2xl font-bold flex items-center gap-3">
+                                {t('results.title')}
+                            </h3>
+                            {coach.job_title_detected && (
+                                <p className="text-gray-500 dark:text-gray-400 mt-1">
+                                    Target Role: <span className="font-medium text-gray-900 dark:text-gray-200">{coach.job_title_detected}</span>
+                                </p>
+                            )}
+                        </div>
+                        <div className={`px-4 py-2 rounded-xl text-lg font-bold ${coach.overall_score >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                            coach.overall_score >= 60 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                            }`}>
+                            {t('results.matchScore', { score: coach.overall_score })}
+                        </div>
+                    </div>
+
+                    <div className="p-6 sm:p-8 space-y-8">
+                        {/* Summary Feedback */}
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-100 dark:border-blue-900/50">
+                            <h4 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">Executive Summary</h4>
+                            <p className="text-blue-800 dark:text-blue-200 leading-relaxed text-lg">
+                                {coach.summary_feedback}
+                            </p>
+                        </div>
+
+                        {/* Score Breakdown Grid */}
+                        <div>
+                            <h4 className="font-semibold text-lg mb-4">Score Breakdown</h4>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {Object.entries(coach.score_breakdown).map(([key, value]) => (
+                                    <div key={key} className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl text-center border border-gray-100 dark:border-gray-800">
+                                        <div className="text-sm text-gray-500 dark:text-gray-400 capitalize mb-2">{key}</div>
+                                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value as number}%</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Strengths */}
+                            <div>
+                                <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-green-600 dark:text-green-400">
+                                    <HiCheckCircle className="h-5 w-5" />
+                                    {t('results.strengths')}
+                                </h5>
+                                <ul className="space-y-3">
+                                    {coach.key_strengths.map((s: string, i: number) => (
+                                        <li key={i} className="flex items-start gap-3 bg-green-50 dark:bg-green-900/10 p-3 rounded-lg border border-green-100 dark:border-green-900/30">
+                                            <HiCheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                                            <span className="text-sm text-gray-700 dark:text-gray-300">{s}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Critical Improvements aka Weaknesses */}
+                            <div>
+                                <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-red-600 dark:text-red-400">
+                                    <HiExclamation className="h-5 w-5" />
+                                    Critical Improvements
+                                </h5>
+                                <div className="space-y-3">
+                                    {coach.critical_improvements.map((imp: any, i: number) => (
+                                        <div key={i} className="bg-red-50 dark:bg-red-900/10 p-3 rounded-lg border border-red-100 dark:border-red-900/30">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className="text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-2 py-1 rounded">
+                                                    {imp.section}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
+                                                {imp.issue}
+                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 italic flex items-center gap-1">
+                                                <span className="font-semibold">Fix:</span> {imp.fix}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ATS Keywords Missing */}
+                        {coach.ats_keywords_missing && coach.ats_keywords_missing.length > 0 && (
+                            <div>
+                                <h5 className="font-semibold text-lg mb-4 flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                                    <HiDocumentText className="h-5 w-5" />
+                                    Missing Keywords (ATS)
+                                </h5>
+                                <div className="flex flex-wrap gap-2">
+                                    {coach.ats_keywords_missing.map((keyword: string, i: number) => (
+                                        <span key={i} className="px-3 py-1 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 rounded-full text-sm border border-orange-100 dark:border-orange-900/30">
+                                            {keyword}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {result.visual_analysis && (
+                    <VisualFeedbackDisplay feedback={result.visual_analysis} />
+                )}
+            </motion.div>
+        );
+    }
+
+    if (!legacy) return null;
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -72,11 +199,11 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
                 <div className="p-6 sm:p-8 border-b border-gray-200 dark:border-gray-800">
                     <h3 className="text-2xl font-bold flex items-center gap-3">
                         {t('results.title')}
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${result.analysis_vs_jd.match_score >= 70 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                            result.analysis_vs_jd.match_score >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${legacy.match_score >= 70 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                            legacy.match_score >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
                                 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                             } `}>
-                            {t('results.matchScore', { score: result.analysis_vs_jd.match_score })}
+                            {t('results.matchScore', { score: legacy.match_score })}
                         </span>
                     </h3>
                 </div>
@@ -89,7 +216,7 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
                                 {t('results.strengths')}
                             </h5>
                             <ul className="space-y-2">
-                                {result.analysis_vs_jd.strengths.map((s: string, i: number) => (
+                                {legacy.strengths.map((s: string, i: number) => (
                                     <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
                                         <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
                                         {s}
@@ -104,7 +231,7 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
                                 {t('results.weaknesses')}
                             </h5>
                             <ul className="space-y-2">
-                                {result.analysis_vs_jd.weaknesses.map((w: string, i: number) => (
+                                {legacy.weaknesses.map((w: string, i: number) => (
                                     <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
                                         <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-red-500 flex-shrink-0" />
                                         {w}
@@ -126,7 +253,7 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
                                     Hard Skills
                                 </h6>
                                 <div className="grid grid-cols-1 gap-3">
-                                    {result.analysis_vs_jd.detailed_analysis.hard_skills.map((skill: any, i: number) => (
+                                    {legacy.detailed_analysis?.hard_skills.map((skill: any, i: number) => (
                                         <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
                                             <div className="flex justify-between items-start mb-1">
                                                 <span className="font-medium text-gray-900 dark:text-gray-100">{skill.skill}</span>
@@ -152,7 +279,7 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
                                     Soft Skills
                                 </h6>
                                 <div className="grid grid-cols-1 gap-3">
-                                    {result.analysis_vs_jd.detailed_analysis.soft_skills.map((skill: any, i: number) => (
+                                    {legacy.detailed_analysis?.soft_skills.map((skill: any, i: number) => (
                                         <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
                                             <div className="flex justify-between items-start mb-1">
                                                 <span className="font-medium text-gray-900 dark:text-gray-100">{skill.skill}</span>
@@ -178,7 +305,7 @@ export function AnalysisResults({ result }: AnalysisResultsProps) {
                                     Experience
                                 </h6>
                                 <div className="grid grid-cols-1 gap-3">
-                                    {result.analysis_vs_jd.detailed_analysis.experience.map((exp: any, i: number) => (
+                                    {legacy.detailed_analysis?.experience.map((exp: any, i: number) => (
                                         <div key={i} className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-800">
                                             <div className="flex justify-between items-start mb-1">
                                                 <span className="font-medium text-gray-900 dark:text-gray-100">{exp.requirement}</span>

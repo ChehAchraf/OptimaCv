@@ -49,16 +49,27 @@ export default function HistoryPage() {
             setAnalyses(
                 (data || []).map((a: any) => {
                     const result = typeof a.result === 'string' ? JSON.parse(a.result) : a.result || {};
+
+                    let score = 0;
+                    if (result.analysis_vs_jd?.match_score !== undefined) {
+                        score = result.analysis_vs_jd.match_score;
+                    } else if (result.match_score !== undefined) {
+                        score = result.match_score;
+                    } else if (result.overall_score !== undefined) {
+                        score = result.overall_score;
+                    } else if (result.recruiter_analysis?.match_percentage !== undefined) {
+                        score = result.recruiter_analysis.match_percentage;
+                    }
+
                     return {
                         id: a.id,
                         created_at: a.created_at,
                         job_title: result.job_title || a.cv_name || 'Untitled CV',
                         company_name: result.company_name,
-                        overall_score: result.analysis_vs_jd?.match_score || 0,
+                        overall_score: score,
                         status: 'completed' as const,
-                        top_strengths: result.strengths?.slice(0, 3) || [],
-                        top_improvements: result.improvements?.slice(0, 3) || [],
-                        
+                        top_strengths: (result.strengths || result.analysis_vs_jd?.strengths || []).slice(0, 3),
+                        top_improvements: (result.improvements || result.analysis_vs_jd?.weaknesses || []).slice(0, 3),
                     };
                 })
             );

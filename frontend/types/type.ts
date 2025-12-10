@@ -3,8 +3,34 @@ import { LucideIcon } from "lucide-react";
 
 export interface AnalysisResult {
     filename: string;
-    analysis: Analysis
+    filename_pdf?: string;
+    filename_image?: string;
+    analysis?: Analysis;
+    recruiter_analysis?: RecruiterAnalysis; // Added
+    analysis_vs_jd?: Analysis; // Backward compatibility
+    cv_coach_analysis?: CVCoachAnalysis;
+    visual_analysis?: any;
 };
+
+export interface CVCoachAnalysis {
+    overall_score: number;
+    score_breakdown: {
+        impact: number;
+        brevity: number;
+        style: number;
+        structure: number;
+    };
+    summary_feedback: string;
+    key_strengths: string[];
+    critical_improvements: {
+        section: string;
+        issue: string;
+        fix: string;
+    }[];
+    ats_keywords_missing: string[];
+    job_title_detected: string | null;
+}
+
 
 export interface Analysis {
     contact_info: ContactInfo;
@@ -14,6 +40,36 @@ export interface Analysis {
     weaknesses: string[];
     detailed_analysis: DetailedAnalysis;
 }
+
+export interface RecruiterAnalysis {
+    contact_info?: {
+        name: string;
+        email: string;
+        phone: string;
+        location?: string;
+    };
+    match_percentage: number;
+    hiring_recommendation: "Strong Hire" | "Interview" | "Backup" | "Reject";
+    executive_summary: string;
+    fit_analysis: {
+        technical_skills_match: number;
+        experience_relevance: number;
+        cultural_culture_fit: number;
+        education_requirements: "Met" | "Not Met" | "Exceeded";
+    };
+    key_strengths: string[];
+    gaps_and_red_flags: {
+        severity: "High" | "Medium" | "Low";
+        issue: string;
+        detail: string;
+    }[];
+    missing_critical_skills: string[];
+    suggested_interview_questions: {
+        focus_area: string;
+        question: string;
+    }[];
+}
+
 
 export interface DetailedAnalysis {
     hard_skills: SkillAnalysis[];

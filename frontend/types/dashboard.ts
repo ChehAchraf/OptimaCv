@@ -2,18 +2,50 @@ import { LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 
 export interface AnalysisResult {
-    job_title: string;
+    job_title?: string;
     company_name?: string;
-    analysis_vs_jd: {
+
+    // Structure 1: Analysis vs JD
+    analysis_vs_jd?: {
         weaknesses: string[];
         match_score: number;
         summary: string;
         strengths: string[];
         improvements: string[];
     };
-    strengths: string[];
-    weaknesses: string[];
-    improvements: string[];
+
+    // Structure 2: CV Coach
+    cv_coach_analysis?: {
+        overall_score: number;
+        key_strengths: string[];
+        areas_for_improvement: string[];
+        summary?: string;
+        summary_feedback?: string;
+        score_breakdown?: Record<string, number>;
+        critical_improvements?: any[];
+        job_title_detected?: string;
+        ats_keywords_missing?: string[];
+    };
+
+    // Structure 3: Recruiter
+    recruiter_analysis?: {
+        match_percentage: number;
+    };
+
+    // Common/Fallback direct fields
+    strengths?: string[];
+    weaknesses?: string[];
+    improvements?: string[];
+    match_score?: number;
+    overall_score?: number;
+    summary?: string;
+
+    visual_analysis?: {
+        layout_score: number;
+        overall_professionalism: string;
+        layout_notes: string;
+        font_choice_notes: string;
+    };
 }
 
 export interface CVAnalysis {

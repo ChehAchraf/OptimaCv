@@ -43,7 +43,7 @@ async function performAnalysis(payload: CVPayload) {
     try {
         const formData = new FormData();
         formData.append('cv_pdf', payload.cv_pdf);
-        formData.append('job_description', payload.job_description);
+        formData.append('job_description', payload.job_description || '');
 
         if (payload.cv_image) {
             formData.append('cv_image', payload.cv_image);

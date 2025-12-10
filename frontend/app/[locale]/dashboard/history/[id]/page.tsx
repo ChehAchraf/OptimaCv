@@ -3,14 +3,12 @@
 import { PageLoader } from '@/components/loading';
 import { motion } from 'framer-motion';
 
-import { useEffect, useState, Fragment, JSX, use } from 'react';
+import { useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
-import { createClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
 import clsx from 'clsx';
 import { Link } from '@/i18n/routing';
-// Imports removed (dynamic now)
 import {
     ArrowLeft,
     Calendar,
@@ -21,12 +19,16 @@ import {
     Award,
     Share2,
     Download,
-    AlertCircle
+    AlertCircle,
+    Target,
+    Layout,
+    Type
 } from 'lucide-react';
 
-import { AnalysisResult, CVAnalysis } from '@/types/dashboard';
-
-
+import { AnalysisResult } from '@/types/dashboard';
+import { useExportPdf } from '@/hooks/use-export-pdf';
+import { useAnalysis } from '@/hooks/use-analysis';
+import { Loader2 } from 'lucide-react';
 
 const SCORE_STYLES = {
     excellent: {
@@ -108,14 +110,23 @@ const colorVariants = {
         bgLight: 'bg-blue-100',
         bgDarkLight: 'dark:bg-blue-900/30',
     },
+    purple: {
+        text: 'text-purple-500',
+        bg: 'bg-purple-50',
+        bgDark: 'dark:bg-purple-900/20',
+        textMain: 'text-purple-600',
+        textDark: 'dark:text-purple-400',
+        border: 'border-purple-200',
+        borderDark: 'dark:border-purple-800',
+        bgLight: 'bg-purple-100',
+        bgDarkLight: 'dark:bg-purple-900/30',
+    },
 } as const;
-
-
 
 function ScoreCircle({ score, color }: { score: number; color: keyof typeof colorVariants }) {
     const styles = colorVariants[color];
     return (
-        <div className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+        <div className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-700/50 h-full">
             <div className="relative h-40 w-40 flex items-center justify-center">
                 <svg className="h-full w-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle
@@ -158,17 +169,19 @@ function SectionCard({
     icon,
     title,
     children,
-    color
+    color,
+    className
 }: {
-    icon: JSX.Element;
+    icon: React.ReactNode;
     title: string;
     children: React.ReactNode;
     color: keyof typeof colorVariants;
+    className?: string;
 }) {
     const styles = colorVariants[color];
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className={clsx("bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm", className)}>
             <div className="flex items-center gap-3 mb-6">
                 <div
                     className={clsx(
@@ -207,7 +220,7 @@ function BulletList({ items, color }: { items: string[]; color: keyof typeof col
                 >
                     <div
                         className={clsx(
-                            'mt-1 h-5 w-5 rounded-full flex items-center justify-center',
+                            'mt-1 h-5 w-5 rounded-full flex items-center justify-center flex-shrink-0',
                             styles.bgLight,
                             styles.bgDarkLight,
                             styles.textMain,
@@ -216,7 +229,7 @@ function BulletList({ items, color }: { items: string[]; color: keyof typeof col
                     >
                         <CheckCircle2 className="h-3.5 w-3.5" />
                     </div>
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">
+                    <span className="text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
                         {item}
                     </span>
                 </div>
@@ -225,160 +238,113 @@ function BulletList({ items, color }: { items: string[]; color: keyof typeof col
     );
 }
 
-export const dynamic = 'force-dynamic';
+function ImprovementList({ items }: { items: any[] }) {
+    const styles = colorVariants.rose;
 
-const getReportHTML = (result: AnalysisResult, score: number, config: { label: string; color: string }, date: string) => {
-    return `
-        <div style="font-family: Arial, sans-serif; padding: 40px; color: #000; background: #fff; width: 210mm; box-sizing: border-box;">
-            <div style="border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px;">
-                <h1 style="margin: 0; font-size: 28px; color: #111;">Analysis Report</h1>
-                <p style="color: #666; margin: 5px 0 0; font-size: 14px;">Generated on ${date}</p>
-            </div>
-
-            <div style="margin-bottom: 30px;">
-                <h2 style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px;">Overview</h2>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: bold; width: 150px; color: #555;">Job Title:</td>
-                        <td style="padding: 8px 0; color: #000;">${result.job_title || 'N/A'}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: bold; color: #555;">Company:</td>
-                        <td style="padding: 8px 0; color: #000;">${result.company_name || 'N/A'}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; font-weight: bold; color: #555;">Match Score:</td>
-                        <td style="padding: 8px 0;">
-                            <span style="display: inline-block; padding: 4px 12px; border-radius: 4px; background-color: ${score >= 70 ? '#d1fae5' : score >= 60 ? '#fef3c7' : '#ffe4e6'}; color: ${score >= 70 ? '#065f46' : score >= 60 ? '#92400e' : '#9f1239'}; font-weight: bold;">
-                                ${score}/100 - ${config.label}
+    return (
+        <div className="grid gap-4">
+            {items.map((item, i) => (
+                <div
+                    key={i}
+                    className={clsx(
+                        'flex items-start gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border transition-colors',
+                        'border-gray-100 dark:border-gray-700',
+                        `hover:${styles.border}`,
+                        `hover:${styles.borderDark}`
+                    )}
+                >
+                    <div
+                        className={clsx(
+                            'mt-1 h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0',
+                            styles.bgLight,
+                            styles.bgDarkLight,
+                            styles.textMain,
+                            styles.textDark
+                        )}
+                    >
+                        <AlertCircle className="h-4 w-4" />
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-100 dark:bg-rose-900/40 px-2 py-0.5 rounded">
+                                {item.section}
                             </span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-            ${result.analysis_vs_jd?.summary ? `
-            <div style="margin-bottom: 30px;">
-                <h3 style="font-size: 16px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #333; margin-bottom: 12px;">Executive Summary</h3>
-                <p style="line-height: 1.6; font-size: 14px; color: #444; margin: 0;">
-                    ${result.analysis_vs_jd.summary}
-                </p>
-            </div>
-            ` : ''}
-
-            <div style="margin-bottom: 30px;">
-                <h3 style="font-size: 16px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #333; margin-bottom: 12px;">Key Strengths</h3>
-                <ul style="margin: 0; padding-left: 20px;">
-                    ${(result.strengths || result.analysis_vs_jd?.strengths || []).slice(0, 5).map(item =>
-        `<li style="margin-bottom: 8px; font-size: 14px; color: #444;">${item}</li>`
-    ).join('')}
-                </ul>
-            </div>
-
-            <div style="margin-bottom: 30px;">
-                <h3 style="font-size: 16px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; color: #333; margin-bottom: 12px;">Areas for Improvement</h3>
-                <ul style="margin: 0; padding-left: 20px;">
-                    ${(result.improvements || result.analysis_vs_jd?.improvements || []).slice(0, 5).map(item =>
-        `<li style="margin-bottom: 8px; font-size: 14px; color: #444;">${item}</li>`
-    ).join('')}
-                </ul>
-            </div>
-            
-            <div style="margin-top: 50px; font-size: 12px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
-                Powered by OptimaCV
-            </div>
+                            <p className="text-gray-900 dark:text-white font-semibold">
+                                {item.issue}
+                            </p>
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                            <span className="font-medium text-rose-600 dark:text-rose-400 mr-1">Fix:</span>
+                            {item.fix}
+                        </p>
+                    </div>
+                </div>
+            ))}
         </div>
-    `;
-};
+    );
+}
+
+function ScoreBreakdownGrid({ breakdown }: { breakdown: Record<string, number> }) {
+    return (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            {Object.entries(breakdown).map(([key, value]) => (
+                <div key={key} className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl text-center border border-gray-100 dark:border-gray-700">
+                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{key.replace(/_/g, ' ')}</div>
+                    <div className={clsx(
+                        "text-2xl font-black",
+                        value >= 70 ? "text-emerald-500" : value >= 50 ? "text-amber-500" : "text-rose-500"
+                    )}>
+                        {value}%
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+export const dynamic = 'force-dynamic';
 
 export default function AnalysisDetailPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
     const { locale, id } = use(params);
     const router = useRouter();
     const t = useTranslations('Dashboard');
 
-    const [analysis, setAnalysis] = useState<CVAnalysis | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { data: analysis, isLoading, error } = useAnalysis(id);
 
     useEffect(() => {
-        if (!id) return;
-
-        const fetchData = async () => {
-            try {
-                const supabase = createClient();
-
-                const { data, error } = await supabase
-                    .from('ai_cv_results')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-
-                if (error) throw error;
-
-                const parsed =
-                    typeof data.result === 'string'
-                        ? JSON.parse(data.result)
-                        : data.result;
-
-                setAnalysis({ ...data, result: parsed });
-            } catch (err) {
-                router.push('/dashboard/history');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [id, router]);
+        if (error) {
+            router.push('/dashboard/history');
+        }
+    }, [error, router]);
 
 
-    const handleExportPDF = async () => {
-        // Dynamically import heavy libraries only when needed
-        const html2canvas = (await import('html2canvas')).default;
-        const { jsPDF } = await import('jspdf');
+    const { mutate: exportPdf, isPending: isExporting, variables: exportVariables, statusLabel } = useExportPdf();
 
-        const htmlContent = getReportHTML(
+    const handleExport = (actionType: 'export' | 'share') => {
+        if (!analysis) return;
+
+        const result = analysis.result as AnalysisResult;
+
+        const score =
+            result.cv_coach_analysis?.overall_score ||
+            result.analysis_vs_jd?.match_score ||
+            result.match_score ||
+            result.overall_score ||
+            0;
+
+        const config = getScoreConfig(score);
+
+        exportPdf({
             result,
             score,
             config,
-            new Date().toLocaleDateString(locale, { dateStyle: 'long' })
-        );
-        const container = document.createElement('div');
-        container.innerHTML = htmlContent;
-
-        container.querySelectorAll('*').forEach(el => el.removeAttribute('class'));
-
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.top = '0';
-        document.body.appendChild(container);
-
-        try {
-            const canvas = await html2canvas(container.firstElementChild as HTMLElement, {
-                scale: 2,
-                backgroundColor: "#ffffff",
-                useCORS: true,
-                logging: false
-            });
-
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("p", "mm", "a4");
-
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-            pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-            pdf.save(`${result.job_title || "analysis"}.pdf`);
-        } catch (error) {
-            console.error("PDF generation failed:", error);
-            alert("Failed to generate PDF. Please try again.");
-        } finally {
-            document.body.removeChild(container);
-        }
+            date: new Date().toLocaleDateString(locale, { dateStyle: 'long' }),
+            filename: result.job_title || "analysis",
+            actionType
+        });
     };
 
-
-
-    if (loading)
+    if (isLoading)
         return (
             <DashboardLayout>
                 <PageLoader />
@@ -403,8 +369,39 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
         );
 
     const result = analysis.result as AnalysisResult;
-    const score = result.analysis_vs_jd?.match_score || 0;
+
+    // Robust Score Extraction
+    const score =
+        result.cv_coach_analysis?.overall_score ||
+        result.analysis_vs_jd?.match_score ||
+        result.match_score ||
+        result.overall_score ||
+        0;
+
     const config = getScoreConfig(score);
+
+    // Data Extraction
+    const strengths = result.cv_coach_analysis?.key_strengths || result.analysis_vs_jd?.strengths || result.strengths || [];
+
+    // For improvements, prefer detailed objects if available, otherwise string list
+    const hasDetailedImprovements = result.cv_coach_analysis?.critical_improvements && result.cv_coach_analysis.critical_improvements.length > 0;
+    const improvements = result.cv_coach_analysis?.critical_improvements ||
+        result.cv_coach_analysis?.areas_for_improvement ||
+        result.analysis_vs_jd?.improvements ||
+        result.improvements ||
+        [];
+
+    // Fallback weaknesses (string only)
+    const weaknesses = result.weaknesses || result.analysis_vs_jd?.weaknesses || [];
+
+    const summary = result.cv_coach_analysis?.summary_feedback ||
+        result.cv_coach_analysis?.summary ||
+        result.analysis_vs_jd?.summary ||
+        (typeof result.summary === 'string' ? result.summary : null);
+
+    const scoreBreakdown = result.cv_coach_analysis?.score_breakdown;
+    const atsKeywords = result.cv_coach_analysis?.ats_keywords_missing;
+    const visualStats = result.visual_analysis; // Assuming this might exist on result based on previous code
 
     return (
         <DashboardLayout>
@@ -413,8 +410,6 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
                 animate={{ opacity: 1, y: 0 }}
                 className="max-w-7xl mx-auto p-6 space-y-8"
             >
-
-                {/* NAV */}
                 <nav className="text-sm text-gray-500 flex items-center">
                     <Link href="/dashboard" className="hover:text-gray-900">Dashboard</Link>
                     <span className="mx-2">/</span>
@@ -425,12 +420,12 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
                     </span>
                 </nav>
 
-                {/* HERO */}
+                {/* HEADER CARD */}
                 <div className="relative bg-white dark:bg-gray-800 border rounded-3xl p-10 shadow-sm">
-                    <div className={clsx('absolute top-0 left-0 h-2 w-full', config.color === 'emerald' && 'bg-emerald-500', config.color === 'amber' && 'bg-amber-500', config.color === 'rose' && 'bg-rose-500')} />
+                    <div className={clsx('absolute top-0 left-0 h-2 w-full rounded-t-3xl', config.color === 'emerald' && 'bg-emerald-500', config.color === 'amber' && 'bg-amber-500', config.color === 'rose' && 'bg-rose-500')} />
 
-                    <div className="flex flex-col lg:flex-row justify-between gap-8">
-                        <div className="flex-1 space-y-6">
+                    <div className="flex flex-col lg:flex-row justify-between gap-8 h-full">
+                        <div className="flex-1 space-y-6 flex flex-col justify-center">
                             <div>
                                 <span
                                     className={clsx(
@@ -450,7 +445,7 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
                                     })}
                                 </div>
 
-                                <h1 className="text-4xl font-extrabold mt-3">
+                                <h1 className="text-4xl font-extrabold mt-3 text-gray-900 dark:text-white">
                                     {result.job_title || analysis.cv_name}
                                 </h1>
 
@@ -462,43 +457,70 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
                                 )}
                             </div>
 
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 pt-2">
                                 <button
-                                    onClick={() => handleExportPDF()}
-                                    className="inline-flex items-center px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium hover:opacity-90 transition-all shadow-lg shadow-gray-200 dark:shadow-none"
+                                    onClick={() => handleExport('export')}
+                                    disabled={isExporting}
+                                    className="inline-flex items-center px-6 py-3 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium hover:opacity-90 transition-all shadow-lg shadow-gray-200 dark:shadow-none disabled:opacity-70 disabled:cursor-not-allowed justify-center"
                                 >
-                                    <Download className="h-4 w-4 mr-2" /> Export Report
+                                    {isExporting && exportVariables?.actionType === 'export' ? (
+                                        <>
+                                            <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                            {statusLabel}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Download className="h-5 w-5 mr-2" />
+                                            Export Report
+                                        </>
+                                    )}
                                 </button>
 
                                 <button
-                                    onClick={async () => {
-                                        await handleExportPDF();
-                                        window.open('https://www.linkedin.com/feed/', '_blank');
-                                        alert("PDF Downloaded! Please upload it to your LinkedIn post.");
-                                    }}
-                                    className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-white border border-gray-200 dark:border-gray-600 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-all"
+                                    onClick={() => handleExport('share')}
+                                    disabled={isExporting}
+                                    className="inline-flex items-center px-6 py-3 rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-white border border-gray-200 dark:border-gray-600 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-all disabled:opacity-70 disabled:cursor-not-allowed justify-center"
                                 >
-                                    <Share2 className="h-4 w-4 mr-2" /> Share on LinkedIn
+                                    {isExporting && exportVariables?.actionType === 'share' ? (
+                                        <>
+                                            <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                            {statusLabel}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Share2 className="h-5 w-5 mr-2" />
+                                            Share
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
 
-                        <ScoreCircle score={score} color={config.color} />
+                        <div className="flex-shrink-0">
+                            <ScoreCircle score={score} color={config.color} />
+                        </div>
                     </div>
+
+                    {/* Score Breakdown if available */}
+                    {scoreBreakdown && (
+                        <div className="mt-8 pt-8 border-t border-gray-100 dark:border-gray-700">
+                            <ScoreBreakdownGrid breakdown={scoreBreakdown} />
+                        </div>
+                    )}
                 </div>
 
-                {/* GRID */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 no-advanced-colors" id="export-section">
+                {/* MAIN GRID */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
 
-                        {result.analysis_vs_jd?.summary && (
+                        {summary && (
                             <SectionCard
                                 icon={<Briefcase />}
                                 title="Executive Summary"
                                 color="blue"
                             >
                                 <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-                                    {result.analysis_vs_jd.summary}
+                                    {summary}
                                 </p>
                             </SectionCard>
                         )}
@@ -510,78 +532,143 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ local
                         >
                             <BulletList
                                 color="emerald"
-                                items={result.strengths || result.analysis_vs_jd?.strengths || []}
+                                items={strengths}
                             />
                         </SectionCard>
 
+                        {/* Critical Improvements (Detailed) or Ordinary Improvements (Simple) */}
                         <SectionCard
                             icon={<TrendingUp />}
-                            title="Areas for Improvement"
-                            color="amber"
+                            title={hasDetailedImprovements ? "Critical Improvements" : "Areas for Improvement"}
+                            color="rose"
                         >
-                            <BulletList
-                                color="amber"
-                                items={result.improvements || result.analysis_vs_jd?.improvements || []}
-                            />
+                            {hasDetailedImprovements ? (
+                                <ImprovementList items={improvements as any[]} />
+                            ) : (
+                                <BulletList
+                                    color="rose"
+                                    items={improvements as string[]}
+                                />
+                            )}
                         </SectionCard>
 
-                        {(result.weaknesses || result.analysis_vs_jd?.weaknesses) && (
+                        {/* Weaknesses (Legacy) */}
+                        {(!hasDetailedImprovements && weaknesses.length > 0) && (
                             <SectionCard
                                 icon={<AlertCircle />}
                                 title="Weaknesses"
-                                color="rose"
+                                color="amber"
                             >
                                 <BulletList
-                                    color="rose"
-                                    items={result.weaknesses || result.analysis_vs_jd?.weaknesses || []}
+                                    color="amber"
+                                    items={weaknesses}
                                 />
                             </SectionCard>
                         )}
+
+                        {/* ATS Keywords */}
+                        {atsKeywords && atsKeywords.length > 0 && (
+                            <SectionCard
+                                icon={<Target />}
+                                title="Missing ATS Keywords"
+                                color="amber"
+                            >
+                                <div className="flex flex-wrap gap-2">
+                                    {atsKeywords.map((keyword, i) => (
+                                        <span key={i} className="px-3 py-1.5 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-lg text-sm font-medium border border-amber-100 dark:border-amber-800">
+                                            {keyword}
+                                        </span>
+                                    ))}
+                                </div>
+                                <p className="mt-4 text-sm text-gray-500">
+                                    Adding these keywords can help your CV pass automated Applicant Tracking Systems (ATS).
+                                </p>
+                            </SectionCard>
+                        )}
+
+                        {/* Visual Analysis */}
+                        {visualStats && (
+                            <SectionCard
+                                icon={<Layout />}
+                                title="Visual Presentation"
+                                color="purple"
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-purple-50 dark:bg-purple-900/20 p-5 rounded-2xl border border-purple-100 dark:border-purple-800">
+                                        <div className="text-sm text-purple-600 dark:text-purple-300 font-semibold mb-1">Layout Score</div>
+                                        <div className="text-3xl font-bold text-purple-700 dark:text-purple-200">{visualStats.layout_score}/10</div>
+                                        <div className="mt-2 text-sm text-purple-800 dark:text-purple-100">{visualStats.overall_professionalism}</div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <div className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                                <Layout className="h-4 w-4 text-gray-500" />
+                                                Layout Notes
+                                            </div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{visualStats.layout_notes}</p>
+                                        </div>
+                                        <div>
+                                            <div className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                                <Type className="h-4 w-4 text-gray-500" />
+                                                Font Choice
+                                            </div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{visualStats.font_choice_notes}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </SectionCard>
+                        )}
+
                     </div>
 
                     {/* SIDEBAR */}
                     <div className="space-y-6">
-                        <SectionCard icon={<Download />} title="Quick Actions" color="gray">
+                        <SectionCard icon={<Download />} title="Menu" color="gray" className="lg:sticky lg:top-6">
                             <div className="space-y-3">
-                                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white">
-                                    Download PDF <Download className="h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                <button
+                                    onClick={() => handleExport('export')}
+                                    disabled={isExporting}
+                                    className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white disabled:opacity-50"
+                                >
+                                    Download PDF
+                                    {isExporting && exportVariables?.actionType === 'export' ? (
+                                        <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
+                                    ) : (
+                                        <Download className="h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                    )}
                                 </button>
-                                <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white">
-                                    Share Analysis <Share2 className="h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                <button
+                                    onClick={() => handleExport('share')}
+                                    disabled={isExporting}
+                                    className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white disabled:opacity-50"
+                                >
+                                    Share Analysis
+                                    {isExporting && exportVariables?.actionType === 'share' ? (
+                                        <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
+                                    ) : (
+                                        <Share2 className="h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                    )}
                                 </button>
                             </div>
-                        </SectionCard>
 
-                        <SectionCard icon={<Award />} title="Details" color="gray">
-                            <div className="space-y-4 text-gray-700 dark:text-gray-300">
-                                <p>
+                            <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 space-y-4">
+                                <div>
                                     <span className="text-xs font-semibold uppercase text-gray-500">
-                                        Created
+                                        Analysis ID
                                     </span>
-                                    <br />
-                                    {new Date(analysis.created_at).toLocaleDateString(locale, {
-                                        dateStyle: 'full'
-                                    })}
-                                </p>
-
-                                <p>
+                                    <div className="font-mono text-xs opacity-70 mt-1 truncate" title={analysis.id}>
+                                        {analysis.id}
+                                    </div>
+                                </div>
+                                <div>
                                     <span className="text-xs font-semibold uppercase text-gray-500">
                                         Status
                                     </span>
-                                    <br />
-                                    <span className="flex items-center gap-2">
-                                        <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                                        Completed
-                                    </span>
-                                </p>
-
-                                <p>
-                                    <span className="text-xs font-semibold uppercase text-gray-500">
-                                        ID
-                                    </span>
-                                    <br />
-                                    <span className="font-mono text-xs opacity-70">{analysis.id}</span>
-                                </p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Completed</span>
+                                    </div>
+                                </div>
                             </div>
                         </SectionCard>
                     </div>

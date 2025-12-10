@@ -138,10 +138,146 @@ class GeminiService:
             return {}
 
 
-    async def analyze_cv_vs_jd(self, cv_text: str, jd_text: str) -> dict:
+    async def analyze_cv_with_coach(self, cv_text: str, jd_text: str = None) -> dict:
+        context_part = f"CV CONTENT:\n---\n{cv_text}\n---"
+        if jd_text:
+            context_part += f"\n\nJOB DESCRIPTION:\n---\n{jd_text}\n---"
 
+        prompt = f"""
+        **Role:** You are an expert AI Resume Analyst and Career Coach with 20 years of experience in HR and recruitment.
+
+        **Objective:** Analyze the user's CV content and provide structured, actionable, and empathetic feedback to improve their chances of getting hired.
+
+        **Strict Output Rules:**
+        1.  You must respond ONLY in a valid **JSON format**.
+        2.  Do not include any text, markdown, or explanations outside the JSON block.
+        3.  The tone must be professional, encouraging, and constructive (User Experience focus).
+        4.  Language: Detect the language of the CV (English or French) and respond in the SAME language.
+
+        **JSON Schema Structure:**
+        {{
+          "overall_score": (integer 0-100),
+          "score_breakdown": {{
+            "impact": (integer 0-100),
+            "brevity": (integer 0-100),
+            "style": (integer 0-100),
+            "structure": (integer 0-100)
+          }},
+          "summary_feedback": "A short, 2-sentence empathetic summary of the CV.",
+          "key_strengths": ["string", "string", "string"],
+          "critical_improvements": [
+            {{
+              "section": "e.g., Experience",
+              "issue": "e.g., Lack of quantifiable metrics",
+              "fix": "e.g., Use numbers like 'increased sales by 20%'"
+            }}
+          ],
+          "ats_keywords_missing": ["string", "string", "string"],
+          "job_title_detected": "string or null"
+        }}
+
+        {context_part}
+        """
+
+        try:
+            response = await self._generate_content_with_retry(self.model_pro, prompt)
+        except RetryError:
+            print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (Coach) ⚠️ ---")
+            try:
+                response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            except RetryError:
+                 raise ValueError("Service temporarily unavailable: AI Model Quota Exceeded. Please try again later.")
+
+        print("--- 💡 RAW GEMINI (Coach) RESPONSE 💡 ---")
+        cleaned_text = self._clean_json_response(response.text)
         
+        try:
+            return json.loads(cleaned_text)
+        except json.JSONDecodeError:
+            print(f"--- 🔴 ERROR: Failed to parse cleaned Coach JSON: {cleaned_text} 🔴 ---")
+            return {}
 
+
+    async def analyze_cv_for_recruiter(self, cv_text: str, jd_text: str) -> dict:
+        prompt = f"""
+        **Role:** You are a Senior Technical Recruiter and Talent Acquisition Specialist for a top-tier tech company.
+
+        **Objective:** Evaluate a candidate's CV against a provided Job Description (JD) to determine their suitability for the role.
+
+        **Strict Output Rules:**
+        1.  You must respond ONLY in a valid **JSON format**.
+        2.  Do not include any text, markdown, or explanations outside the JSON block.
+        3.  The tone must be objective, analytical, and decisional (Recruiter focus).
+        4.  Language: Output strictly in English (standard business language for internal HR reports).
+
+        **JSON Schema Structure:**
+        {{
+          "contact_info": {{
+            "name": "string",
+            "email": "string",
+            "phone": "string",
+            "location": "string"
+          }},
+          "match_percentage": (integer 0-100),
+          "hiring_recommendation": "Strong Hire" | "Interview" | "Backup" | "Reject",
+          "executive_summary": "A 2-sentence objective summary of the candidate's fit for the hiring manager.",
+          "fit_analysis": {{
+            "technical_skills_match": (integer 0-100),
+            "experience_relevance": (integer 0-100),
+            "cultural_culture_fit": (integer 0-100),
+            "education_requirements": "Met" | "Not Met" | "Exceeded"
+          }},
+          "key_strengths": ["string", "string", "string"],
+          "gaps_and_red_flags": [
+            {{
+              "severity": "High" | "Medium" | "Low",
+              "issue": "e.g., Employment gap of 2 years",
+              "detail": "e.g., Unexplained gap between 2021 and 2023"
+            }}
+          ],
+          "missing_critical_skills": ["string", "string"],
+          "suggested_interview_questions": [
+            {{
+              "focus_area": "e.g., React Performance",
+              "question": "e.g., I see you used React, but the project scale isn't clear. How did you handle re-renders in large lists?"
+            }},
+             {{
+              "focus_area": "string",
+              "question": "string"
+            }}
+          ]
+        }}
+
+        CV CONTENT:
+        ---
+        {cv_text}
+        ---
+
+        JOB DESCRIPTION:
+        ---
+        {jd_text}
+        ---
+        """
+
+        try:
+            response = await self._generate_content_with_retry(self.model_pro, prompt)
+        except RetryError:
+            print("--- ⚠️ WARNING: Primary model exhausted. Switching to Fallback (Recruiter) ⚠️ ---")
+            try:
+                response = await self._generate_content_with_retry(self.model_fallback, prompt)
+            except RetryError:
+                 raise ValueError("Service temporarily unavailable: AI Model Quota Exceeded. Please try again later.")
+
+        print("--- 💡 RAW GEMINI (Recruiter) RESPONSE 💡 ---")
+        cleaned_text = self._clean_json_response(response.text)
+        
+        try:
+            return json.loads(cleaned_text)
+        except json.JSONDecodeError:
+            print(f"--- 🔴 ERROR: Failed to parse cleaned Recruiter JSON: {cleaned_text} 🔴 ---")
+            return {}
+
+    async def analyze_cv_vs_jd(self, cv_text: str, jd_text: str) -> dict:
         prompt_in_english = f"""
         You are an expert ATS (Applicant Tracking System) analyzer and a professional career coach.
         Your task is to analyze the given CV text and compare it against the provided Job Description.

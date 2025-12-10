@@ -666,7 +666,8 @@
             "totalAnalyses": "Total Analyses",
             "remainingAnalyses": "Remaining",
             "noAnalysis": "N/A",
-            "lastAnalysis": "Last Analysis"
+            "lastAnalysis": "Last Analysis",
+            "performanceTrend": "Performance Trend"
         },
         "history": {
             "empty": {
